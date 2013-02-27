@@ -53,7 +53,6 @@ Public gReprintFile_Type As String         'used to help determine replacement o
 Public Planning As CPlanningMethods
 Public PlanningList As CColPlanningInfo
 Public ProductionGroup As CProdGroup
-' kbg 2006-036 added
 Public gApplicationUser As ClintrakCommon.ApplicationUser
 
 Public gShowQuarantineTagFlag As Boolean        'used to determine which tags get blanked out on form
@@ -61,7 +60,6 @@ Public gReOrientFlag As Boolean
 
 Public ClientReqdFields As CColClientReqdFields
 
-' kbg 2008-009 added
 Public Const CNODELIMITER As String = "?"
 Public Const BLANK_RPT As String = "BLANK"
 Public gRandBarcode As String
@@ -280,13 +278,13 @@ Public Function PadLeftString( _
   PadLeftString = Right$(String$(intStrLength, Left$(strPadChar, 1)) & _
     strIn, intStrLength)
   
-PROC_EXIT:
+Proc_EXIT:
   Exit Function
   
 PROC_ERR:
   MsgBox "Error: " & Err.Number & ". " & Err.description, , _
     "PadLeftString"
-  Resume PROC_EXIT
+  Resume Proc_EXIT
   
 End Function
 Public Function CheckNulls(Teststr As String) As String
@@ -357,19 +355,16 @@ Public Sub GetRandIDNumber()
     On Error GoTo Error_this_Sub
 
     gRandIDNumber = ""
-    ' kbg 2008-009
     gRandBarcode = ""
     
     If madoData Is Nothing Then
         Set madoData = New CADOData
         With madoData
-            ' DW 2010-002 added
             Set .Connection = GetDBConnection
         End With
     End If
 
     With madoData
-        ' DW 2010-002 added
         Set .Connection = GetDBConnection
         .CursorType = adOpenForwardOnly
         .CommandType = adCmdStoredProc
@@ -476,13 +471,13 @@ Public Function GetFileNameFromFilePath(strFilePath As String) As String
   ' Return the value
   GetFileNameFromFilePath = strTmp
   
-PROC_EXIT:
+Proc_EXIT:
   Exit Function
   
 PROC_ERR:
   MsgBox "Error: " & Err.Number & ". " & Err.description, , _
     "GetFileNameFromFilePath"
-  Resume PROC_EXIT
+  Resume Proc_EXIT
  
 End Function
 
@@ -553,13 +548,13 @@ Public Sub RecordSetToSSDBComboBox( _
     
   End With
 
-PROC_EXIT:
+Proc_EXIT:
   Exit Sub
 
 PROC_ERR:
   MsgBox "Error: " & Err.Number & ". " & Err.description, , _
     "RecordSetToSSDBComboBox"
-  Resume PROC_EXIT
+  Resume Proc_EXIT
 
 End Sub
 
@@ -605,13 +600,13 @@ Line Input #lngSourceFile, vdata
 ' Close file
 Close lngSourceFile
 
-PROC_EXIT:
+Proc_EXIT:
     Exit Sub
   
 PROC_ERR:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Read File"
-    Resume PROC_EXIT
+    Resume Proc_EXIT
 
 End Sub
 
@@ -644,17 +639,16 @@ Public Function CountDelimitedWords( _
   ' Return the value
   CountDelimitedWords = intWordCount
   
-PROC_EXIT:
+Proc_EXIT:
   Exit Function
   
 PROC_ERR:
   MsgBox "Error: " & Err.Number & ". " & Err.description, , _
     "CountDelimitedWords"
-  Resume PROC_EXIT
+  Resume Proc_EXIT
 
 End Function
 
-' kbg 2008-009 added param to add BLANK or not
 Public Function GetDelimitedFirstLine( _
   strIn As String, _
   intIndex As Integer, _
@@ -681,7 +675,7 @@ Public Function GetDelimitedFirstLine( _
   count = CountDelimitedWords(strIn, chrDelimit)
     If count < intIndex Then
         GetDelimitedFirstLine = ""
-            GoTo PROC_EXIT
+            GoTo Proc_EXIT
     End If
 
   ' Set initial values
@@ -703,18 +697,18 @@ Public Function GetDelimitedFirstLine( _
   
   ' Pull the word out and return it
   GetDelimitedFirstLine = Mid$(strIn, intStartPos, intEndPos - intStartPos + 1)
-    ' kbg 2008-009 changed to return "BLANK" if blank
+    ' return "BLANK" if blank
     If InsertBLANK = True Then
         GetDelimitedFirstLine = IIf(GetDelimitedFirstLine = "", BLANK_RPT, GetDelimitedFirstLine)
     End If
   
-PROC_EXIT:
+Proc_EXIT:
   Exit Function
   
 PROC_ERR:
   MsgBox "Error: " & Err.Number & ". " & Err.description, , _
     "GetDelimitedFirstLine"
-  Resume PROC_EXIT
+  Resume Proc_EXIT
 
 End Function
 
@@ -756,13 +750,13 @@ Public Function GetDelimitedWord( _
   ' Pull the word out and return it
   GetDelimitedWord = Mid$(strIn, intStartPos, intEndPos - intStartPos + 1)
   
-PROC_EXIT:
+Proc_EXIT:
   Exit Function
   
 PROC_ERR:
   MsgBox "Error: " & Err.Number & ". " & Err.description, , _
     "GetDelimitedWord"
-  Resume PROC_EXIT
+  Resume Proc_EXIT
 
 End Function
 
@@ -793,13 +787,13 @@ count = 1
     ' Close file
     Close lngSourceFile
 
-PROC_EXIT:
+Proc_EXIT:
     Exit Sub
   
 PROC_ERR:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Read Sample File"
-    Resume PROC_EXIT
+    Resume Proc_EXIT
     
 End Sub
 
@@ -823,13 +817,13 @@ Public Function GetFilePath(strPath As String) As String
   ' Return the value
   GetFilePath = Left$(strPath, intCounter - 1)
 
-PROC_EXIT:
+Proc_EXIT:
   Exit Function
   
 PROC_ERR:
   MsgBox "Error: " & Err.Number & ". " & Err.description, , _
     "GetFilePath"
-  Resume PROC_EXIT
+  Resume Proc_EXIT
   
 End Function
 Public Sub LoadShippingInfo(itemData As Long, ship As TextBox, attn As TextBox, add1 As TextBox, _
@@ -885,7 +879,6 @@ Public Function ParseEmptyData(dataItem As String)
  '
     ParseEmptyData = False
 
-    ' kbg 2008-009 added "BLANK" check
     If IsNull(dataItem) Or Trim$(dataItem) = "" Or Trim$(UCase$(dataItem)) = BLANK_RPT Then
         writeData = ""
     Else
@@ -1128,7 +1121,7 @@ Error_this_Sub:
     Resume Exit_this_Sub
 
 End Sub
-' kbg 2008-009 added booAllCodings param
+
 Public Sub LookUpSetToDuplicate(rand_id As Long, prod_id As Long, dData As CCOLdupFiles, booAllCodings As Boolean)
 '
 'comments:  This function looks up all production run id associated with a randomization id
@@ -1160,10 +1153,8 @@ On Error GoTo Error_this_Sub
         .ResetParameters
         .AddParameter "Randomization Id", rand_id, adInteger, adParamInput
         .AddParameter "Production Run Id", prod_id, adInteger, adParamInput
-        ' kbg 2008-009 added parm and change SP
         .AddParameter "All Codings", booAllCodings, adInteger, adParamInput
         
-'        .OpenRecordSetFromSP "get_Production_Id_Set"
         .OpenRecordSetFromSP "get_ProductionRunSet_NotProcessed"
         
         If Not .Recordset.EOF Then
@@ -1277,10 +1268,10 @@ deleteCount = sdata.count
             Set mData = New CCOLPDRFILES
             'md added code for clintrak samples
             If sdata.Item(j).sampleType = "CLINTRAK" Then
-                Call ReadProcess_File(dData.Item(i).fileName, _
+                Call ReadProcess_File(dData.Item(i).filename, _
                     sdata.Item(j).quantity, sdata.Item(j).sampleType)
             Else
-                Read_File (dData.Item(i).fileName)
+                Read_File (dData.Item(i).filename)
                 'duplicates for each sample type number
                 For k = 1 To sdata.Item(j).quantity
                     Call mData.Add(vdata, k, sdata.Item(j).sampleType)
@@ -1556,13 +1547,11 @@ dataCount = 0
     
 End Function
 
-' kbg 2008-009 removed JobId as long param b/c not used
 Public Sub LoadShipToCombo2Column(cboControl As SSDBCombo, Optional sColumnDisplay As String)
 '
 'comments: this function loads a combobox with the shipping addresses associated with the
 '          production run job log id.
-'parameters:    JobId - Job Log Id to identify available shipping addresses
-'               cboControl - combobox which to populate data
+'parameters:    cboControl - combobox which to populate data
 '               sColumnDisplay - name of the column in rstIn to display
 '               in the combo box
 'returns:        nothing
@@ -1638,13 +1627,13 @@ End If
 ' Close file
 Close lngSourceFile
 
-PROC_EXIT:
+Proc_EXIT:
     Exit Sub
   
 PROC_ERR:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "ReadProcess File"
-    Resume PROC_EXIT
+    Resume Proc_EXIT
 
 End Sub
 
@@ -1683,13 +1672,13 @@ On Error GoTo PROC_ERR
     End With
    
    
-PROC_EXIT:
+Proc_EXIT:
     Exit Function
   
 PROC_ERR:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Error Getting Lookup Description"
-    Resume PROC_EXIT
+    Resume Proc_EXIT
 
 End Function
 
@@ -1815,7 +1804,7 @@ Private Function GetClintrakRecordCnts(sdata As CCOLsmpFiles, dData As CCOLdupFi
             If Not .Recordset.EOF Then
               If OrigSmplRequested > .Recordset!Qty_Requested Then
                 GetClintrakRecordCnts = True
-                GoTo PROC_EXIT
+                GoTo Proc_EXIT
               Else
                 .Recordset.Close
               End If
@@ -1826,13 +1815,13 @@ Private Function GetClintrakRecordCnts(sdata As CCOLsmpFiles, dData As CCOLdupFi
         End With
     Next i
        
-PROC_EXIT:
+Proc_EXIT:
     Exit Function
   
 PROC_ERR:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Error Getting Clintrak Record Counts"
-    Resume PROC_EXIT
+    Resume Proc_EXIT
 
 End Function
 
@@ -1942,7 +1931,6 @@ Error_this_Sub:
     
 End Sub
 
-' kbg 2008-009 added in place of old control's method
 Public Sub LoadSmpTypeCombo(sLookupType As String, cboControl As SSDBCombo, Optional sColumnDisplay As String)
     
     If Trim$(sColumnDisplay) = "" Or IsNull(sColumnDisplay) Then sColumnDisplay = "Value"
@@ -1978,7 +1966,6 @@ Public Sub LoadSmpTypeCombo(sLookupType As String, cboControl As SSDBCombo, Opti
 
 End Sub
 
-' kbg 2008-009
 Public Sub DuplicateFilesCopyMods(sdata As CCOLsmpFiles, dData As CCOLdupFiles)
 '
 'comments: This function uses the sdata collection as a template and duplicates all sample
@@ -2020,7 +2007,7 @@ deleteCount = sdata.count
 
 'goes through all the production files
     For i = 1 To dupcount
-        Read_File (dData.Item(i).fileName)
+        Read_File (dData.Item(i).filename)
         strCodingData = vdata
         arrCodingData = Split(strCodingData, gRandDelimiter)
         If UBound(arrCodingData) - gCodingRepeatCnt + 1 <= 0 Then
@@ -2035,7 +2022,7 @@ deleteCount = sdata.count
             Set mData = New CCOLPDRFILES
             'md added code for clintrak samples
             If sdata.Item(j).sampleType = "CLINTRAK" Then
-                Call ReadProcess_File(dData.Item(i).fileName, _
+                Call ReadProcess_File(dData.Item(i).filename, _
                     sdata.Item(j).quantity, sdata.Item(j).sampleType)
             Else
                 Read_File (sdata.Item(j).smpfileName)
@@ -2088,7 +2075,6 @@ Error_this_Sub:
 
 End Sub
 
-' kbg 2008-009 moved from modVBFileDisk
 Public Function DirExists(strDir As String) As Boolean
   ' Comments  : Determines if the named directory exists
   ' Parameters: strDir - Directory to check
@@ -2099,17 +2085,16 @@ Public Function DirExists(strDir As String) As Boolean
 
   DirExists = Len(Dir$(strDir & "\.", vbDirectory)) > 0
   
-PROC_EXIT:
+Proc_EXIT:
   Exit Function
   
 PROC_ERR:
   MsgBox "Error: " & Err.Number & ". " & Err.description, , _
     "DirExists"
-  Resume PROC_EXIT
+  Resume Proc_EXIT
   
 End Function
 
-' kbg 2008-009 moved from modVBFileDisk
 Public Function FileExists(strDest As String) As Boolean
   ' Comments  : Determines if the named file exists
   ' Parameters: strDest - File to check
@@ -2127,17 +2112,16 @@ Public Function FileExists(strDest As String) As Boolean
     FileExists = False
   End If
 
-PROC_EXIT:
+Proc_EXIT:
   Exit Function
   
 PROC_ERR:
   MsgBox "Error: " & Err.Number & ". " & Err.description, , _
     "FileExists"
-  Resume PROC_EXIT
+  Resume Proc_EXIT
   
 End Function
 
-' kbg 2008-009 moved from frmProdPlan
 Public Function Determine_If_PDR_HasRun() As Boolean
 '
 'md new for clintrak samples
@@ -2194,7 +2178,6 @@ Error_this_Sub:
 
 End Function
 
-' kbg 2008-009 added
 Public Sub LoadBarcodeInfo(ProductionRunId As Long)
     Dim oValue As CBarcodeInfo
     
@@ -2247,7 +2230,6 @@ Error_this_Sub:
     
 End Sub
 
-' kbg 2008-009 added SamplesFlag param and moved here from frmProdPlan
 Public Function DeterminePDROnPKS(Optional SamplesFlag As String = " ") As Boolean
     On Error GoTo Error_this_Sub
     
@@ -2269,7 +2251,6 @@ Public Function DeterminePDROnPKS(Optional SamplesFlag As String = " ") As Boole
         .CursorType = adOpenForwardOnly
                     
         .AddParameter "Production Run ID", ProductionRun.Production_Run_Id, adInteger, adParamInput
-        ' kbg 2008-009 added samples flag param
         .AddParameter "Samples Flag", SamplesFlag, adVarChar, adParamInput
         
         .OpenRecordSetFromSP "get_PackingSlip_By_ProductionRunId"
@@ -2352,14 +2333,14 @@ Next i
 ' Close file
 Close lngSourceFile
 
-PROC_EXIT:
+Proc_EXIT:
     Exit Sub
 
 PROC_ERR:
 
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "ReadProcessFileKeepMod"
-    Resume PROC_EXIT
+    Resume Proc_EXIT
 
 End Sub
 
@@ -2424,4 +2405,82 @@ Handle_Error:
     Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 End Sub
+
+Public Function GetNumberLinesInFile(filename As String) As Long
+    Dim lngSourceFile As Long
+    Dim strData As String
+    
+    On Error GoTo Handle_Error
+
+    GetNumberLinesInFile = 0
+    
+    ' Open the source file
+    lngSourceFile = FreeFile
+    Open filename For Input Access Read As lngSourceFile
+   
+    Do Until EOF(lngSourceFile)
+        Line Input #lngSourceFile, strData
+        
+        GetNumberLinesInFile = GetNumberLinesInFile + 1
+    Loop
+        
+    ' Close file
+    Close lngSourceFile
+    
+Cleanup_Exit:
+    Exit Function
+Handle_Error:
+    Err.Raise Err.Number, Err.Source, Err.description
+    Resume Cleanup_Exit
+
+End Function
+
+Public Function GetLineOfData(filename As String, LineNumber As Long) As String
+'
+'comments:  reads the specified line of data in the specified file
+'parameters:    FileName - path of file to read
+'               LineNumber - the number of the line of data to retrieve
+'returns: String of data from the specified line in the file
+
+    Dim lngSourceFile As Long
+    Dim lngLineCount As Long
+    Dim strHoldData As String
+
+    On Error GoTo PROC_ERR
+    
+    GetLineOfData = ""
+    lngLineCount = 1
+    
+    ' Open the source file
+    lngSourceFile = FreeFile
+    Open filename For Input Access Read As lngSourceFile
+    Do Until lngLineCount > LineNumber Or EOF(lngSourceFile)
+        If lngLineCount = LineNumber Then
+            Line Input #lngSourceFile, GetLineOfData
+        Else
+            Line Input #lngSourceFile, strHoldData
+        End If
+        lngLineCount = lngLineCount + 1
+    Loop
+    
+    ' Close file
+    Close lngSourceFile
+
+    If GetLineOfData = "" Then
+        ' Open the source file
+        lngSourceFile = FreeFile
+        Open filename For Input Access Read As lngSourceFile
+        Line Input #lngSourceFile, GetLineOfData
+        Close lngSourceFile
+    End If
+
+Proc_EXIT:
+    Exit Function
+  
+PROC_ERR:
+    MsgBox "Error: " & Err.Number & ". " & Err.description, , _
+        "GetFileFirstList"
+    Resume Proc_EXIT
+
+End Function
 

@@ -33,15 +33,12 @@ Public Function Add(Field1 As String, count As Long, smptype As String, Optional
     'not being displayed correctly in the Grid on the sample config. screen
     
     If (booReplacement) And (smptype <> "CTK") Then
-        ' kbg 2008-009 added InsertBLANK param
        temp = GetDelimitedFirstLine(vdata, 1, gRandDelimiter, False)
-       ' kbg 2008-009 added InsertBLANK param
        objNewMember.Field1 = smptype & "-" & GetDelimitedFirstLine(temp, 3, "-", False)
     Else
         objNewMember.Field1 = smptype & "-" & count
     End If
    
-   ' kbg 2008-009 added InsertBLANK param
     objNewMember.Field2 = GetDelimitedFirstLine(vdata, 2, gRandDelimiter, True)
     objNewMember.Field3 = GetDelimitedFirstLine(vdata, 3, gRandDelimiter, True)
     objNewMember.Field4 = GetDelimitedFirstLine(vdata, 4, gRandDelimiter, True)
@@ -61,7 +58,6 @@ Public Function Add(Field1 As String, count As Long, smptype As String, Optional
     objNewMember.Field18 = GetDelimitedFirstLine(vdata, 18, gRandDelimiter, True)
     objNewMember.Field19 = GetDelimitedFirstLine(vdata, 19, gRandDelimiter, True)
     objNewMember.Field20 = GetDelimitedFirstLine(vdata, 20, gRandDelimiter, True)
-    ' DW increasing # of columns from 20 to 30 based on client supplied data
     objNewMember.Field21 = GetDelimitedFirstLine(vdata, 21, gRandDelimiter, True)
     objNewMember.Field22 = GetDelimitedFirstLine(vdata, 22, gRandDelimiter, True)
     objNewMember.Field23 = GetDelimitedFirstLine(vdata, 23, gRandDelimiter, True)

@@ -19,12 +19,28 @@ Begin VB.Form frmSmpConfig
       Strikethrough   =   0   'False
    EndProperty
    LinkTopic       =   "Form1"
-   LockControls    =   -1  'True
    MaxButton       =   0   'False
    MinButton       =   0   'False
    ScaleHeight     =   6675
    ScaleWidth      =   8415
    StartUpPosition =   2  'CenterScreen
+   Begin VB.CommandButton cmdAdd 
+      Caption         =   "Add New Type"
+      BeginProperty Font 
+         Name            =   "MS Sans Serif"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   375
+      Left            =   1320
+      TabIndex        =   41
+      Top             =   6120
+      Width           =   1335
+   End
    Begin VB.Frame Frame3 
       BackColor       =   &H00FFFFFF&
       BorderStyle     =   0  'None
@@ -597,7 +613,7 @@ Public oIRQInfo As CIRQInfo
 Dim jobShippingId As Long
 Dim comboSmp As String         'temp to test for change in sampletype combo
 Dim description As String      'temp to test for change in the Description
-Private mvarIssuedIRQ As Boolean
+Private mvarIRQsExist As Boolean
 Private mvarCombinedOrRun As Boolean
 Private intCodingColCount As Integer
 
@@ -615,8 +631,7 @@ Private Sub Form_Load()
     
     jgrdData.Columns.Clear
     
-    ' kbg 2008-009
-    mvarIssuedIRQ = False
+    mvarIRQsExist = False
     mvarCombinedOrRun = False
     intCodingColCount = 0
     strCodingFileHeaders = ProductionRun.Coding_File_Header
@@ -630,8 +645,7 @@ Private Sub Form_Load()
     ' Extract headers into array
     arrHeader = Split(strCodingFileHeaders, gRandDelimiter)
 
-    'initializes the grid with 20 columns
-    ' DW increasing # of columns from 20 to 30 based on client supplied data
+    'initializes the grid with 30 columns
     For i = 1 To 30
         Set colTemp = jgrdData.Columns.Add()
         If i = 1 Then
@@ -654,7 +668,7 @@ Private Sub Form_Load()
         Call Read_SampleFile(gSampleFileName, SSDBComboSmpType.Columns.Item(2).Text)
         'counts the number of columns
         colCount = CountDelimitedWords(vdata, gRandDelimiter)
-        ' kbg 2008-009 account for barcode column
+        ' account for barcode column
         intCodingColCount = colCount
         If BarcodeInfo.count > 0 Then
             colCount = colCount + BarcodeInfo.count
@@ -681,7 +695,7 @@ Private Sub Form_Load()
         dirtyFlag = "Y"
         'counts the number of columns
         colCount = CountDelimitedWords(vdata, gRandDelimiter)
-         ' kbg 2008-009 account for barcode column
+         ' account for barcode column
         intCodingColCount = colCount
         If BarcodeInfo.count > 0 Then
             colCount = colCount + BarcodeInfo.count
@@ -690,7 +704,6 @@ Private Sub Form_Load()
     End If
     
     'hides columns that do not have data in it.
-    ' DW increasing # of columns from 20 to 30 based on client supplied data
     For j = colCount + 1 To 30
         jgrdData.Columns.Item(j).Visible = False
     Next j
@@ -709,32 +722,28 @@ Private Sub Form_Load()
 
     If Not frmProdPlan.oCollIRQInfo Is Nothing Then
         For Each oIRQInfo In frmProdPlan.oCollIRQInfo
-            If (IIf(InStr(1, frmProdPlan.txtStockIRQ, CStr(oIRQInfo.IRQ_Number)) > 0, True, False) Or oIRQInfo.IRQ_Number = frmProdPlan.txtScratchIRQ) Then ' DW 2012-001 modified
-                ' DW 2012-001 modified
-                'If oIRQInfo.IRQ_Status <> "PENDING" Then
-                    mvarIssuedIRQ = True
-                'End If
+            If (IIf(InStr(1, frmProdPlan.txtStockIRQ, CStr(oIRQInfo.IRQ_Number)) > 0, True, False) Or oIRQInfo.IRQ_Number = frmProdPlan.txtScratchIRQ) Then
+                    mvarIRQsExist = True
             End If
         Next
     End If
     
-    ' kbg 2008-009 only enable if not a replacement and not clintrak samples
-    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIssuedIRQ = True Then
+    ' only enable if not a replacement and not clintrak samples
+    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIRQsExist = True Then
         Me.mnuLoadSample.Enabled = False
         Me.cmdDeleteButton.Enabled = False
     End If
     
-    If booReplacement Or mvarIssuedIRQ = True Then
+    If booReplacement Or mvarIRQsExist = True Then
         Update.Enabled = False
         txtQtynumber.Enabled = False
-        Me.cmdLoadCoding.Enabled = False        ' DW 2010-002 added
+        Me.cmdLoadCoding.Enabled = False
     Else
         Update.Enabled = True
         txtQtynumber.Enabled = True
-        If Me.SSDBComboSmpType.Text <> "CLINTRAK" Then Me.cmdLoadCoding.Enabled = True         ' DW 2010-002 added
+        If Me.SSDBComboSmpType.Text <> "CLINTRAK" Then Me.cmdLoadCoding.Enabled = True
     End If
 
-    ' kbg 2008-009 added
     If Determine_If_PDR_HasRun = True Or Planning.CheckIfCombined(ProductionRun.Barcode_Id) = True Then
         mvarCombinedOrRun = True
         Call LockOutForm
@@ -774,16 +783,15 @@ Private Sub cmdBackButton_Click()
         If SSDBComboSmpType.Text <> "CLINTRAK" Then
             Call LoadShippingInfo(jobShippingId, txtShip, txtAttn, txtAdd1, txtAdd2, _
                         txtCity, txtState, txtZip, txtAdd3)
-            If jobShippingId = 0 Then ClearShipFields   ' DW 2010-002 added
+            If jobShippingId = 0 Then ClearShipFields
         End If
-        ' kbg 2008-009 added
+    
         cmdDeleteButton.Enabled = True
     Else
         Read_File (gCodingFileName)
         Set mData = New CCOLPDRFILES
         dirtyFlag = "Y"
         gSampleTypeId = 0
-        ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
         SSDBComboSmpType.Text = ""
         SSDBComboShip.Text = ""
         comboSmp = ""
@@ -807,8 +815,8 @@ Private Sub cmdBackButton_Click()
         cmdBackButton.Enabled = False
     End If
     
-    ' kbg 2008-009 only enable if not a replacement and not clintrak samples
-    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIssuedIRQ = True Then
+    ' only enable if not a replacement and not clintrak samples
+    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIRQsExist = True Then
         Me.mnuLoadSample.Enabled = False
         cmdDeleteButton.Enabled = False
     Else
@@ -817,7 +825,6 @@ Private Sub cmdBackButton_Click()
     
     Call CheckAvailableNext
     
-    ' kbg 2008-009 added
     If mvarCombinedOrRun = True Then
         Call LockOutForm
     End If
@@ -849,23 +856,13 @@ Private Sub cmdCloseButton_Click()
     'was not saved
     ElseIf dirtyFlag = "Y" Then
         Me.txtQtynumber = mData.count
-        If Not MatchTotals Then
-            ChangeQuantity
-        End If
         columnNumber = 0    'resets the selected column when the form is closed
         Unload Me
         Exit Sub
     End If
-    
-   'check the totals of the sample config and the dirtyflag
-   If MatchTotals And dirtyFlag = "" Then
-        columnNumber = 0    'resets the selected column when the form is closed
-        Unload Me
-   Else
-        'option to change quantity
-        Call ChangeQuantity
-        Unload Me
-   End If
+
+    columnNumber = 0    'resets the selected column when the form is closed
+    Unload Me
     
 End Sub
 
@@ -901,6 +898,9 @@ Private Sub cmdDeleteButton_Click()
         cmdBackButton.Enabled = False
     End If
     
+    
+    Call CheckAvailableNext
+    
     If SampleDataExists(Me.txtSmpTypeNum) Then
         Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.Text)
         Call Read_SampleFile(gSampleFileName, _
@@ -914,22 +914,19 @@ Private Sub cmdDeleteButton_Click()
         Read_File (gCodingFileName)
         'populates the collection with data from file
         Set mData = New CCOLPDRFILES
-        ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
         Call mData.Add(vdata, 1, SSDBComboSmpType.Text)
         gSampleTypeId = 0
         Call ClearShipFields
-        ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
         SSDBComboSmpType.Text = ""
         SSDBComboShip.Text = ""
-        ' kbg 2008-009 added
         Me.cmdDeleteButton.Enabled = False
     End If
     
     columnNumber = 0
     txtcolumn.Text = ""
     
-    ' kbg 2008-009 only enable if not a replacement and not clintrak samples
-    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIssuedIRQ = True Then
+    ' only enable if not a replacement and not clintrak samples
+    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIRQsExist = True Then
         Me.mnuLoadSample.Enabled = False
         Me.cmdDeleteButton.Enabled = False
     Else
@@ -946,8 +943,8 @@ Private Sub cmdDeleteButton_Click()
     End If
     
     Call CheckAvailableNext
-    frmProdPlan.txtDirtyFlag = "Y"
-    ' kbg 2006-036 using global user object
+    
+    frmProdPlan.booSamplesDirtyFlag = True
     frmProdPlan.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
     
     'md added calls to correct the sample file(s) when the delete is done
@@ -976,7 +973,6 @@ Private Sub cmdLoadCoding_Click()
     Dim tempstr As String
     
      'checks to see whether the sample type was filled in first
-     ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
     If SSDBComboSmpType.Text = "" Then
         MsgBox "The Sample Type must be entered!", vbExclamation
         txtQtynumber = 1
@@ -994,12 +990,7 @@ Private Sub cmdLoadCoding_Click()
         MsgBox "Cannot load ""As Per Sequence"" since there are more sample labels than product.", vbExclamation
         Exit Sub
     End If
-    
-    'check to see if the quantity has been exceeded
-    If CheckQuantityFull(Me.txtQtynumber - getExistingSampleQTY(Me.txtSmpTypeNum)) Then
-        Exit Sub
-    End If
-    
+       
     temp = txtQtynumber
     
     If SSDBComboSmpType.Text <> "CLINTRAK" Then
@@ -1007,13 +998,7 @@ Private Sub cmdLoadCoding_Click()
         For i = 1 To mData.count
             mData.Remove (mData.count)
         Next
-        ' DW 2010-002 commented out
-        'populates with new quantity
-    '    For i = 1 To temp
-    '        Call mData.Add(vdata, i, SSDBComboSmpType.Columns.Item(2).Text)
-    '    Next i
-        
-        ' DW 2010-002 added
+       
         tempstr = SSDBComboSmpType.Columns.Item(2).Text
         Call ReadProcess_File(ProductionRun.File_Name, temp, tempstr)
             
@@ -1091,12 +1076,10 @@ Private Sub cmdNextButton_Click()
         cmdBackButton.Enabled = False
     Else
         cmdBackButton.Enabled = True
-        ' kbg 2008-009 removed
-'        mnuLoadSample.Enabled = True
     End If
     
-    ' kbg 2008-009 only enable if not a replacement and not clintrak samples
-    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIssuedIRQ = True Then
+    ' only enable if not a replacement and not clintrak samples
+    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIRQsExist = True Then
         Me.mnuLoadSample.Enabled = False
         ' the delete button is enabled/disable above as well, so only disable if certain criteria met
         cmdDeleteButton.Enabled = False
@@ -1107,7 +1090,6 @@ Private Sub cmdNextButton_Click()
     
     Call CheckAvailableNext
     
-    ' kbg 2008-009 added
     If mvarCombinedOrRun = True Then
         Call LockOutForm
     End If
@@ -1150,16 +1132,14 @@ Private Sub cmdSaveButton_Click()
                 
         Call CollectionToFile(gSampleFileName)
         Call Save_Sample_Info
-        Call CleanUpExtra
         SampleDataExists (Me.txtSmpTypeNum)
     Else
         dirtyFlag = "C"
         Exit Sub
     End If
     
-    ' kbg 2008-009 chagned to only enable upon save if not clintrak samples
-    ' kbg 2008-009 only enable if not a replacement and not clintrak samples
-    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIssuedIRQ = True Then
+    ' only enable if not a replacement and not clintrak samples
+    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIRQsExist = True Then
         Me.mnuLoadSample.Enabled = False
         Me.cmdDeleteButton.Enabled = False
     Else
@@ -1167,18 +1147,19 @@ Private Sub cmdSaveButton_Click()
         Me.cmdDeleteButton.Enabled = True
     End If
     
-    frmProdPlan.txtDirtyFlag.Text = "Y"
-    ' kbg 2006-036 using global user object
+    frmProdPlan.booSamplesDirtyFlag = True
     frmProdPlan.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
     
     MsgBox "Sample Configuration has been saved", vbInformation
     
+    CheckAvailableNext
+       
     colCount = CountDelimitedWords(vdata, gRandDelimiter)
-    ' kbg 2008-009 account for barcode column
+    ' account for barcode column
     If BarcodeInfo.count > 0 Then
         colCount = colCount + BarcodeInfo.count
     End If
-    ' DW increasing # of columns from 20 to 30 based on client supplied data
+    
     For j = colCount + 1 To 30
         jgrdData.Columns.Item(j).Visible = False
     Next j
@@ -1186,9 +1167,13 @@ Private Sub cmdSaveButton_Click()
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
-    ProductionRun.Sample_Number = getExistingSampleTypes(0)
-    ProductionRun.Samples_Requested = getExistingSampleQTY(0)
-    ProductionRun.UpdateSampleQuantities
+    frmProdPlan.txtSampleGroups = getExistingSampleTypes(0)
+    frmProdPlan.txtSamples = getExistingSampleQTY(0)
+    
+    ProductionRun.Sample_Number = frmProdPlan.txtSampleGroups
+    ProductionRun.Samples_Requested = frmProdPlan.txtSamples
+    
+'    ProductionRun.UpdateSampleQuantities
 End Sub
 
 Private Sub jgrdData_ColumnHeaderClick(ByVal column As GridEX20.JSColumn)
@@ -1222,8 +1207,6 @@ End Sub
 
 Private Sub jgrdData_UnboundReadData(ByVal RowIndex As Long, ByVal Bookmark As Variant, ByVal Values As GridEX20.JSRowData)
     Dim recTemp As CPRDFiles
-    
-    ' kbg 2008-009 added
     Dim Coding_File_Data() As String
     Dim selected_columns() As String
     Dim strData As String
@@ -1253,7 +1236,6 @@ Private Sub jgrdData_UnboundReadData(ByVal RowIndex As Long, ByVal Bookmark As V
         Values(18) = IIf(.Field18 = "", BLANK_RPT, .Field18)
         Values(19) = IIf(.Field19 = "", BLANK_RPT, .Field19)
         Values(20) = IIf(.Field20 = "", BLANK_RPT, .Field20)
-        ' DW increasing # of columns from 20 to 30 based on client supplied data
         Values(21) = IIf(.Field21 = "", BLANK_RPT, .Field21)
         Values(22) = IIf(.Field22 = "", BLANK_RPT, .Field22)
         Values(23) = IIf(.Field23 = "", BLANK_RPT, .Field23)
@@ -1266,7 +1248,7 @@ Private Sub jgrdData_UnboundReadData(ByVal RowIndex As Long, ByVal Bookmark As V
         Values(30) = IIf(.Field30 = "", BLANK_RPT, .Field30)
     End With
     
-    ' kbg 2008-009 added for barcode info column
+
     If BarcodeInfo.count > 0 Then
 
         For i = 1 To intCodingColCount
@@ -1323,7 +1305,6 @@ Private Sub jgrdData_UnboundUpdate(ByVal RowIndex As Long, ByVal Bookmark As Var
         .Field18 = IIf(Trim(UCase(Values(18))) = BLANK_RPT, "", Values(18))
         .Field19 = IIf(Trim(UCase(Values(19))) = BLANK_RPT, "", Values(19))
         .Field20 = IIf(Trim(UCase(Values(20))) = BLANK_RPT, "", Values(20))
-        ' DW increasing # of columns from 20 to 30 based on client supplied data
         .Field21 = IIf(Trim(UCase(Values(21))) = BLANK_RPT, "", Values(21))
         .Field22 = IIf(Trim(UCase(Values(22))) = BLANK_RPT, "", Values(22))
         .Field23 = IIf(Trim(UCase(Values(23))) = BLANK_RPT, "", Values(23))
@@ -1357,32 +1338,30 @@ Private Sub mnuLoadSample_Click()
                 "Enter Sample Type Number or Cancel to Quit!", _
                 "Load Existing Sample", _
                 1)
-            If Len(strInput) = 0 Then Exit Sub  ' DW 2010-002 modifying > to =
+            If Len(strInput) = 0 Then Exit Sub
         Loop Until CheckSampleNum(CInt(strInput), file, quantity, _
             "Sample Type Number Does Not Exists. Please Try Again.", stype)
-            
-        If Not CheckQuantityFull((quantity - mData.count)) Then
-            ' kbg 2008-009 added to update the descrition too
-            'if the description value was the default one change to the newly selected type
-            If Trim(txtDescription.Text) = Trim(SSDBComboSmpType.Text) Then
-                txtDescription.Text = stype
-            End If
-
-            SSDBComboSmpType.Text = stype
-            Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.Text)
-            comboSmp = Me.SSDBComboSmpType.Text
-              
-            ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
-            Call Read_SampleFile(file, _
-                SSDBComboSmpType.Columns.Item(2).Text)
-            Call Read_File(ProductionRun.File_Name)
-            
-            dirtyFlag = "Y"
-            txtQtynumber.Text = mData.count
-            jgrdData.ItemCount = mData.count
-            jgrdData.Update
-            jgrdData.Refresh
+      
+        ' update the descrition too
+        'if the description value was the default one change to the newly selected type
+        If Trim(txtDescription.Text) = Trim(SSDBComboSmpType.Text) Then
+            txtDescription.Text = stype
         End If
+
+        SSDBComboSmpType.Text = stype
+        Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.Text)
+        comboSmp = Me.SSDBComboSmpType.Text
+          
+        Call Read_SampleFile(file, _
+            SSDBComboSmpType.Columns.Item(2).Text)
+        Call Read_File(ProductionRun.File_Name)
+        
+        dirtyFlag = "Y"
+        txtQtynumber.Text = mData.count
+        jgrdData.ItemCount = mData.count
+        jgrdData.Update
+        jgrdData.Refresh
+    
     End If
 
 Cleanup_Exit:
@@ -1414,7 +1393,6 @@ Private Sub SSDBComboShip_InitColumnProps()
     
 End Sub
 
-' kbg 2008-009 added
 Private Sub SSDBComboSmpType_InitColumnProps()
 
     SSDBComboSmpType.Columns(0).Width = SSDBComboSmpType.Width
@@ -1423,7 +1401,6 @@ Private Sub SSDBComboSmpType_InitColumnProps()
     
 End Sub
 
-' kbg 2008-009 added
 Private Sub SSDBComboSmpType_Click()
     
     On Error GoTo Handle_Error
@@ -1482,7 +1459,6 @@ Private Sub Update_Click()
     Dim tempstr As String
         
      'checks to see whether the sample type was filled in first
-     ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
     If SSDBComboSmpType.Text = "" Then
         MsgBox "The Sample Type Must be Entered!!", vbExclamation
         txtQtynumber = 1
@@ -1495,36 +1471,25 @@ Private Sub Update_Click()
         Exit Sub
     End If
     
-    'check to see if the total sample quantity requested has been exceeded
-    If CheckQuantityFull(Me.txtQtynumber - getExistingSampleQTY(Me.txtSmpTypeNum)) Then
-        Exit Sub
-    End If
-
     temp = txtQtynumber
     
-    'md added code
     'check to see if the clintrak samples requested are > than total quantity
     'if clintrak samples - must read the coding file and populate with real data
     'to the screen, not just default the values.
-    ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
     If SSDBComboSmpType.Text = "CLINTRAK" Then
          'check the sample quantity
           'load the grid with live data for Clintrak samples
-        ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
-'        tempstr = GetLookupDescr(comboSmpType.itemData(comboSmpType.ListIndex))
         tempstr = SSDBComboSmpType.Columns.Item(2).Text
         Call ReadProcess_File(ProductionRun.File_Name, temp, tempstr)
         dirtyFlag = "Y"
     End If
     'adds new rows to the table if not clintrak sample request
     'md added check for <> CLINTRAK
-    ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
     If SSDBComboSmpType.Text <> "CLINTRAK" Then
         ' DW 2010-002 added
         For i = 1 To mData.count
             mData.Remove (mData.count)
         Next
-        ' DW 2010-002 added
         ' Re-Read vdata record 1
         Read_File (ProductionRun.File_Name)
         
@@ -1579,10 +1544,6 @@ On Error GoTo Error_this_Sub
             
             'calls the function to write the collection to a file
             'md added code to write to file with 3 char abbrev.
-            ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
-'            Call WriteFile(mData, _
-'                GetLookupDescr(comboSmpType.itemData(comboSmpType.ListIndex)), _
-'               Trim(strFilename))
             Call WriteFile(mData, _
                 SSDBComboSmpType.Columns.Item(2).Text, _
                Trim(strFilename))
@@ -1612,7 +1573,6 @@ On Error GoTo Error_this_Sub
 
     Set objData = New CADOData
     With objData
-        ' DW 2010-002 added
         Set .Connection = GetDBConnection
         .ResetParameters
         .CommandType = adCmdStoredProc
@@ -1621,7 +1581,6 @@ On Error GoTo Error_this_Sub
         .AddParameter "Sample Type Id", gSampleTypeId, adInteger, adParamInput
         .AddParameter "Production Run Id", ProductionRun.Production_Run_Id, adInteger, adParamInput
         .AddParameter "Type Number", CInt(txtSmpTypeNum), adInteger, adParamInput
-        ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
         .AddParameter "Sample Type", SSDBComboSmpType, adVarChar, adParamInput
         .AddParameter "Ship To Id", jobShippingId, adInteger, adParamInput
         .AddParameter "Quantity", mData.count, adInteger, adParamInput
@@ -1665,7 +1624,6 @@ On Error GoTo Error_this_Function
     
     Set objData = New CADOData
     With objData
-        ' DW 2010-002 added
         Set .Connection = GetDBConnection
         .CursorType = adOpenForwardOnly
         .CommandType = adCmdStoredProc
@@ -1680,21 +1638,18 @@ On Error GoTo Error_this_Function
             gSampleTypeId = .Recordset!sample_type_id
             gProductionRun_Id = .Recordset!Production_Run_Id
             txtSmpTypeNum = .Recordset!Type_Number
-            ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
             SSDBComboSmpType.Text = .Recordset!Sample_Type
             SSDBComboShip = .Recordset!description
             txtQtynumber = .Recordset!quantity
             gSampleFileName = .Recordset!Sample_File_Name
             txtDescription.Text = Trim(.Recordset!Sample_Description)
             jobShippingId = .Recordset!Job_Shipping_Id
-            ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
             comboSmp = SSDBComboSmpType.Text
             description = txtDescription.Text
             notes = .Recordset!notes
         Else
             txtQtynumber = "1"
             gSampleFileName = ""
-            ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
             txtDescription = SSDBComboSmpType.Text
             gSampleTypeId = 0
             notes = ""
@@ -1718,61 +1673,6 @@ Error_this_Function:
     "Error Loading existing sample data information"
     Resume Exit_this_Function
 
-End Function
-
-'<comment>
-' <summary>
-'       Check to see that there are enough quantity totals to support
-'       additional elements to add to the sample and allow the user to change
-'       the total for adjustments if there aren't enough.</summary>
-' <param name="intIncrease">New amount to change to</param>
-' <return>True if the quantity is full.</return>
-'</comment>
-Private Function CheckQuantityFull(intIncrease As Long) As Boolean
-    On Error GoTo Handle_Error
-
-    Dim strInput As String
-
-    CheckQuantityFull = True
-    'checks to see whether the total matches the new total
-    If intIncrease > (CLng(frmProdPlan.txtSamples) - getExistingSampleQTY(0)) Then
-    
-        If MsgBox( _
-            "The Quantity Total has Been Exceeded!" & vbCrLf & _
-            "Do you want to change quantity total?", vbQuestion + vbYesNo) = vbYes Then
-            
-                strInput = InputBox( _
-                    "Enter New Quantity Total or click Cancel to Quit.", _
-                    "New Quantity Total", _
-                    CLng(frmProdPlan.txtSamples))
-                    
-                If Len(strInput) = 0 Or Not IsNumeric(strInput) Then
-                    Me.txtQtynumber.Text = mData.count
-                    Exit Function
-                Else
-                    'checks to see whether the new total is enough
-                    If CLng(strInput) < intIncrease + getExistingSampleQTY(0) Then
-                        MsgBox "Sample quantity value too small.", vbExclamation
-                        Me.txtQtynumber.Text = mData.count
-                        Exit Function
-                    End If
-                End If
-        Else
-            Me.txtQtynumber.Text = mData.count
-            Exit Function
-        End If
-        
-        'sets new total
-        frmProdPlan.txtSamples = CLng(strInput)
-    End If
-
-    CheckQuantityFull = False
-
-Cleanup_Exit:
-    Exit Function
-Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
-    Resume Cleanup_Exit
 End Function
 
 '<comment>
@@ -1802,16 +1702,13 @@ Public Function Valid_Sample_Form() As Boolean
         Exit Function
     End If
     
-    ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
     If SSDBComboSmpType.Text = "" Then
-        ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
         Me.SSDBComboSmpType.SetFocus
         MsgBox "Please Select a Sample Type from Drop Down Box", vbExclamation
         Exit Function
     End If
     
     'md added code to bypass this check if TYPE = Clintrak
-    ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
     If SSDBComboSmpType.Text <> "CLINTRAK" And Not CBool(frmProdPlan.chkPrintAtPackager) Then
         If Trim(SSDBComboShip.Text) = "" Then
             Me.SSDBComboShip.SetFocus
@@ -1822,7 +1719,7 @@ Public Function Valid_Sample_Form() As Boolean
     
     ' DW 2010-002 added - when print at packager is checked Clintrak samples are not required
     If Not CBool(frmProdPlan.chkPrintAtPackager.value) Then
-        ' kbg 2008-009 check that the first set of samples is CLINTRAK and there are 2
+        ' check that the first set of samples is CLINTRAK and there are 2
         If Me.txtSmpTypeNum.Text = "1" Then
             If Me.SSDBComboSmpType.Text <> "CLINTRAK" Then
                 MsgBox "The first sample set must be CLINTRAK samples.", vbExclamation
@@ -1847,29 +1744,6 @@ Public Function Valid_Sample_Form() As Boolean
     columnSqueeze = Space$(columnSqueezeCapacity)
     
     For i = 1 To mData.count
-'        If InStr(mData.Item(i).Field1, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field2, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field3, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field4, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field5, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field6, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field7, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field8, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field9, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field10, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field11, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field12, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field13, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field14, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field15, gRandDelimiter) > 0 Or InStr(mData.Item(i).Field16, gRandDelimiter) > 0 Or InStr(mData.Item(i).Field17, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field18, gRandDelimiter) > 0 Or InStr(mData.Item(i).Field19, gRandDelimiter) > 0 Or InStr(mData.Item(i).Field20, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field21, gRandDelimiter) > 0 Or InStr(mData.Item(i).Field22, gRandDelimiter) > 0 Or InStr(mData.Item(i).Field23, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field24, gRandDelimiter) > 0 Or InStr(mData.Item(i).Field25, gRandDelimiter) > 0 Or InStr(mData.Item(i).Field26, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field27, gRandDelimiter) > 0 Or InStr(mData.Item(i).Field28, gRandDelimiter) > 0 Or InStr(mData.Item(i).Field29, gRandDelimiter) > 0 Or _
-'            InStr(mData.Item(i).Field30, gRandDelimiter) > 0 Then
-'            booHasDelimiter = True
-'            Exit For
-'        End If
             tmpField = mData.Item(i).Field1
             If Len(tmpField) + columnSqueezeLength >= columnSqueezeCapacity Then columnSqueezeCapacity = columnSqueezeCapacity * 2: columnSqueeze = columnSqueeze & Space$(columnSqueezeCapacity)
                 Mid(columnSqueeze, columnSqueezeLength + 1, Len(tmpField)) = tmpField: columnSqueezeLength = columnSqueezeLength + Len(tmpField)
@@ -1989,11 +1863,6 @@ Public Function Valid_Sample_Form() As Boolean
             tmpField = mData.Item(i).Field30
             If Len(tmpField) + columnSqueezeLength >= columnSqueezeCapacity Then columnSqueezeCapacity = columnSqueezeCapacity * 2: columnSqueeze = columnSqueeze & Space$(columnSqueezeCapacity)
                 Mid(columnSqueeze, columnSqueezeLength + 1, Len(tmpField)) = tmpField: columnSqueezeLength = columnSqueezeLength + Len(tmpField)
-
-'        If InStr(1, Left$(columnSqueeze, columnSqueezeLength), gRandDelimiter) > 0 Then
-'            booHasDelimiter = True
-'            Exit For
-'        End If
         
         columnSqueezeLength = 0
         
@@ -2013,20 +1882,6 @@ Handle_Error:
     Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 End Function
-Private Function MatchTotals() As Boolean
-'
-'comments: checks to see that the requested quantity matches the existing
-'parameters:
-'returns: True if the totals match
-'
-    If getExistingSampleQTY(0) <> frmProdPlan.txtSamples Or _
-    getExistingSampleTypes(0) <> frmProdPlan.txtSampleGroups Then
-        MatchTotals = False
-    Else
-        MatchTotals = True
-    End If
-
-End Function
 
 Private Function getExistingSampleQTY(typenum As Integer) As Long
 '
@@ -2042,7 +1897,6 @@ Dim objData As nADOData.CADOData
 
     Set objData = New CADOData
     With objData
-        ' DW 2010-002 added
         Set .Connection = GetDBConnection
         .CursorType = adOpenForwardOnly
         .CommandType = adCmdStoredProc
@@ -2123,7 +1977,6 @@ On Error GoTo Error_this_Sub
     If SampleDataExists(Me.txtSmpTypeNum + 1) Then
         ' this code is executed if the next sample exists in the DB and the file exists.
         ' it loads the screen with the saved info for the next sample set.
-        ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
         Call Read_SampleFile(gSampleFileName, SSDBComboSmpType.Text)
         Read_File (gCodingFileName)
         dirtyFlag = ""
@@ -2139,15 +1992,10 @@ On Error GoTo Error_this_Sub
         txtSmpTypeNum = txtSmpTypeNum + 1
         Read_File (gCodingFileName)
         Set mData = New CCOLPDRFILES
-        'md added code for 3 char abbrev.
-        ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
-'        Call mData.Add(vdata, 1, _
-'            GetLookupDescr(comboSmpType.itemData(comboSmpType.ListIndex)))
         Call mData.Add(vdata, 1, _
             SSDBComboSmpType.Columns.Item(2).Text)
         frmProdPlan.sampleTypes = frmProdPlan.sampleTypes + 1
         dirtyFlag = "Y"
-        ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
         SSDBComboSmpType.Text = ""
         SSDBComboShip.Text = ""
         comboSmp = ""
@@ -2166,14 +2014,9 @@ On Error GoTo Error_this_Sub
         Read_File (gCodingFileName)
         'populates the collection with data from file
         Set mData = New CCOLPDRFILES
-        'md added code for 3 char abbrev.
-        ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
-'        Call mData.Add(vdata, 1, _
-'             GetLookupDescr(comboSmpType.itemData(comboSmpType.ListIndex)))
          Call mData.Add(vdata, 1, _
              SSDBComboSmpType.Columns.Item(2).Text)
         dirtyFlag = "Y"
-        ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
         SSDBComboSmpType.Text = ""
         SSDBComboShip.Text = ""
         comboSmp = ""
@@ -2187,8 +2030,8 @@ On Error GoTo Error_this_Sub
     txtcolumn.Text = ""
     columnNumber = 0
     
-    ' kbg 2008-009 only enable if not a replacement and not clintrak samples
-    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIssuedIRQ = True Then
+    ' only enable if not a replacement and not clintrak samples
+    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIRQsExist = True Then
         Me.mnuLoadSample.Enabled = False
         Me.cmdDeleteButton.Enabled = False
     Else
@@ -2197,11 +2040,7 @@ On Error GoTo Error_this_Sub
     
     If txtSmpTypeNum = 1 Then
         cmdBackButton.Enabled = False
-        ' kbg 2008-009 removed
-'        mnuLoadSample.Enabled = False
     Else
-        ' kbg 2008-009 removed
-'        mnuLoadSample.Enabled = True
         cmdBackButton.Enabled = True
     End If
     
@@ -2284,62 +2123,10 @@ Error_this_Function:
 
 End Function
 
-
-'<comment>
-' <summary>
-'       Checks to see if the totals have been satisfied, if not the user is
-'       allowed to change the quantity to the existing configured total.</summary>
-'</comment>
-Private Sub ChangeQuantity()
-    On Error GoTo Handle_Error
-
-    If MsgBox( _
-        "The Sample Quantity Totals do mot match!" & vbCrLf & _
-        "Do you want to reset sample quantity totals to?" & vbCrLf & _
-        "Qty Samples:" & getExistingSampleQTY(0) & vbCrLf & " Sample Types:" & _
-        getExistingSampleTypes(0), vbQuestion + vbYesNo) = vbYes Then
-        
-        frmProdPlan.txtSampleGroups = getExistingSampleTypes(0)
-        frmProdPlan.txtSamples = getExistingSampleQTY(0)
-        Unload Me
-    End If
-    
-Cleanup_Exit:
-    Exit Sub
-Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
-    Resume Cleanup_Exit
-End Sub
-
-Private Sub CleanUpExtra()
-'
-'comments:  this sub checks whether the quantity is full and if there are remaining sample types
-'           that have not been configured. it removes the unconfigured sample types
-'           because there are not enough total quantities to support it.
-'parameter:  none
-'returns: nothing
-'
-    If getExistingSampleQTY(0) = frmProdPlan.txtSamples And _
-        getExistingSampleTypes(0) < frmProdPlan.txtSampleGroups Then
-        MsgBox _
-            "The quantity total is full" & vbCrLf & _
-            "Production Run Totals will be changed to:" & vbCrLf & _
-            "QTY Samples: " & getExistingSampleQTY(0) & vbCrLf & _
-            "Sample Types: " & getExistingSampleTypes(0), vbInformation
-        frmProdPlan.txtSampleGroups = getExistingSampleTypes(0)
-        'greys out next button cause samples are full
-        cmdNextButton.Enabled = False
-    End If
-
-End Sub
-
 Private Sub UpdateFirstColumn()
 Dim i As Long
 
     For i = 1 To mData.count
-        ' kbg 2008-009 changed from comboSmpType to SSDBComboSmpType
-'        mData.Item(i).Field1 = _
-'        GetLookupDescr(comboSmpType.itemData(comboSmpType.ListIndex)) & "-" & i
          mData.Item(i).Field1 = _
         SSDBComboSmpType.Columns.Item(2).Text & "-" & i
     Next
@@ -2397,11 +2184,32 @@ End Function
 Private Sub CheckAvailableNext()
 'checks to see if the last sample has been reached and greys out next button
 
-    If Me.txtSmpTypeNum = frmProdPlan.txtSampleGroups Then
+'    If Me.txtSmpTypeNum = frmProdPlan.txtSampleGroups Then
+'        cmdNextButton.Enabled = False
+'        cmdAdd.Enabled = True
+'    Else
+'        cmdNextButton.Enabled = True
+'        cmdAdd.Enabled = False
+'    End If
+    
+
+    If Me.txtSmpTypeNum = frmProdPlan.sampleTypes Then
         cmdNextButton.Enabled = False
+        If mvarIRQsExist = True Or booReplacement = True Then
+            cmdAdd.Enabled = False
+        Else
+            cmdAdd.Enabled = True
+        End If
+        
     Else
         cmdNextButton.Enabled = True
+        cmdAdd.Enabled = False
     End If
+''     If CLng(Me.txtSmpTypeNum.Text) >= CLng(frmProdPlan.txtSampleGroups.Text) Then
+''        cmdNextButton.Caption = "Add New Type"
+''    Else
+''        cmdNextButton.Caption = "Next>>"
+''    End If
 
 End Sub
 
@@ -2443,7 +2251,7 @@ Private Sub SetScreenEdit()
     Me.jgrdData.Columns(1).Selectable = False
     For i = 2 To 20
         Me.jgrdData.Columns(i).Selectable = SSDBComboSmpType.Enabled
-        ' kbg 2008-009 added so barcode columns are not selectable
+        ' so barcode columns are not selectable
         If i > intCodingColCount Then
             Me.jgrdData.Columns(i).Selectable = False
         End If
@@ -2485,9 +2293,7 @@ Dim StringCnt As String
 Dim stringfl As String
 Dim strFilename As String
 
-    'md added for clintrak samples project
     
-    ' kbg 2008-009 added InsertBLANK param
     StringCnt = GetDelimitedFirstLine(TmpSmpFile, 1, ".", False)
     'StringCnt = GetDelimitedFirstLine(StringCnt, 2, "_", False) ' DW 2010-002 commented out for modification
     ' Explanation: Path changed to UNC, introduced second underscore, desired value is now the third element
@@ -2528,7 +2334,6 @@ Private Sub AlignSmplFileName_After_Delete()
 
     Set objData = New CADOData
     With objData
-        ' DW 2010-002 added
         Set .Connection = GetDBConnection
         .CursorType = adOpenForwardOnly
         .CommandType = adCmdStoredProc
@@ -2607,8 +2412,6 @@ Error_this_Sub:
   
 End Sub
 
-
-' kbg 2008-009
 Private Sub Extract_MergeBarcode_Columns(mergeCoding As String, ByRef colArray() As String, With_Delimiters As Boolean)
 '
 'comments:  This function extracts the merged barcode data into an array separating column numbers and delimiters
@@ -2654,7 +2457,6 @@ Handle_Error:
 
 End Sub
 
-' kbg 2008-009 added
 Private Function Display_Barcode(Selected_Column_Array() As String, Coding_File_Data() As String) As String
 'Function to return Barcode from the Input String Array
 'comments:  This function returns a string of what the barcode data will look like
@@ -2697,20 +2499,16 @@ Handle_Error:
 
 End Function
 
-' kbg 2008-009 added
 Private Function CheckBarCodeOutPut(strColumn As String) As String
     ' Returns the desired output pending the input column designation
     On Error GoTo Handle_Error
     Select Case strColumn
         Case "R"
-'            CheckBarCodeOutPut = Replace$(gRandBarcode, "RND", "")
             CheckBarCodeOutPut = Format$(Mid$(gRandBarcode, 4, Len(gRandBarcode) - 3), "000000")
         Case "P"
             If booReplacement Then
-'                CheckBarCodeOutPut = Replace$(gOrigPDRNumber, "PDR", "000")
                 CheckBarCodeOutPut = Format$(Mid$(gOrigPDRNumber, 4, Len(gOrigPDRNumber) - 3), "0000000")
             Else
-'                CheckBarCodeOutPut = Replace$(ProductionRun.Barcode_Id, "PDR", "000")
                 CheckBarCodeOutPut = Format$(Mid$(ProductionRun.Barcode_Id, 4, Len(ProductionRun.Barcode_Id) - 3), "0000000")
             End If
         Case Is <> CNODELIMITER
@@ -2726,7 +2524,6 @@ Handle_Error:
     Resume exit_function
 End Function
 
-' kbg 2008-009 added
 Private Sub LockOutForm()
     On Error GoTo Handle_Error
 
@@ -2739,6 +2536,7 @@ Private Sub LockOutForm()
         Me.cmdConfigure.Enabled = False
         Me.mnuLoadSample.Enabled = False
         Me.cmdDeleteButton.Enabled = False
+        Me.cmdAdd.Enabled = False
     End If
         
 Cleanup_Exit:
@@ -2748,4 +2546,23 @@ Handle_Error:
     Resume Cleanup_Exit
 
 End Sub
+
+Private Sub cmdAdd_Click()
+    On Error GoTo Handle_Error
+
+    Call cmdNextButton_Click
+    cmdAdd.Enabled = False
+                
+
+Cleanup_Exit:
+     Exit Sub
+Handle_Error:
+     MsgBox Err.description & vbCrLf & _
+         "in frmSmpConfig.cmdAdd_Click ", _
+         vbCritical + vbOKOnly, "Application Error"
+     Resume Cleanup_Exit
+
+End Sub
+
+
 

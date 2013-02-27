@@ -1,8 +1,10 @@
 Type=Exe
-Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\WINDOWS\system32\stdole2.tlb#OLE Automation
-Reference=*\G{52E0A6AD-BDAA-408B-A4AA-F222DB8A286D}#3.1#0#..\..\..\..\Program Files\Microsoft Visual Studio\VB98\ClintrakCommon.dll#ClintrakCommon
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\WINDOWS\system32\stdole2.tlb#OLE Automation
+Reference=*\G{52E0A6AD-BDAA-408B-A4AA-F222DB8A286D}#3.1#0#\\clkaldata\it_data\Development\Documentation\Projects\2012\CR12-001 (Digital Press)\Completed Modules\Clintrak Common VB6 (v3.0.0)\ClintrakCommon.dll#ClintrakCommon
+Reference=*\G{9D028723-DF1B-40F3-983B-78332057D89D}#1.1#0#ProductionRuns.dll#
 Form=frmTestPDR.frm
 Startup="frmTestPDR"
+ExeName32="TestProductionRuns.exe"
 Command32=""
 Name="TestProductionRuns"
 HelpContextID="0"

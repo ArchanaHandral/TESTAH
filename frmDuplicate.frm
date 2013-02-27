@@ -310,7 +310,6 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Dim PDR_List As CCOLdupFiles    'holder collection of PDR's that can be duplicated
-' kbg 2008-009 added
 Private PDR_SameCoding_List As CCOLdupFiles
 
 Private Sub cmdAdd_Click()
@@ -321,7 +320,7 @@ Dim i As Long
         For i = listPDR.ListCount To 1 Step -1
             If listPDR.Selected(i - 1) Then
             
-                ' kbg 2008-009 added to remove from the dup with same coding box
+                ' remove from the dup with same coding box
                 Dim n  As Long
                 For n = dupSameCodingData.count To 1 Step -1
                     If dupSameCodingData.Item(n).productionRun_Barcode = PDR_List.Item(i).productionRun_Barcode Then
@@ -350,7 +349,6 @@ Dim i As Long
 End Sub
 
 Private Sub cmdOK_Click()
-    ' kbg 2008-009 added message box here
     If dupData.count = 0 And dupSameCodingData.count = 0 Then
         MsgBox "Production Runs have not been choosen!", _
                 vbInformation + vbOKOnly, "Duplicate Samples"
@@ -388,14 +386,12 @@ Dim i As Long
 
     Set PDR_List = New CCOLdupFiles
     'loads the holder collection with all PDR's that are associated with the rand except for the current
-    ' kbg 2008-009 added booAllCodings param
     Call LookUpSetToDuplicate(gRandomizationId, ProductionRun.Production_Run_Id, PDR_List, True)
     'loads the PDR listbox with the PDR's
     For i = 1 To PDR_List.count
         Call listPDR.AddItem(PDR_List.Item(i).productionRun_Barcode)
     Next
     
-    ' kbg 2008-009 added another list box
     Set PDR_SameCoding_List = New CCOLdupFiles
     Call LookUpSetToDuplicate(gRandomizationId, ProductionRun.Production_Run_Id, PDR_SameCoding_List, False)
     For i = 1 To PDR_SameCoding_List.count
@@ -406,7 +402,6 @@ Dim i As Long
     
 End Sub
 
-' kbg 2008-009 added
 Private Sub cmdRemoveSameCoding_Click()
     On Error GoTo Handle_Error
 
@@ -436,7 +431,6 @@ Handle_Error:
      Resume Cleanup_Exit
 End Sub
 
-' kbg 2008-009 added
 Private Sub cmdAddSameCoding_Click()
     On Error GoTo Handle_Error
 
@@ -482,7 +476,6 @@ Handle_Error:
      Resume Cleanup_Exit
 End Sub
 
-' kbg 2008-009 added
 Private Sub cmdCancel_Click()
     Dim i As Long
     For i = dupData.count To 1 Step -1

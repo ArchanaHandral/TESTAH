@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "Richtx32.ocx"
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "MSCOMCTL.OCX"
 Object = "{8D650141-6025-11D1-BC40-0000C042AEC0}#3.0#0"; "ssdw3b32.ocx"
 Begin VB.Form frmProdPlan 
@@ -836,6 +836,7 @@ Begin VB.Form frmProdPlan
       Top             =   5520
       Width           =   3615
       Begin VB.TextBox txtSampleGroups 
+         Enabled         =   0   'False
          Height          =   315
          Left            =   1995
          TabIndex        =   8
@@ -851,6 +852,7 @@ Begin VB.Form frmProdPlan
          Width           =   1455
       End
       Begin VB.TextBox txtSamples 
+         Enabled         =   0   'False
          Height          =   315
          Left            =   1995
          TabIndex        =   7
@@ -1078,7 +1080,6 @@ Private mReprintProdRunId As Long
 
 Public mColClientFields As CColClientReqdFields    ' used to hold Client Required fields and values collection
 
-' kbg 2008-009 added
 Private mvarOrigStockProofId As Long
 Private mvarOrigScratchStockProofId As Long
 Private mvarOrigBlindLamApply As Integer
@@ -1086,6 +1087,7 @@ Private mvarOrigStockId As String
 Private mvarOrigScratchStockId As String
 Private mvarOrigOnsertDieToolId As Long
 Private mvarOrigOnsertDiePartNumber As String
+Public booSamplesDirtyFlag As Boolean
 
 
 Private Sub Form_Load()
@@ -1097,18 +1099,19 @@ Private Sub Form_Load()
     Dim lngProofId As Long
     Dim lngRandId As Long
     Dim strGroupNum As String
-    ' kbg 2008-009 added
     Dim i As Long
     Dim strMessageCC As String
     Dim strMessage As String
     Dim booIRQsExist As Boolean
     Dim booChange As Boolean
     Dim strReason As String
+    Dim booPdrHasRun As Boolean
+    Dim booPdrIsCombined As Boolean
     
+    booSamplesDirtyFlag = False
     Call Me.txtReplacement.Move(Me.StatusBar1.Panels(2).Left + 50, Me.StatusBar1.Top + 50)
     Call Me.txtPDRStatus.Move(Me.StatusBar1.Panels(3).Left + 50, Me.StatusBar1.Top + 50)
     
-    ' kbg 2008-009 added
     Set CCBlindLamApplyCol = New Collection
     Call CCBlindLamApplyCol.Add(LABELS_ONLY_TEXT, "0")
     Call CCBlindLamApplyCol.Add(LABEL_AND_SAMPLES_TEXT, "1")
@@ -1134,6 +1137,7 @@ Private Sub Form_Load()
     Me.txtReplacement.Visible = False
     Me.mnuReplacements.Enabled = False
     booSamplesQTYChanged = False
+    booPdrIsCombined = False
     Call Enable_Fields
     
     Set ProductionRun = New CProdrun
@@ -1154,11 +1158,9 @@ Private Sub Form_Load()
     Me.txtGroupName = gGroupName
     Me.txtCoding = gCodingName
     strGroupNum = gGroupNumber
-    ' kbg 2008-009 removed gJob_Id param b/c not used
     'loads the ship to combobox with all associated shipping addresses
     Call LoadShipToCombo2Column(Me.SSDBComboShip)
 
-    ' tj - IRQ stuff
     HoldStockProofId = 0
     HoldScratchStockProofId = 0
     
@@ -1211,13 +1213,11 @@ Private Sub Form_Load()
                
                     ProductionRun.Qty_Requested = lngQtyReq
                     Me.txtDirtyFlag = "Y"
-                    ' kbg 2006-036 using global user object
                     Me.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
                 End If
             End If
             
-            '
-            ' tj - IRQ stuff
+            ' IRQ stuff
             Call GetIRQInfo
             If Not oCollIRQInfo Is Nothing Then
                 For Each oIRQInfo In oCollIRQInfo
@@ -1241,7 +1241,6 @@ Private Sub Form_Load()
     Else
         booNewProdRun = True
         Me.txtDirtyFlag = "Y"
-        ' kbg 2006-036 using global user object
         Me.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
         Me.cmdSpecInst.Enabled = False
         ProductionRun.Job_Log_Id = gJob_Id
@@ -1251,7 +1250,6 @@ Private Sub Form_Load()
         ProductionRun.Proof_Id = lngProofId
         ProductionRun.Campaign_No = strGroupNum
         ProductionRun.File_Name = gCodingFileName
-        ' kbg 2008-009 changed SSDBComboStockNos to txtStockNo
         Me.txtStockNo.Text = gStockLabelId
         ProductionRun.stock = gStockLabelId
         ProductionRun.Stock_Proof_Id = gStockProofId
@@ -1263,7 +1261,6 @@ Private Sub Form_Load()
         ProductionRun.OnsertDieToolId = gOnsertDieToolId
         txtSamples.Text = "0"
         txtSampleGroups.Text = "0"
-        ' kbg 2008-009 added
         Me.lblApplyBlindLam.Caption = CCBlindLamApplyCol(CStr(gBlindLamApply))
         If Me.lblApplyBlindLam.Caption = NA_TEXT Or Me.lblApplyBlindLam.Caption = NOT_BLINDED_TEXT Then
             Me.lblApplyBlindLam.Caption = ""
@@ -1280,7 +1277,6 @@ Private Sub Form_Load()
     'Load Client Required fields and values
     Call LoadClientLabelFields(gClientId, ProductionRun.Production_Run_Id)
     
-    ' kbg 2008-009 added
     If ProductionRun.Production_Run_Id > 0 Then
         Call LoadBarcodeInfo(ProductionRun.Production_Run_Id)
     End If
@@ -1310,23 +1306,23 @@ Private Sub Form_Load()
     
     ' This option is only enabled for Replacements
     Me.chkPrintAtPackager.Enabled = False
-    
+       
     'md added for clintrak samples - determine if the PDR has been RUN.  If so, block all
     'fields on the form.
     If Not booNewProdRun Then
         If Determine_If_PDR_HasRun Then
+            booPdrHasRun = True
             Call Lock_Out_PDRForm(False, True)
             
-            ' kbg 2006-026 added check to see if the PDR is on a PKS
+            ' check to see if the PDR is on a PKS
             ' b/c the Job Shipping Flag isn't the most reliable indicator
             If Determine_Shipping_Flag_On Or DeterminePDROnPKS Then
                 Me.txtProdDesc.Enabled = False
                 SSDBComboShip.Enabled = False
                 cmdSave.Enabled = False
-                ' kbg 2008-009 add a check here to see if any samples are on PKS
+                ' check here to see if any samples are on PKS
                 ' and if so, disable the button.  only do the check if the
                 ' number of sample types is greater than 1
-'                cmdSamples.Enabled = False
                 If Me.txtSampleGroups.Text > 1 Then
                     If DeterminePDROnPKS("S") Then
                         cmdSamples.Enabled = False
@@ -1344,11 +1340,12 @@ Private Sub Form_Load()
             End If
             If ProductionRun.Barcode_Id <> "" Then
                 If Planning.CheckIfCombined(ProductionRun.Barcode_Id) Then
-                    'cmdSamples.Enabled = False     ' DW 2010-002 like their uncombined cousins; you should be allowed to do this :)
+                    booPdrIsCombined = True
                     txtPDRStatus.Text = "COMBINED PDR HAS BEEN PROCESSED"
                 End If
             End If
         Else
+            booPdrHasRun = False
             Call Lock_Out_PDRForm(True, False)
             Me.txtProdDesc.Enabled = True
             SSDBComboShip.Enabled = True
@@ -1359,6 +1356,7 @@ Private Sub Form_Load()
             
             If ProductionRun.Barcode_Id <> "" Then
                 If Planning.CheckIfCombined(ProductionRun.Barcode_Id) Then
+                    booPdrIsCombined = True
                     Call Lock_Out_PDRForm(False, True)
                     txtProdDesc.Enabled = True
                     txtPDRStatus.Text = "COMBINED PDR"
@@ -1366,6 +1364,7 @@ Private Sub Form_Load()
             End If
         End If
     Else
+        booPdrHasRun = False
         Call Lock_Out_PDRForm(True, False)
         SSDBComboShip.Enabled = True
         cmdSamples.Enabled = True
@@ -1375,6 +1374,7 @@ Private Sub Form_Load()
         
         If ProductionRun.Barcode_Id <> "" Then
             If Planning.CheckIfCombined(ProductionRun.Barcode_Id) Then
+                booPdrIsCombined = True
                 Call Lock_Out_PDRForm(False, True)
                 cmdSamples.Enabled = False
                 txtProdDesc.Enabled = True
@@ -1384,7 +1384,6 @@ Private Sub Form_Load()
     End If
     
 
-    ' kbg 2008-009 added
     mvarOrigStockProofId = 0
     mvarOrigStockId = ""
     mvarOrigScratchStockProofId = 0
@@ -1413,11 +1412,14 @@ Private Sub Form_Load()
         '       the process the PDR is and they can start from there to get it to a positiong
         '       where it can be udpated.
         strReason = ""
-        If InStr(txtPDRStatus.Text, "PROCESSED") > 0 And Me.txtPDRStatus.Visible = True Then
+        
+'        If InStr(txtPDRStatus.Text, "PROCESSED") > 0 And Me.txtPDRStatus.Visible = True Then
+        If booPdrHasRun Then
             strReason = "has been run."
         ElseIf booIRQsExist Then
             strReason = "has an IRQ."
-        ElseIf InStr(txtPDRStatus.Text, "COMBINED") > 0 And Me.txtPDRStatus.Visible = True Then
+'        ElseIf InStr(txtPDRStatus.Text, "COMBINED") > 0 And Me.txtPDRStatus.Visible = True Then
+        ElseIf booPdrIsCombined Then
             strReason = "is part of a PRG."
         ElseIf ProductionRun.ApprovalDate <> "1/1/1900" Then
             strReason = "has been Approved."
@@ -1553,8 +1555,10 @@ Private Sub cmdAddtlData_Click()
 End Sub
 
 Private Sub cmdSamples_Click()
-    Dim intExistingSampleQTY As Long
-    Dim intNewSampleQTY As Long
+    Dim lngExistingSampleQTY As Long
+    Dim lngNewSampleQTY As Long
+    Dim lngExistingSampleTypes As Long
+    Dim lngNewSampleTypes As Long
     
     ' Checks to see whether the production run exists or not
     If Not CheckProdRunExist Then
@@ -1564,69 +1568,31 @@ Private Sub cmdSamples_Click()
             "Please save Production Run First Before Configuring Samples.", vbExclamation
         Exit Sub
     End If
-
-    ' Checks to see that the quantity data entered is numeric value greater than one
-    If Not IsNumeric(Me.txtSamples) Or IsNull(Me.txtSamples) Then
-        MsgBox _
-            "The QTY Samples value must be numeric and greater than zero!", vbExclamation
-        Exit Sub
-    ElseIf Not IsNumeric(Me.txtSampleGroups) Or IsNull(Me.txtSampleGroups) Then
-        ' Checks to see if the sample type quantity data entered is numeric and greater than one
-        MsgBox "The Sample Types Value Must Be Numeric!", vbExclamation
-        Exit Sub
-    End If
-    
-    ' Checks to see if the data fields for samples is greater than 0
-    If CLng(Me.txtSamples) = 0 Then
-        MsgBox "QTY Samples must be greater than zero!", vbExclamation
-        Exit Sub
-    End If
-    
-    ' Checks to see if the data fields for samples is greater than 0
-    If CInt(Me.txtSampleGroups) = 0 Then
-        MsgBox "Samples Types must be larger than zero!", vbExclamation
-        Exit Sub
-    End If
-    
-    ' Checks to see if the sample types are larger or than the quantity total
-    If CInt(Me.txtSampleGroups) > CLng(Me.txtSamples) Then
-        MsgBox "The QTY Samples value must be larger!", vbExclamation
-        Exit Sub
-    End If
-    
-    ' Check to see if there is data already in the table for production run id
-    ' and sample type number
-    If CheckExistingSample Then
-        If Me.txtSamples < quantityTotal Then
+        
+    If Not CheckExistingSample Then
+        If ProductionRun.PrintAtPackager Then
             MsgBox _
-                "Data already exists, QTY Samples:" & quantityTotal & vbCrLf & _
-                "The QTY Samples value must be larger!", vbExclamation
+            "There are no samples to configure for this run.", vbInformation
             Exit Sub
-        ElseIf Me.txtSampleGroups < sampleTypes Then
-            MsgBox _
-                "Data Already Exists, Sample Types:" & sampleTypes & vbCrLf & _
-                "The Sample Types value must be larger!"
-            Exit Sub
-        Else
-            If CInt(Me.txtSampleGroups) - CInt(Me.sampleTypes) > CLng(Me.txtSamples) - CLng(Me.quantityTotal) Then
-                MsgBox _
-                    "Data already exists, not enough quantity!" & vbCrLf & _
-                    "QTY Samples: " & Me.quantityTotal
-                Me.txtSampleGroups = Me.sampleTypes
-                Exit Sub
-            End If
         End If
     End If
+   
+    lngExistingSampleQTY = CLng(Me.txtSamples.Text)
+    lngExistingSampleTypes = CLng(Me.txtSampleGroups.Text)
     
-    intExistingSampleQTY = Get_SampleQTY(ProductionRun.Production_Run_Id, 0)
     frmSmpConfig.Show vbModal
-    intNewSampleQTY = Get_SampleQTY(ProductionRun.Production_Run_Id, 0)
+    
+    lngNewSampleQTY = CLng(Me.txtSamples.Text)
+    lngNewSampleTypes = CLng(Me.txtSampleGroups.Text)
     
     ' Check to see if the sample quantities changed
-    If intNewSampleQTY <> intExistingSampleQTY Then
-        booSamplesQTYChanged = True
+    If (lngExistingSampleQTY <> lngNewSampleQTY) Or (lngExistingSampleTypes <> lngNewSampleTypes) Or booSamplesDirtyFlag = True Then
+        Me.txtProducedBy.Text = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
+        ProductionRun.Produced_By = Me.txtProducedBy
+        ProductionRun.UpdateSampleQuantities
+        booSamplesDirtyFlag = False
     End If
-    
+        
 End Sub
 
 Private Sub cmdSpecInst_Click()
@@ -1687,7 +1653,6 @@ Private Sub mnuViewComputerizationOrder_Click()
         rptProdPlan.Show vbModal
     
     Else
-        ' kbg 2008-009 changed to msgbox
         MsgBox "Create the Production Run first by clicking the Save Button.", vbInformation + vbOKOnly, "Production Run Error"
     End If
 End Sub
@@ -1726,7 +1691,7 @@ Private Sub cmdDeleteProdRun_Click()
         Exit Sub
     End If
     
-    ' kbg 2008-009 added check for existing replacements b/c when the main PDR is deleted,
+    ' check for existing replacements b/c when the main PDR is deleted,
     ' it orphans the replacements and throughs things out of whack.
     If Not booReplacement And Me.mnuRepProdRuns(0).Visible = True Then
         MsgBox _
@@ -1735,7 +1700,6 @@ Private Sub cmdDeleteProdRun_Click()
         Exit Sub
     End If
 
-    ' DW 2012-001 added
     ' Check to see if the PDR is associated to a Digital Overage Order and prompt user to unassociate it
     digitalOverageOrder = checkForAssociatedDigitalOverageOrder(ProductionRun.Barcode_Id)
     If Not digitalOverageOrder = "N/A" Then
@@ -1759,7 +1723,6 @@ Private Sub cmdDeleteProdRun_Click()
     ProductionRun.DeleteRecord
     If ProductionRun.Prod_Run_Updated Then
         
-        ' kbg 2008-009 added
         If Not booReplacement Then
             Set UpdateSchedule = New ScheduleUpdate.CScheduleUpdatemain
             With gApplicationUser
@@ -1774,7 +1737,6 @@ Private Sub cmdDeleteProdRun_Click()
         Call UpdateCompletelyShippedFlag(ProductionRun.Job_Log_Id)
         txtDirtyFlag = ""
     Else
-        ' kbg 2008-009 changed to msgbox
         MsgBox "Production Run Record was NOT Deleted." & Chr$(13) & "Check data and retry.", vbCritical
     End If
     
@@ -1790,10 +1752,8 @@ Error_this_Sub:
 
 End Sub
 
-' kbg 2008-009 added
 Private Sub Form_Unload(Cancel As Integer)
-    'Call CheckData ' DW 2010-002 this should be in query_unload
-    
+        
     ' clean up all global variables here
     Set CCBlindLamApplyCol = Nothing
     Set BlindLamApplyCol = Nothing
@@ -1804,8 +1764,6 @@ Private Sub Form_Unload(Cancel As Integer)
     Set dupSameCodingData = Nothing
     Set smpSameCodingData = Nothing
     Set BarcodeInfo = Nothing
-    'Set CCBlindLamApplyCol = Nothing   ' DW 2008-017 not sure why these are set
-    'Set BlindLamApplyCol = Nothing     'to Nothing twice....
     Set UpdateSchedule = Nothing
     Set ProductionRun = Nothing
     Set mData = Nothing
@@ -1893,8 +1851,6 @@ Private Sub mnuAbout_Click()
     abt.Initialize gApplicationUser, Me.Icon, App.Title, App.ProductName, App.Major, App.Minor, App.Revision
     abt.Show
 
-    'Load frmAbout
-    'frmAbout.Show vbModal
 End Sub
 
 Private Sub cmdViewShipping_Click()
@@ -1905,7 +1861,6 @@ Private Sub cmdViewShipping_Click()
     End If
 End Sub
 
-' kbg 2008-009 modified this method to handle new dupliation to keep modifications
 Private Sub duplicateConfig_Click()
     Dim i As Long
     
@@ -2059,7 +2014,6 @@ End Sub
 ' this creates a new Replacement Run
 Private Sub mnuReplacements_Click()
     Dim n As Long
-    ' kbg 2008-009 added
     Dim strMessageCC As String
     Dim strMessage As String
     
@@ -2115,7 +2069,6 @@ Private Sub mnuReplacements_Click()
     End With
     
     If booFound = False Then
-        ' kbg 2008-009 changed to msgbox
         MsgBox "The scanned Reprint File, " & txtInputSeqNum & ", was not found.", _
                 vbExclamation + vbOKOnly, "Error - File Not Found!"
         Exit Sub
@@ -2123,14 +2076,12 @@ Private Sub mnuReplacements_Click()
     
     'md new check - should only be scanning a file intended for a Replacement
     If gReprintFile_Type <> "REPLACEMENT" Then
-        ' kbg 2008-009 changed to msgbox
         MsgBox "The scanned file, " & txtInputSeqNum & ", was not intended to be a Replacement. " & _
              "Please try again!!", vbExclamation + vbOKOnly, "Error - Incorrect File Scanned!"
         Exit Sub
     End If
          
     If mReprintProdRunId <> ProductionRun.Production_Run_Id Then
-        ' kbg 2008-009 changed to msgbox
         MsgBox "The scanned file, " & txtInputSeqNum & ", does not belong to " & txtBarcodeId & ". " & _
              "Please try again!!", vbExclamation + vbOKOnly, "Error - Incorrect File Scanned!"
         Exit Sub
@@ -2138,7 +2089,6 @@ Private Sub mnuReplacements_Click()
     
      'verify that the data file scanned exists on the server before continuing
     If Not FileExists(strReprintFileName) Then
-        ' kbg 2008-009 changed to msgbox
         MsgBox "The Reprint File Does Not Exist on the server!" & vbCrLf _
             & "Verify that the file was not archived and try again.", vbExclamation + vbOKOnly, "Input File Does Not Exist!"
         Exit Sub
@@ -2188,8 +2138,6 @@ Private Sub mnuReplacements_Click()
     Me.chkReOrientation.value = 0
     
     Call Lock_Out_PDRForm(True, False)
-    Me.txtSampleGroups.Enabled = False
-    Me.txtSamples.Enabled = False
     
     'client reqd fields (if they exist) are carried over from the original PDR.
     'This will clear out the Production_Run_Client_Fields_Id
@@ -2211,14 +2159,12 @@ Private Sub mnuReplacements_Click()
     'from the original PDR so it is not editable ever
     Me.txtReferanceNo.Enabled = False
     
-    ' kbg 2008-009 added
     ' the special instructions should not be enabled until the replacement run is initially
     ' saved b/c that screen writes directly to the DB and if the PDR isn't in the DB, the
     ' changes are just not saved.
     Me.cmdSpecInst.Enabled = False
     
     
-    ' kbg 2008-009 added
     If (ProductionRun.Stock_Proof_Id <> gStockProofId) Then
         If MsgBox("The original PDR's stock is " & ProductionRun.stock & "." & vbCrLf & _
                 "Label Specs's stock is currently " & gStockLabelId & "." & vbCrLf & vbCrLf & _
@@ -2283,20 +2229,19 @@ Private Sub mnuReplacements_Click()
     
     Me.chkPrintAtPackager.Enabled = True
     
-PROC_EXIT:
+Proc_EXIT:
     Exit Sub
   
 Error_this_Sub:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Error Processing Reprint Name"
-    Resume PROC_EXIT
+    Resume Proc_EXIT
   
 End Sub
 
 ' this loads an existing Replacement Run
 Private Sub mnuRepProdRuns_Click(Index As Integer)
     Dim objData As nADOData.CADOData
-    ' kbg 2008-009 added
     Dim strMessageOrig As String
     Dim strMessage As String
     Dim booIRQsExist As Boolean
@@ -2331,7 +2276,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
         ProductionRun.Production_Run_Id = .Recordset!Production_Run_Id
         gProductionRun_Id = ProductionRun.Production_Run_Id
         ProductionRun.Reprint_File_Id = .Recordset!Reprint_File_Id
-        ' kbg 2008-009 added
+
         If mvarOrigStockProofId = 0 Then
             mvarOrigStockProofId = ProductionRun.Stock_Proof_Id
             mvarOrigStockId = ProductionRun.stock
@@ -2347,6 +2292,9 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
         'reset screen fields and collection fields
         booReplacement = True
         Me.txtReplacement.Visible = True
+        
+        ' reset the text of the PDR status field back to the default value from when the screen was originally loaded.
+        txtPDRStatus.Text = "PDR HAS BEEN PROCESSED"
     
         ProductionRun.LookupRecord
         
@@ -2379,12 +2327,13 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
         'fields on the form.
         If Determine_If_PDR_HasRun Then
             Call Lock_Out_PDRForm(False, True)
-            ' kbg 2006-026 added check to see if the PDR is on a PKS
+            Me.cmdSamples.Enabled = True
+            ' check to see if the PDR is on a PKS
             ' b/c the Job Shipping Flag isn't the most reliable indicator
             If Determine_Shipping_Flag_On Or DeterminePDROnPKS Then
                 SSDBComboShip.Enabled = False
                 Me.chkPrintAtPackager.Enabled = False
-                ' kbg 2008-009 added check for samples on PKS
+                ' check for samples on PKS
                 If Me.txtSampleGroups.Text > 1 Then
                     If DeterminePDROnPKS("S") Then
                         cmdSamples.Enabled = False
@@ -2397,14 +2346,12 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
             End If
             If ProductionRun.Barcode_Id <> "" Then
                 If Planning.CheckIfCombined(ProductionRun.Barcode_Id) Then
-                    cmdSamples.Enabled = False
                     txtPDRStatus.Text = "COMBINED PDR HAS BEEN PROCESSED"
+                    chkPrintAtPackager.Enabled = False
                 End If
             End If
         Else
             Call Lock_Out_PDRForm(True, False)
-            Me.txtSampleGroups.Enabled = False
-            Me.txtSamples.Enabled = False
             SSDBComboShip.Enabled = True
             cmdSamples.Enabled = True
             cmdSave.Enabled = True
@@ -2412,9 +2359,9 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
             If ProductionRun.Barcode_Id <> "" Then
                 If Planning.CheckIfCombined(ProductionRun.Barcode_Id) Then
                     Call Lock_Out_PDRForm(False, True)
-                    cmdSamples.Enabled = False
                     txtProdDesc.Enabled = True
                     txtPDRStatus.Text = "COMBINED PDR"
+                    chkPrintAtPackager.Enabled = False
                 End If
             End If
         End If
@@ -2429,7 +2376,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
         Me.txtSampleGroups = ProductionRun.Sample_Number
         Me.txtProducedBy = ProductionRun.Produced_By
         Call SetSSDBComboText(Me.SSDBComboShip, ProductionRun.Ship_To_Id)
-        ' kbg 2008-009 hold the orig pdr number
+        ' hold the orig pdr number
         If gOrigPDRNumber = "" Then
             gOrigPDRNumber = Me.txtBarcodeId.Text
         End If
@@ -2439,7 +2386,6 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
         ' tj - IRQ stuff 2
         HoldStockProofId = ProductionRun.Stock_Proof_Id
         HoldScratchStockProofId = ProductionRun.Scratch_Proof_Id
-        ' kbg 2008-009 added
         Me.txtStockNo.Text = ProductionRun.stock
         Me.txtOnsertDie.Text = ProductionRun.OnsertDiePartNumber
         Me.txtScratchStockNo.Text = ProductionRun.Scratch_Stock
@@ -2484,10 +2430,8 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
         Me.txtReplacement.Text = "REPLACEMENT"
     End If
     
-    'md 2006-020
     Me.chkReOrientation.value = ProductionRun.Reorient_Ind
     
-    ' kbg 2008-009 added
     booIRQsExist = False
     If Not oCollIRQInfo Is Nothing Then
         If oCollIRQInfo.count > 0 Then
@@ -2821,7 +2765,7 @@ Private Sub cmdSave_Click()
     ProductionRun.SaveProdRun
     If ProductionRun.Prod_Run_Updated Then
         Call DupLinksSpecInstructions
-        ' kbg 2008-009 added
+        
         If booReplacement Then
             Call AppendOrigRunToSpecInstructions
         End If
@@ -2840,7 +2784,6 @@ Private Sub cmdSave_Click()
         End If
         
         If booInitialSave Then
-            ' kbg 2008-009 added
             Call LoadBarcodeInfo(ProductionRun.Production_Run_Id)
             
             ' changes the Links approval method to PDRs if it is currently FULL and it is
@@ -2864,11 +2807,6 @@ Private Sub cmdSave_Click()
             Call SaveClientReqdFields
         End If
         
-' DW 2012-001 commented out - modification of quantities after IRQ created will no longer be allowed
-'        Call SaveStock2IRQ(ProductionRun.Stock_Proof_Id, Me.txtStockIRQ, Stock_IRQ_Details_Id, Stock_IRQ_Qty_Requested, False)
-'        If ProductionRun.Scratch_Proof_Id > 0 Or HoldScratchStockProofId > 0 Then
-'            Call SaveStock2IRQ(ProductionRun.Scratch_Proof_Id, Me.txtScratchIRQ, ScratchStock_IRQ_Details_Id, ScratchStock_IRQ_Qty_Requested, True)
-'        End If
 
         Me.txtStockIRQ = ""
         Me.txtScratchIRQ = ""
@@ -2896,7 +2834,7 @@ Private Sub cmdSave_Click()
         GoTo Exit_this_Sub
     End If
     
-    ' kbg 2008-008 added to hold main's barcode info
+    ' hold main's barcode info
     If booReplacement = True Then
         strCodingFileHeader = ProductionRun.Coding_File_Header
     End If
@@ -2907,7 +2845,7 @@ Private Sub cmdSave_Click()
     Me.cmdDeleteProdRun.Enabled = True
     Call Load_Menu
     
-    ' kbg 2008-008 added to hold main's barcode info
+    ' hold main's barcode info
     If booReplacement = True Then
         ProductionRun.Coding_File_Header = strCodingFileHeader
     End If
@@ -2943,12 +2881,6 @@ Private Function ValidScreen() As Boolean
         MsgBox "Quantity Requested must be entered.", vbExclamation
         Exit Function
     End If
-    If Trim$(Me.txtSamples) = "" Or Not IsNumeric(Me.txtSamples) Then
-        Me.txtSamples.SetFocus
-        MsgBox "Samples Requested must be entered.", vbExclamation
-        Exit Function
-    End If
-    ' kbg 2008-009 added
     If ProductionRun.Apply_ScratchOff = NA Then
         MsgBox _
             "The Label is missing scratchoff information." & vbCrLf & _
@@ -3088,15 +3020,8 @@ Private Sub CheckData()
 
     Dim i As Long
 
-    If Not IsNumeric(txtSamples) Or Not IsNumeric(txtSampleGroups) Then
-        MsgBox "The Sample Data has to be Numeric!", vbExclamation
-        Exit Sub
-    End If
-
     If Trim$(Me.txtProdDesc) <> Trim$(ProductionRun.Prod_Description) Then GoTo Flag_Dirty
     If Trim$(Me.txtReferanceNo) <> Trim$(ProductionRun.Reference_No) Then GoTo Flag_Dirty
-    If CLng(Me.txtSamples) <> ProductionRun.Samples_Requested Then GoTo Flag_Dirty
-    If CInt(Me.txtSampleGroups) <> ProductionRun.Sample_Number Then GoTo Flag_Dirty
     If Me.chkReOrientation.value <> ProductionRun.Reorient_Ind Then GoTo Flag_Dirty
     
     ' Determine whether client required fields have changed
@@ -3110,7 +3035,7 @@ Private Sub CheckData()
         End If
     End If
     
-    ' kbg 2008-009 added check that descriptions match still
+    ' check that descriptions match still
     If Not CBool(Me.chkPrintAtPackager.value) Then
         If (ProductionRun.Ship_To_Id <> SSDBComboShip.Columns.Item(1).Text) Or _
                 ProductionRun.Ship_Description <> SSDBComboShip.Columns(0).Text Then
@@ -3122,7 +3047,6 @@ Data_Changed:
     If Me.txtDirtyFlag = "Y" Then
         Select Case MsgBox("Do you want to save changes?", vbYesNo + vbQuestion)
             Case vbNo
-                Call CheckSampleQtyTotals(ProductionRun.Production_Run_Id, Me.txtSamples, Me.txtSampleGroups)
                 Me.txtDirtyFlag = ""
             Case vbYes
                 Call cmdSave_Click
@@ -3159,6 +3083,10 @@ Dim CodeString As String
 Dim ChgCodingFile As Boolean
 Dim HoldSmplId As Long
 Dim objData As nADOData.CADOData
+Dim lngNumberSampleFileLines As Long
+Dim strData As String
+Dim i As Long
+
 
     'check to see if samples exist
     If Trim$(txtSampleGroups.Text) = "" Or txtSampleGroups.Text = "0" Then
@@ -3167,7 +3095,6 @@ Dim objData As nADOData.CADOData
 
     Set objData = New CADOData
     With objData
-        ' DW 2010-002 added
         Set .Connection = GetDBConnection
             .CursorType = adOpenForwardOnly
             .CommandType = adCmdStoredProc
@@ -3181,69 +3108,78 @@ Dim objData As nADOData.CADOData
             'check to see if the column numbers are the same
             If Not .Recordset.EOF Then
                 gSampleFileName = .Recordset!Sample_File_Name
-                
-                Read_File (gSampleFileName)
-                SampleColumns = CountDelimitedWords(vdata, gRandDelimiter)
-                'md added for compare of data
-                tmpString = GetDelimitedWord(vdata, 1, gRandDelimiter)
-                tmpLength = Len(tmpString)
-                tmpTotal = Len(vdata)
-                SmplString = Mid$(vdata, tmpLength + 2, tmpTotal)
-                
-                Read_File (gCodingFileName)
-                codingColumns = CountDelimitedWords(vdata, gRandDelimiter)
-                'md added for compare of data
-                tmpString = GetDelimitedWord(vdata, 1, gRandDelimiter)
-                tmpLength = Len(tmpString)
-                tmpTotal = Len(vdata)
-                CodeString = Mid$(vdata, tmpLength + 2, tmpTotal)
-                
+                lngNumberSampleFileLines = GetNumberLinesInFile(gSampleFileName)
+                                
                 ChgCodingFile = False
                 
-                If CodeString = SmplString Then
-                    ChgCodingFile = False
-                Else
-                    ChgCodingFile = True
-                    If codingColumns <> SampleColumns Then
+                ' loop through all records in the sample file to compare to
+                ' the corresponding record in the coding file
+                For i = 1 To lngNumberSampleFileLines
+                    ' get the line of data from the sample file
+                    strData = GetLineOfData(gSampleFileName, i)
+                    ' get the number of columns in the line of data
+                    SampleColumns = CountDelimitedWords(strData, gRandDelimiter)
+                    tmpString = GetDelimitedWord(strData, 1, gRandDelimiter)
+                    tmpLength = Len(tmpString)
+                    tmpTotal = Len(strData)
+                    SmplString = Mid$(strData, tmpLength + 2, tmpTotal)
+                                    
+                    ' get the line of data from the coding file
+                    strData = GetLineOfData(gCodingFileName, i)
+                    ' get the number of columns in the line of data
+                    codingColumns = CountDelimitedWords(strData, gRandDelimiter)
+                    tmpString = GetDelimitedWord(strData, 1, gRandDelimiter)
+                    tmpLength = Len(tmpString)
+                    tmpTotal = Len(strData)
+                    CodeString = Mid$(strData, tmpLength + 2, tmpTotal)
+                              
+                    ' compare the sample data to the coding data.
+                    ' if different, display a message and exit the loop bc there's no need to continue checking.
+                    If CodeString <> SmplString Then
                         ChgCodingFile = True
-                        MsgBox _
-                            "The number of coded fields from the original coding file has changed." & vbCrLf & _
-                            "All the sample files will be DELETED! You MUST reconfigure ALL samples again!!!", vbExclamation
-                    Else
-                        MsgBox _
-                            "The Coding File is different than the Sample Files" & vbCrLf & _
-                            "The sample files will be deleted!  You MUST reconfigure ALL samples again!!!", vbExclamation
+                        If codingColumns <> SampleColumns Then
+                            MsgBox _
+                                "The number of coded fields from the original coding file has changed." & vbCrLf & _
+                                "All the sample files will be DELETED! You MUST reconfigure ALL samples again!!!", vbExclamation
+                        Else
+                            MsgBox _
+                                "The Coding File is different than the Sample Files" & vbCrLf & _
+                                "The sample files will be deleted!  You MUST reconfigure ALL samples again!!!", vbExclamation
+                        End If
+                        
+                        Exit For
                     End If
-                End If
-                
+                Next i
+                 
             End If
             
-            'md if there was a change in the coding file, then we MUST delete ALL sample files and
-            'make them reconfigure the samples.
+            ' if there was a change in the coding file, then we MUST delete ALL
+            ' sample files and make them reconfigure the samples.
             If ChgCodingFile Then
-              Do While Not .Recordset.EOF
-                HoldSmplId = .Recordset!sample_type_id
-                gSampleFileName = .Recordset!Sample_File_Name
-                If DeleteSample_By_SmplID(HoldSmplId) Then
-                    Kill (gSampleFileName)
-                Else
-                    MsgBox _
-                        "There was an error deleting sample file " & gSampleFileName & vbCrLf & _
-                        "Please contact IT.", vbExclamation
-                    .Recordset.Close
-                    Exit Sub
-                End If
-                .Recordset.MoveNext
-              Loop
+                Do While Not .Recordset.EOF
+                    HoldSmplId = .Recordset!sample_type_id
+                    gSampleFileName = .Recordset!Sample_File_Name
+                    
+                    If DeleteSample_By_SmplID(HoldSmplId) Then
+                        Kill (gSampleFileName)
+                    Else
+                        MsgBox _
+                            "There was an error deleting sample file " & gSampleFileName & vbCrLf & _
+                            "Please contact IT.", vbExclamation
+                            
+                        .Recordset.Close
+                        Exit Sub
+                    End If
+                    .Recordset.MoveNext
+                Loop
             End If
+            
             .Recordset.Close
     End With
         
 End Sub
 
 Public Sub ActivateEditOption(on_off As Boolean)
-    txtSamples.Enabled = on_off
-    txtSampleGroups.Enabled = on_off
     cmdSamples.Enabled = on_off
     cmdSpecInst.Enabled = on_off
     cmdDeleteProdRun.Enabled = on_off
@@ -3265,86 +3201,6 @@ Private Function CheckProdRunExist() As Boolean
     End If
 
 End Function
-
-Private Sub CheckSampleQtyTotals(prodrunid As Long, SmpQtyTot As Long, SmpTypesTot As Integer)
-    Dim objData As nADOData.CADOData
-
-    On Error GoTo Error_this_Sub
-
-    Dim Sampletotal As Long
-    Dim QtyTotal As Long
-
-    Set objData = New CADOData
-    With objData
-        ' DW 2010-002 added
-        Set .Connection = GetDBConnection
-        .ResetParameters
-        .CommandType = adCmdStoredProc
-        .CursorType = adOpenForwardOnly
-        .RowsetSize = 1
-
-        ' Call the SP to create the resultset
-        .ResetParameters
-        .AddParameter "Production Run Id", prodrunid, adInteger, adParamInput
-        .AddParameter "Type Number", 0, adInteger, adParamInput
-        .OpenRecordSetFromSP "get_SampleTypeInfo"
-
-        ' loading record set
-        Do While Not .Recordset.EOF
-            QtyTotal = QtyTotal + .Recordset!quantity
-            Sampletotal = Sampletotal + 1
-            .Recordset.MoveNext
-        Loop
-        
-        .Recordset.Close
-    
-    End With
-    
-    If Not oCollIRQInfo Is Nothing Then
-        For Each oIRQInfo In oCollIRQInfo
-            If (IIf(InStr(1, Me.txtStockIRQ, CStr(oIRQInfo.IRQ_Number)) > 0, True, False) Or oIRQInfo.IRQ_Number = Me.txtScratchIRQ) Then      ' DW 2012-001 modified
-                ' kbg 2008-009 changed to check that it isn't pending, because there is
-                ' also a completed status and we want to treat that one like issued
-                'If oIRQInfo.IRQ_Status <> "PENDING" Then   ' DW 2012-001 commented out
-'                If oIRQInfo.IRQ_Status = "ISSUED" Then
-                    GoTo Exit_this_Sub
-                'End If                                     ' DW 2012-001 commented out
-            End If
-        Next
-    Else
-        GoTo Exit_this_Sub
-    End If
-    
-    If (QtyTotal <> SmpQtyTot) Or (Sampletotal <> SmpTypesTot) Then
-        MsgBox _
-            "The sample totals have been changed - Quantities will Automatically be Changed to: " & _
-            "Quantity is: " & QtyTotal & " and Sample Types are: " & Sampletotal & vbCrLf '& vbCrLf & _     ' DW 2012-001 commented out
-            '"*Note* IRQ quantities will be updated to match the new totals.", vbInformation                ' DW 2012-001 commented out
-    End If
-    
-    If booSamplesQTYChanged Then
-        MsgBox _
-            "The sample totals have been changed." & vbCrLf '& _
-            '"IRQ quantities will be updated to match the new totals.", vbInformation       ' DW 2012-001 commented out
-        
-' DW 2012-001 commented out - modification of quantities after IRQ created will no longer be allowed
-'        'Update IRQ info
-'        Call SaveStock2IRQ(ProductionRun.Stock_Proof_Id, Me.txtStockIRQ, Stock_IRQ_Details_Id, Stock_IRQ_Qty_Requested, False)
-'        '
-'        If ProductionRun.Scratch_Proof_Id > 0 Or HoldScratchStockProofId > 0 Then
-'            Call SaveStock2IRQ(ProductionRun.Scratch_Proof_Id, Me.txtScratchIRQ, ScratchStock_IRQ_Details_Id, ScratchStock_IRQ_Qty_Requested, True)
-'        End If
-    End If
-    
-Exit_this_Sub:
-    Exit Sub
-
-Error_this_Sub:
-    MsgBox "Error: " & Err.Number & " " & Err.description, vbCritical, _
-    "ERROR - "
-    Resume Exit_this_Sub
-    
-End Sub
 
 Private Function UpdateCompletelyShippedFlag(lngJobLogId As Long) As Boolean
     On Error GoTo Handle_Error
@@ -3399,14 +3255,14 @@ On Error GoTo PROC_ERR
     If Me.txtQty = 0 Then
         Call Get_SampleFile_Layout
     Else
-        'load 2 clintrak samples to collection for use in creation of file with live data
-        ' DW 2010-002 added  If Print at Packager is true do not add the "Clintrak" Samples
+        ' load 2 clintrak samples to collection for use in creation of file with live data
+        ' If Print at Packager is true do not add the "Clintrak" Samples
         If Not CBool(Me.chkPrintAtPackager.value) Then
             Call ReadProcess_File_CTK(ProductionRun.File_Name, 2, "CLINTRAK")
         End If
     End If
     
-    ' DW 2010-002 added  If Print at Packager is true do not add the "Clintrak" Samples
+    ' If Print at Packager is true do not add the "Clintrak" Samples
     If Not CBool(Me.chkPrintAtPackager.value) Then
         'create clintrak sample file
         Call CollectionToFileCTK(mSampleFileName)
@@ -3426,13 +3282,13 @@ On Error GoTo PROC_ERR
          Save_Samples_FromPDR_Screen = True
     End If
     
-PROC_EXIT:
+Proc_EXIT:
     Exit Function
   
 PROC_ERR:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Error Saving Samples from PDR screen", vbExclamation
-    Resume PROC_EXIT
+    Resume Proc_EXIT
 
 End Function
 
@@ -3586,18 +3442,17 @@ End If
 ' Close file
 Close lngSourceFile
 
-PROC_EXIT:
+Proc_EXIT:
     Exit Sub
   
 PROC_ERR:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "ReadProcess File"
-    Resume PROC_EXIT
+    Resume Proc_EXIT
 
 End Sub
 
 Private Sub Get_ReprintSamples_ID_For_Replacements()
-'md new for clintrak samples
 'get sample reprints
 
     Dim Index As Long
@@ -3607,7 +3462,6 @@ Private Sub Get_ReprintSamples_ID_For_Replacements()
 
     Set objData = New CADOData
     With objData
-        ' DW 2010-002 added
         Set .Connection = GetDBConnection
         .ResetParameters
         .CommandType = adCmdStoredProc
@@ -3695,9 +3549,7 @@ End Function
 
 
 Private Sub Lock_Out_PDRForm(booval1 As Boolean, booval2 As Boolean)
-
-    txtSamples.Enabled = booval1
-    txtSampleGroups.Enabled = booval1
+    
     cmdDeleteProdRun.Enabled = (ProductionRun.Production_Run_Id <> 0) And booval1
     
     txtPDRStatus.Visible = booval2
@@ -3739,13 +3591,13 @@ Private Sub GetReprintFile_For_PDR(Found As Boolean)
          End If
     End With
          
-PROC_EXIT:
+Proc_EXIT:
     Exit Sub
   
 PROC_ERR:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Error Getting Reprint File for PDR"
-    Resume PROC_EXIT
+    Resume Proc_EXIT
          
 End Sub
 
@@ -3831,7 +3683,6 @@ Public Sub GetIRQInfo()
             
     Set objData = New CADOData
     With objData
-        ' DW 2010-002 added
         Set .Connection = GetDBConnection
         .CursorType = adOpenForwardOnly
         .CommandType = adCmdStoredProc
@@ -4013,29 +3864,6 @@ Handle_Error:
     
 End Function
 
-Private Sub txtSamples_Change()
-
-    If Not oCollIRQInfo Is Nothing Then
-        If Not IsNumeric(txtSamples.Text) Then
-            txtSamples.Text = ProductionRun.Samples_Requested
-            Exit Sub
-        End If
-        For Each oIRQInfo In oCollIRQInfo
-            ' kbg 2008-009 changed to check the IRQ status isn't pending (instead of just checking if issued)
-            ' because there is also a completed status and we want to treat that one like issued
-            ' DW 2012-001 changing this again to consider only the fact that an IRQ exists and that modifications
-            ' should not be made that could directly affect available quantities vs. scheduling
-            If (IIf(InStr(1, Me.txtStockIRQ, CStr(oIRQInfo.IRQ_Number)) > 0, True, False) Or oIRQInfo.IRQ_Number = Me.txtScratchIRQ) And _
-               txtSamples <> ProductionRun.Samples_Requested Then       ' DW - removed from if block oIRQInfo.IRQ_Status <> "PENDING" And
-                    MsgBox "Cannot change quantities because an IRQ has already been created.", vbCritical, "Error Changing Quantities"
-                    txtSamples.Text = ProductionRun.Samples_Requested
-                    Exit For
-            End If
-        Next
-    End If
-    
-End Sub
-
 '<comment>
 ' <summary>
 '       This sub checks to see if there are links special instructions and if so,
@@ -4055,13 +3883,11 @@ Private Sub DupLinksSpecInstructions()
                 "to the PDR's Special Instructions?", vbQuestion + vbYesNo) = vbYes Then
                 
                 If Trim$(Me.rtbPDRInstructions.Text) <> "" Then
-                    ' kbg 2006-036 using global user object
                     Me.rtbPDRInstructions.Text = _
                         Me.rtbPDRInstructions.Text & vbCrLf & vbCrLf & _
                         Me.rtbLinkInstructions.Text & " - " & _
                         Now & " " & gClintrakLocations(gApplicationUser.ClintrakLocationId).Time_Zone_Display
                 Else
-                    ' kbg 2006-036 using global user object
                     Me.rtbPDRInstructions.Text = _
                         Me.rtbLinkInstructions.Text & " - " & _
                         Now & " " & gClintrakLocations(gApplicationUser.ClintrakLocationId).Time_Zone_Display
@@ -4069,7 +3895,6 @@ Private Sub DupLinksSpecInstructions()
                 
                 Call writetext
                 
-                ' kbg 2006-036 using global user object
                 If Len(Me.rtbPDRInstructions.Text) > _
                     Len(Me.rtbLinkInstructions.Text & " - " & _
                         Now & " " & gClintrakLocations(gApplicationUser.ClintrakLocationId).Time_Zone_Display) Then
@@ -4240,7 +4065,6 @@ Handle_Error:
     
 End Sub
 
-' kbg 2008-009 added
 Private Sub AppendOrigRunToSpecInstructions()
 '
 'comments:  this sub appends the replacement run's original PRG or PDR to

@@ -386,22 +386,16 @@ Public Sub LookupRecord()
                 mvarNumSampleTypes = IIf(IsNull(.Recordset!Number_Smp_Types), 0, .Recordset!Number_Smp_Types)
                 mvarShipToId = IIf(IsNull(.Recordset!Job_Shipping_Id), 0, .Recordset!Job_Shipping_Id)
                 mvarShipDescription = IIf(IsNull(.Recordset!Ship_Description), "", .Recordset!Ship_Description)
-                'md added for clintrak samples
                 mvarStock_Proof_Id = .Recordset!Stock_Proof_Id
                 mvarReprint_File_Id = IIf(IsNull(.Recordset!Reprint_File_Id), 0, .Recordset!Reprint_File_Id)
                 mvarApplyScratchOff = IIf(IsNull(.Recordset!Apply_ScratchOff), 0, .Recordset!Apply_ScratchOff)
                 mvarCombinedRun = IIf(IsNull(.Recordset!Combined_Run_Ind), 0, .Recordset!Combined_Run_Ind)
-                ' DW 2008-017
-                'mvarProcessingLocation = IIf(IsNull(.Recordset!Processing_Location), "", .Recordset!Processing_Location)
                 mvarClintrakLocationId = .Recordset!Clintrak_Location_Id
                 mvarReorientInd = IIf(IsNull(.Recordset!Reorient_Ind), 0, .Recordset!Reorient_Ind)
                 mvarCodingFileHeader = .Recordset!Coding_File_Header
                 mvarReferenceNo = Trim$(.Recordset!Reference_Number)
-                'cc 2008-005 added PDR_Print_Date
                 mvarPrintDate = IIf(IsNull(.Recordset!PDR_Print_Date), "1/1/1900", .Recordset!PDR_Print_Date)
-                ' kbg 2008-009 added ApprovalDate
                 mvarApprovalDate = IIf(IsNull(.Recordset!Approval_Date), "1/1/1900", .Recordset!Approval_Date)
-                ' DW 2010-002 added PrintAtPackager
                 mvarPrintAtPackagerInd = .Recordset!Print_At_Packager_Ind
                 mvarOnsertDiePartNumber = .Recordset!Onsert_Die_Part_Number
                 mvarOnsertDieToolId = .Recordset!Onsert_Die_Tool_Id
@@ -810,7 +804,6 @@ Public Sub UpdateSampleQuantities()
                                                         
     Set objData = New CADOData
     With objData
-        ' DW 2010-002 added
         Set .Connection = GetDBConnection
         .CursorType = adOpenForwardOnly
         .CommandType = adCmdStoredProc
@@ -819,6 +812,7 @@ Public Sub UpdateSampleQuantities()
         .AddParameter "Production_Run_Id", mvarProduction_Run_Id, adInteger, adParamInput
         .AddParameter "Samples Requested", mvarSamples_Requested, adInteger, adParamInput
         .AddParameter "Number Sample Types", mvarNumSampleTypes, adInteger, adParamInput
+        .AddParameter "Produced By", CheckNulls(mvarProduced_By), adVarChar, adParamInput
         .AddParameter "Error", "   ", adInteger, adParamOutput
         .ExecuteSP "update_Production_Run_Samples", True
         .RetrieveParameters

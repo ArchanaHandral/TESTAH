@@ -63,9 +63,7 @@ Public Function CheckIfReplacement(barCode As String) As Boolean
         
     Set objData = New CADOData
     With objData
-        ' DW 2010-002 added
         Set .Connection = gadoConnection.Connection
-        'Set .Connection = GetDBConnection
         .CursorType = adOpenForwardOnly
         .CommandType = adCmdStoredProc
         .LockType = adLockReadOnly
@@ -78,8 +76,6 @@ Public Function CheckIfReplacement(barCode As String) As Boolean
         
         If Not .Recordset.EOF Then
             CheckIfReplacement = True
-            ' kbg 2008-009 not used
-'            gReprintBarcode = .Recordset!reprint_file_barcode
             
             gRandomizationId = .Recordset!Randomization_Id
             gProofId = .Recordset!Proof_Id

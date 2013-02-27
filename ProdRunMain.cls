@@ -21,8 +21,6 @@ Option Explicit
 Private rpt As ARProdPlan
 Dim Counter As Long  'page count in multiple IRQ report
 
-' kbg 2006-036
-' DW 2008-017 removed Domain as String from parameter list
 Public Function Initialize(Username As String, Token As String, Server As String, Database As String, Optional DomainIconPath As String) As Boolean
     ' DW 2008-017 added
     Dim objLocation As ClintrakCommon.Location
@@ -142,17 +140,11 @@ Public Sub PrintAll_ProdPlanning_Forms(barCode As String, booPDF As Boolean)
     'change depending on barcode
     If Mid$(UCase$(barCode), 1, 3) = "PRG" Then
         gShowQuarantineTagFlag = False
-        ' kbg 2008-009 not used
-'        gShowSmpLabelTagFlag = True
     Else   'must be PDR
         If Planning.CheckIfCombined(barCode) = True Then
             gShowQuarantineTagFlag = False
-            ' kbg 2008-009 not used
-'            gShowSmpLabelTagFlag = True
         Else
           gShowQuarantineTagFlag = True
-          ' kbg 2008-009 not used
-'          gShowSmpLabelTagFlag = True
         End If
     End If
 
@@ -171,7 +163,6 @@ Public Sub PrintAll_ProdPlanning_Forms(barCode As String, booPDF As Boolean)
                  Call GetJobInformation
                  Call GetClientName
                  Call GetRandIDNumber
-                 ' kbg 2008-009 added
                 Call GetLabelCurrentValues
 
                  ProductionRun.Production_Run_Id = gProductionRun_Id
@@ -193,8 +184,6 @@ Public Sub PrintAll_ProdPlanning_Forms(barCode As String, booPDF As Boolean)
                         Counter = Counter + 1
                     Next n
                 Else
-                    ' kbg 2008-009 not used
-'                    rptProdPlan.LabelMatrix = False
                     rptProdPlan.Printer.Orientation = ddOLandscape
                     Call rptProdPlan.PrintReport(False)
                     Set rptProdPlan = Nothing
@@ -237,8 +226,6 @@ Public Sub PrintAll_ProdPlanning_Forms(barCode As String, booPDF As Boolean)
                         Counter = Counter + 1
                     Next n
                 Else
-                    ' kbg 2008-009 not used
-'                    rptProdPlan.LabelMatrix = False
                     rptProdPlan.Printer.Orientation = ddOLandscape
                     Call rptProdPlan.PrintReport(False)
                     Set rptProdPlan = Nothing
@@ -288,8 +275,6 @@ Public Sub PrintAll_ProdPlanning_Forms(barCode As String, booPDF As Boolean)
                         Counter = Counter + 1
                     Next n
                 Else
-                    ' kbg 2008-009 not used
-'                    rptProdPlan.LabelMatrix = False
                     rptProdPlan.Printer.Orientation = ddOLandscape
                     Call rptProdPlan.PrintReport(False)
                     Set rptProdPlan = Nothing

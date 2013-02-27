@@ -58,6 +58,7 @@ Begin VB.Form frmTestPDR
          Left            =   960
          PasswordChar    =   "*"
          TabIndex        =   9
+         Text            =   "Winter!2#"
          Top             =   1560
          Width           =   3375
       End
@@ -72,7 +73,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   960
          TabIndex        =   7
-         Text            =   "DPClintrak"
+         Text            =   "karentest"
          Top             =   720
          Width           =   3375
       End
@@ -172,30 +173,67 @@ Begin VB.Form frmTestPDR
       TabIndex        =   0
       Top             =   3360
       Width           =   4455
-      Begin VB.TextBox txtRandID 
+      Begin VB.TextBox txtJobLogId 
          Height          =   285
-         Left            =   960
+         Left            =   1080
+         TabIndex        =   20
+         Text            =   "35092"
+         Top             =   960
+         Width           =   1455
+      End
+      Begin VB.TextBox txtCodingNum 
+         Height          =   285
+         Left            =   1080
+         TabIndex        =   18
+         Text            =   "0"
+         Top             =   600
+         Width           =   1455
+      End
+      Begin VB.TextBox txtFileLinksId 
+         Height          =   285
+         Left            =   1080
          TabIndex        =   2
+         Text            =   "649390"
          Top             =   240
          Width           =   1455
       End
       Begin VB.CommandButton Command1 
          Caption         =   "Open"
          Height          =   375
-         Left            =   960
+         Left            =   2880
          TabIndex        =   1
-         Top             =   600
+         Top             =   840
          Width           =   1455
+      End
+      Begin VB.Label lblJobLog 
+         AutoSize        =   -1  'True
+         BackStyle       =   0  'Transparent
+         Caption         =   "Job Log Id"
+         Height          =   195
+         Left            =   120
+         TabIndex        =   21
+         Top             =   960
+         Width           =   825
+      End
+      Begin VB.Label lblCodingNum 
+         AutoSize        =   -1  'True
+         BackStyle       =   0  'Transparent
+         Caption         =   "Coding #"
+         Height          =   195
+         Left            =   120
+         TabIndex        =   19
+         Top             =   600
+         Width           =   825
       End
       Begin VB.Label Label1 
          AutoSize        =   -1  'True
          BackStyle       =   0  'Transparent
-         Caption         =   "Rand ID"
-         Height          =   255
+         Caption         =   "File Links Id"
+         Height          =   195
          Left            =   120
          TabIndex        =   3
          Top             =   240
-         Width           =   735
+         Width           =   825
       End
    End
 End
@@ -222,7 +260,7 @@ Private Sub cmdConnect_Click()
     If mvarUser Is Nothing Then
         If Authenticate(Me.txtUsername.Text, Me.txtPassword.Text, Me.txtDomain.Text) Then
             Me.txtToken.Text = mvarUser.Token
-            Me.fraCodeBreak.Enabled = True
+            Me.fraPDR.Enabled = True
         Else
             Set mvarUser = Nothing
         End If
@@ -241,24 +279,23 @@ Private Function Authenticate(ByVal Username As String, ByVal Password As String
 End Function
 
 Private Sub Command1_Click()
-    Dim cb As CodeBreakReporting.CBForm
+    Dim pdr As ProductionRuns.ProdRunMain
     
-    Set cb = New CodeBreakReporting.CBForm
-    With cb
-        .Initialize Me.txtUsername.Text, Me.txtToken.Text, Me.txtServer.Text, Me.txtDatabase.Text
-        .Randomization_Id = CLng(txtRandID)
-        .Show
+    Set pdr = New ProductionRuns.ProdRunMain
+    With pdr
+        If .Initialize(Me.txtUsername.Text, Me.txtToken.Text, Me.txtServer.Text, Me.txtDatabase.Text, "\\ClkAlData\Clintrak_Data\ICONS\") Then
+            Call .Load_Prod_Run(CLng(txtFileLinksId.Text), CLng(Me.txtCodingNum.Text), CLng(Me.txtJobLogId.Text))
+            
+        End If
+      
     End With
-    
-    'cb.Randomization_Id = 1240 'test very large set
-    'cb.Randomization_Id = 1019 'test small set of about 50
-    'cb.Randomization_Id = 1086 'test missing files
-    'cb.Randomization_Id = 1884 'test leading 0s
-    'cb.Randomization_Id = 1829 'test multi columns
-    'cb.Randomization_Id = 1887 'test strange case
-    'cb.Randomization_Id = 1647 'test key error
-    'cb.Randomization_Id = 1019012 'test rand id that does not exist
-    'cb.Randomization_Id = 1 'test rand id with no files
         
 End Sub
 
+Private Sub Form_Unload(Cancel As Integer)
+
+    If Not mvarUser Is Nothing Then
+        mvarUser.DisposeToken
+    End If
+
+End Sub
