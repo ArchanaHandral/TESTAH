@@ -939,6 +939,7 @@ Begin VB.Form frmProdPlan
       _ExtentX        =   2355
       _ExtentY        =   635
       _Version        =   393217
+      Enabled         =   -1  'True
       TextRTF         =   $"frmProdPlan.frx":1272
    End
    Begin RichTextLib.RichTextBox rtbPDRInstructions 
@@ -952,6 +953,7 @@ Begin VB.Form frmProdPlan
       _ExtentX        =   2355
       _ExtentY        =   635
       _Version        =   393217
+      Enabled         =   -1  'True
       TextRTF         =   $"frmProdPlan.frx":12ED
    End
    Begin VB.TextBox txtStockIRQ 
@@ -3132,6 +3134,14 @@ Dim i As Long
                     tmpLength = Len(tmpString)
                     tmpTotal = Len(strData)
                     CodeString = Mid$(strData, tmpLength + 2, tmpTotal)
+                    
+                    ' this is required because it sets vdata to the first line and
+                    ' this data is then used when creating a replacement PDR
+                    If i = 1 Then
+                        Read_File (gSampleFileName)
+                        Read_File (gCodingFileName)
+                    End If
+                    
                               
                     ' compare the sample data to the coding data.
                     ' if different, display a message and exit the loop bc there's no need to continue checking.
