@@ -23,7 +23,7 @@ Begin VB.Form frmSmpConfig
    MinButton       =   0   'False
    ScaleHeight     =   6675
    ScaleWidth      =   8415
-   StartUpPosition =   2  'CenterScreen
+   StartUpPosition =   1  'CenterOwner
    Begin VB.CommandButton cmdAdd 
       Caption         =   "Add New Type"
       BeginProperty Font 
@@ -619,6 +619,7 @@ Private intCodingColCount As Integer
 
 
 Private Sub Form_Load()
+    CenterForm Me
     Dim colTemp As JSColumn
     Dim colCount As Integer
     Dim i As Long
@@ -664,8 +665,8 @@ Private Sub Form_Load()
     Call getFileLinksInfo
     
     If SampleDataExists(Me.txtSmpTypeNum) Then
-        Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.Text)
-        Call Read_SampleFile(gSampleFileName, SSDBComboSmpType.Columns.Item(2).Text)
+        Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.text)
+        Call Read_SampleFile(gSampleFileName, SSDBComboSmpType.Columns.Item(2).text)
         'counts the number of columns
         colCount = CountDelimitedWords(vdata, gRandDelimiter)
         ' account for barcode column
@@ -688,7 +689,7 @@ Private Sub Form_Load()
         gSampleTypeId = 0
         Call SetSSDBComboText(Me.SSDBComboSmpType, "CLINTRAK", "CLINTRAK")
         Call SSDBComboSmpType_Click
-        Me.txtQtynumber.Text = 2
+        Me.txtQtynumber.text = 2
         Call Update_Click
         jobShippingId = 0
         cmdDeleteButton.Enabled = False
@@ -729,7 +730,7 @@ Private Sub Form_Load()
     End If
     
     ' only enable if not a replacement and not clintrak samples
-    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIRQsExist = True Then
+    If booReplacement Or Me.SSDBComboSmpType.text = "CLINTRAK" Or mvarIRQsExist = True Then
         Me.mnuLoadSample.Enabled = False
         Me.cmdDeleteButton.Enabled = False
     End If
@@ -741,7 +742,7 @@ Private Sub Form_Load()
     Else
         Update.Enabled = True
         txtQtynumber.Enabled = True
-        If Me.SSDBComboSmpType.Text <> "CLINTRAK" Then Me.cmdLoadCoding.Enabled = True
+        If Me.SSDBComboSmpType.text <> "CLINTRAK" Then Me.cmdLoadCoding.Enabled = True
     End If
 
     If Determine_If_PDR_HasRun = True Or Planning.CheckIfCombined(ProductionRun.Barcode_Id) = True Then
@@ -774,13 +775,13 @@ Private Sub cmdBackButton_Click()
     txtSmpTypeNum = txtSmpTypeNum - 1
     
     If SampleDataExists(Me.txtSmpTypeNum) Then
-        Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.Text)
+        Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.text)
         Call Read_SampleFile(gSampleFileName, _
-             SSDBComboSmpType.Columns.Item(2).Text)
+             SSDBComboSmpType.Columns.Item(2).text)
         Read_File (gCodingFileName)
         dirtyFlag = ""
         Call SetScreenEdit
-        If SSDBComboSmpType.Text <> "CLINTRAK" Then
+        If SSDBComboSmpType.text <> "CLINTRAK" Then
             Call LoadShippingInfo(jobShippingId, txtShip, txtAttn, txtAdd1, txtAdd2, _
                         txtCity, txtState, txtZip, txtAdd3)
             If jobShippingId = 0 Then ClearShipFields
@@ -792,21 +793,21 @@ Private Sub cmdBackButton_Click()
         Set mData = New CCOLPDRFILES
         dirtyFlag = "Y"
         gSampleTypeId = 0
-        SSDBComboSmpType.Text = ""
-        SSDBComboShip.Text = ""
+        SSDBComboSmpType.text = ""
+        SSDBComboShip.text = ""
         comboSmp = ""
         Call ClearShipFields
-        txtDescription.Text = ""
+        txtDescription.text = ""
         description = ""
         jobShippingId = 0
         Call SetScreenEdit
         Call mData.Add(vdata, 1, _
-          SSDBComboSmpType.Columns.Item(2).Text)
+          SSDBComboSmpType.Columns.Item(2).text)
         cmdDeleteButton.Enabled = False
     End If
     
     ' Set to dirty if Print @ Packager has changed
-    If gSampleTypeId > 0 And Me.SSDBComboShip.Enabled And Trim(Me.SSDBComboShip.Text) = "" Then
+    If gSampleTypeId > 0 And Me.SSDBComboShip.Enabled And Trim(Me.SSDBComboShip.text) = "" Then
         dirtyFlag = "Y"
     End If
     
@@ -816,7 +817,7 @@ Private Sub cmdBackButton_Click()
     End If
     
     ' only enable if not a replacement and not clintrak samples
-    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIRQsExist = True Then
+    If booReplacement Or Me.SSDBComboSmpType.text = "CLINTRAK" Or mvarIRQsExist = True Then
         Me.mnuLoadSample.Enabled = False
         cmdDeleteButton.Enabled = False
     Else
@@ -830,7 +831,7 @@ Private Sub cmdBackButton_Click()
     End If
     
     'resets the configure column data
-    txtcolumn.Text = ""
+    txtcolumn.text = ""
     columnNumber = 0
     
     jgrdData.ItemCount = mData.count
@@ -893,8 +894,8 @@ Private Sub cmdDeleteButton_Click()
     txtSmpTypeNum = txtSmpTypeNum - 1
     
     'checks to see if the type number goes to zero
-    If CInt(txtSmpTypeNum.Text) < 1 Then
-        txtSmpTypeNum.Text = 1
+    If CInt(txtSmpTypeNum.text) < 1 Then
+        txtSmpTypeNum.text = 1
         cmdBackButton.Enabled = False
     End If
     
@@ -902,9 +903,9 @@ Private Sub cmdDeleteButton_Click()
     Call CheckAvailableNext
     
     If SampleDataExists(Me.txtSmpTypeNum) Then
-        Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.Text)
+        Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.text)
         Call Read_SampleFile(gSampleFileName, _
-             SSDBComboSmpType.Columns.Item(2).Text)
+             SSDBComboSmpType.Columns.Item(2).text)
         Read_File (gCodingFileName)
         dirtyFlag = ""
         Call LoadShippingInfo(jobShippingId, txtShip, txtAttn, txtAdd1, txtAdd2, _
@@ -914,19 +915,19 @@ Private Sub cmdDeleteButton_Click()
         Read_File (gCodingFileName)
         'populates the collection with data from file
         Set mData = New CCOLPDRFILES
-        Call mData.Add(vdata, 1, SSDBComboSmpType.Text)
+        Call mData.Add(vdata, 1, SSDBComboSmpType.text)
         gSampleTypeId = 0
         Call ClearShipFields
-        SSDBComboSmpType.Text = ""
-        SSDBComboShip.Text = ""
+        SSDBComboSmpType.text = ""
+        SSDBComboShip.text = ""
         Me.cmdDeleteButton.Enabled = False
     End If
     
     columnNumber = 0
-    txtcolumn.Text = ""
+    txtcolumn.text = ""
     
     ' only enable if not a replacement and not clintrak samples
-    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIRQsExist = True Then
+    If booReplacement Or Me.SSDBComboSmpType.text = "CLINTRAK" Or mvarIRQsExist = True Then
         Me.mnuLoadSample.Enabled = False
         Me.cmdDeleteButton.Enabled = False
     Else
@@ -973,7 +974,7 @@ Private Sub cmdLoadCoding_Click()
     Dim tempstr As String
     
      'checks to see whether the sample type was filled in first
-    If SSDBComboSmpType.Text = "" Then
+    If SSDBComboSmpType.text = "" Then
         MsgBox "The Sample Type must be entered!", vbExclamation
         txtQtynumber = 1
         Exit Sub
@@ -986,20 +987,20 @@ Private Sub cmdLoadCoding_Click()
     End If
     
     ' Checks to see if there are enough product labels to copy.
-    If CLng(Me.txtQtynumber.Text) > ProductionRun.Qty_Requested Then
+    If CLng(Me.txtQtynumber.text) > ProductionRun.Qty_Requested Then
         MsgBox "Cannot load ""As Per Sequence"" since there are more sample labels than product.", vbExclamation
         Exit Sub
     End If
        
     temp = txtQtynumber
     
-    If SSDBComboSmpType.Text <> "CLINTRAK" Then
+    If SSDBComboSmpType.text <> "CLINTRAK" Then
         'removes all the old data on the grid
         For i = 1 To mData.count
             mData.Remove (mData.count)
         Next
        
-        tempstr = SSDBComboSmpType.Columns.Item(2).Text
+        tempstr = SSDBComboSmpType.Columns.Item(2).text
         Call ReadProcess_File(ProductionRun.File_Name, temp, tempstr)
             
         dirtyFlag = "Y"
@@ -1029,15 +1030,15 @@ Private Sub cmdNextButton_Click()
     Me.txtSmpTypeNum = Me.txtSmpTypeNum + 1
     
     If SampleDataExists(Me.txtSmpTypeNum) Then
-        Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.Text)
+        Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.text)
         Call Read_SampleFile(gSampleFileName, _
-             SSDBComboSmpType.Columns.Item(2).Text)
+             SSDBComboSmpType.Columns.Item(2).text)
         Read_File (gCodingFileName)
         dirtyFlag = ""
         
         Call SetScreenEdit
         
-        If SSDBComboSmpType.Text <> "CLINTRAK" Then
+        If SSDBComboSmpType.text <> "CLINTRAK" Then
             Call LoadShippingInfo(jobShippingId, txtShip, txtAttn, txtAdd1, txtAdd2, _
                         txtCity, txtState, txtZip, txtAdd3)
             If jobShippingId = 0 Then ClearShipFields   ' DW 2010-002 added
@@ -1048,26 +1049,26 @@ Private Sub cmdNextButton_Click()
         Set mData = New CCOLPDRFILES
         dirtyFlag = "Y"
         gSampleTypeId = 0
-        SSDBComboSmpType.Text = ""
-        SSDBComboShip.Text = ""
+        SSDBComboSmpType.text = ""
+        SSDBComboShip.text = ""
         comboSmp = ""
         Call ClearShipFields
-        txtDescription.Text = ""
+        txtDescription.text = ""
         description = ""
         jobShippingId = 0
         cmdDeleteButton.Enabled = False
         Call SetScreenEdit
-        Call mData.Add(vdata, 1, SSDBComboSmpType.Text)
+        Call mData.Add(vdata, 1, SSDBComboSmpType.text)
         frmProdPlan.sampleTypes = frmProdPlan.sampleTypes + 1
     End If
     
     'resets configure column data
-    txtcolumn.Text = ""
+    txtcolumn.text = ""
     columnNumber = 0
     txtQtynumber = mData.count
     
     ' Set to dirty if Print @ Packager has changed
-    If gSampleTypeId > 0 And Me.SSDBComboShip.Enabled And Trim(Me.SSDBComboShip.Text) = "" Then
+    If gSampleTypeId > 0 And Me.SSDBComboShip.Enabled And Trim(Me.SSDBComboShip.text) = "" Then
         dirtyFlag = "Y"
     End If
     
@@ -1079,7 +1080,7 @@ Private Sub cmdNextButton_Click()
     End If
     
     ' only enable if not a replacement and not clintrak samples
-    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIRQsExist = True Then
+    If booReplacement Or Me.SSDBComboSmpType.text = "CLINTRAK" Or mvarIRQsExist = True Then
         Me.mnuLoadSample.Enabled = False
         ' the delete button is enabled/disable above as well, so only disable if certain criteria met
         cmdDeleteButton.Enabled = False
@@ -1114,6 +1115,8 @@ End Sub
 Private Sub cmdSaveButton_Click()
     Dim colCount As Long
     Dim j As Long
+    Dim r As Long
+    Dim c As Long
 
     jgrdData.ItemCount = mData.count
     jgrdData.Update
@@ -1121,7 +1124,7 @@ Private Sub cmdSaveButton_Click()
     
     'checks if the form is valid
     If Valid_Sample_Form() Then
-        If SSDBComboSmpType.Text = "CLINTRAK" Then
+        If SSDBComboSmpType.text = "CLINTRAK" Then
             notes = "This is a CLINTRAK SAMPLE - DO NOT SHIP!!!"
             jobShippingId = 0
         Else
@@ -1139,7 +1142,7 @@ Private Sub cmdSaveButton_Click()
     End If
     
     ' only enable if not a replacement and not clintrak samples
-    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIRQsExist = True Then
+    If booReplacement Or Me.SSDBComboSmpType.text = "CLINTRAK" Or mvarIRQsExist = True Then
         Me.mnuLoadSample.Enabled = False
         Me.cmdDeleteButton.Enabled = False
     Else
@@ -1179,8 +1182,8 @@ End Sub
 Private Sub jgrdData_ColumnHeaderClick(ByVal column As GridEX20.JSColumn)
 
     'current column that we have selected
-    columnNumber = column.Index
-    txtcolumn.Text = columnNumber
+    columnNumber = column.index
+    txtcolumn.text = columnNumber
     
 End Sub
 
@@ -1344,20 +1347,20 @@ Private Sub mnuLoadSample_Click()
       
         ' update the descrition too
         'if the description value was the default one change to the newly selected type
-        If Trim(txtDescription.Text) = Trim(SSDBComboSmpType.Text) Then
-            txtDescription.Text = stype
+        If Trim(txtDescription.text) = Trim(SSDBComboSmpType.text) Then
+            txtDescription.text = stype
         End If
 
-        SSDBComboSmpType.Text = stype
-        Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.Text)
-        comboSmp = Me.SSDBComboSmpType.Text
+        SSDBComboSmpType.text = stype
+        Call SetSSDBComboText(SSDBComboSmpType, "", SSDBComboSmpType.text)
+        comboSmp = Me.SSDBComboSmpType.text
           
         Call Read_SampleFile(file, _
-            SSDBComboSmpType.Columns.Item(2).Text)
+            SSDBComboSmpType.Columns.Item(2).text)
         Call Read_File(ProductionRun.File_Name)
         
         dirtyFlag = "Y"
-        txtQtynumber.Text = mData.count
+        txtQtynumber.text = mData.count
         jgrdData.ItemCount = mData.count
         jgrdData.Update
         jgrdData.Refresh
@@ -1375,9 +1378,9 @@ End Sub
 
 Private Sub SSDBComboShip_Click()
     
-    If jobShippingId <> SSDBComboShip.Columns.Item(1).Text Then
+    If jobShippingId <> SSDBComboShip.Columns.Item(1).text Then
         dirtyFlag = "Y"
-        jobShippingId = SSDBComboShip.Columns.Item(1).Text
+        jobShippingId = SSDBComboShip.Columns.Item(1).text
     End If
     
     Call LoadShippingInfo(jobShippingId, txtShip, txtAttn, txtAdd1, txtAdd2, _
@@ -1406,13 +1409,13 @@ Private Sub SSDBComboSmpType_Click()
     On Error GoTo Handle_Error
     
     'checks to see if data was changed
-    If comboSmp <> SSDBComboSmpType.Columns.Item(0).Text Then
+    If comboSmp <> SSDBComboSmpType.Columns.Item(0).text Then
         ' preventing the manual selection of CLINTRAK sample type
-        If SSDBComboSmpType.Columns.Item(0).Text = "CLINTRAK" And Me.txtSmpTypeNum.Text <> "1" Then
+        If SSDBComboSmpType.Columns.Item(0).text = "CLINTRAK" And Me.txtSmpTypeNum.text <> "1" Then
             Call SetSSDBComboText(Me.SSDBComboSmpType, "", comboSmp)
             MsgBox "CLINTRAK samples cannot be configured manually.", vbCritical, "Invalid Sample Type"
             Exit Sub
-        ElseIf Me.SSDBComboSmpType.Columns.Item(0).Text <> "CLINTRAK" And Me.txtSmpTypeNum.Text = "1" Then
+        ElseIf Me.SSDBComboSmpType.Columns.Item(0).text <> "CLINTRAK" And Me.txtSmpTypeNum.text = "1" Then
             Call SetSSDBComboText(Me.SSDBComboSmpType, "", "CLINTRAK")
             MsgBox "The first sample set must be CLINTRAK samples.", vbCritical, "Invalid Sample Type"
         End If
@@ -1420,12 +1423,12 @@ Private Sub SSDBComboSmpType_Click()
         dirtyFlag = "Y"
         'if the description value was the default one change to the newly selected type
         If Trim(txtDescription) = Trim(comboSmp) Then
-            txtDescription = SSDBComboSmpType.Text
+            txtDescription = SSDBComboSmpType.text
         End If
         
         Call UpdateFirstColumn
         
-        comboSmp = Me.SSDBComboSmpType.Columns(0).Text 'comboSmpType.List(comboSmpType.ListIndex)
+        comboSmp = Me.SSDBComboSmpType.Columns(0).text 'comboSmpType.List(comboSmpType.ListIndex)
     End If
     
     Call SetScreenEdit
@@ -1446,9 +1449,9 @@ End Sub
 
 Private Sub txtDescription_LostFocus()
     'checks to see whether the description text was changed
-    If Trim(description) <> Trim(txtDescription.Text) Then
+    If Trim(description) <> Trim(txtDescription.text) Then
         dirtyFlag = "Y"
-        description = Trim(txtDescription.Text)
+        description = Trim(txtDescription.text)
     End If
 End Sub
 
@@ -1459,7 +1462,7 @@ Private Sub Update_Click()
     Dim tempstr As String
         
      'checks to see whether the sample type was filled in first
-    If SSDBComboSmpType.Text = "" Then
+    If SSDBComboSmpType.text = "" Then
         MsgBox "The Sample Type Must be Entered!!", vbExclamation
         txtQtynumber = 1
         Exit Sub
@@ -1476,16 +1479,16 @@ Private Sub Update_Click()
     'check to see if the clintrak samples requested are > than total quantity
     'if clintrak samples - must read the coding file and populate with real data
     'to the screen, not just default the values.
-    If SSDBComboSmpType.Text = "CLINTRAK" Then
+    If SSDBComboSmpType.text = "CLINTRAK" Then
          'check the sample quantity
           'load the grid with live data for Clintrak samples
-        tempstr = SSDBComboSmpType.Columns.Item(2).Text
+        tempstr = SSDBComboSmpType.Columns.Item(2).text
         Call ReadProcess_File(ProductionRun.File_Name, temp, tempstr)
         dirtyFlag = "Y"
     End If
     'adds new rows to the table if not clintrak sample request
     'md added check for <> CLINTRAK
-    If SSDBComboSmpType.Text <> "CLINTRAK" Then
+    If SSDBComboSmpType.text <> "CLINTRAK" Then
         ' DW 2010-002 added
         For i = 1 To mData.count
             mData.Remove (mData.count)
@@ -1495,7 +1498,7 @@ Private Sub Update_Click()
         
         If temp > mData.count Then
             For i = mData.count To (temp - 1)
-                Call mData.Add(vdata, (i + 1), SSDBComboSmpType.Columns.Item(2).Text)
+                Call mData.Add(vdata, (i + 1), SSDBComboSmpType.Columns.Item(2).text)
             Next i
             dirtyFlag = "Y"
         End If
@@ -1535,7 +1538,7 @@ On Error GoTo Error_this_Sub
                     'creates the smp directory if it doesn't
                     MkDir (strFilename)
                 End If
-                strFilename = strFilename & Trim(ProductionRun.Barcode_Id) & "_" & CInt(Me.txtSmpTypeNum.Text) & ".smp"
+                strFilename = strFilename & Trim(ProductionRun.Barcode_Id) & "_" & CInt(Me.txtSmpTypeNum.text) & ".smp"
                 gSampleFileName = strFilename
             Else
                 strFilename = strDestination
@@ -1545,7 +1548,7 @@ On Error GoTo Error_this_Sub
             'calls the function to write the collection to a file
             'md added code to write to file with 3 char abbrev.
             Call WriteFile(mData, _
-                SSDBComboSmpType.Columns.Item(2).Text, _
+                SSDBComboSmpType.Columns.Item(2).text, _
                Trim(strFilename))
                
             dirtyFlag = ""
@@ -1638,19 +1641,19 @@ On Error GoTo Error_this_Function
             gSampleTypeId = .Recordset!sample_type_id
             gProductionRun_Id = .Recordset!Production_Run_Id
             txtSmpTypeNum = .Recordset!Type_Number
-            SSDBComboSmpType.Text = .Recordset!Sample_Type
+            SSDBComboSmpType.text = .Recordset!Sample_Type
             SSDBComboShip = .Recordset!description
             txtQtynumber = .Recordset!quantity
             gSampleFileName = .Recordset!Sample_File_Name
-            txtDescription.Text = Trim(.Recordset!Sample_Description)
+            txtDescription.text = Trim(.Recordset!Sample_Description)
             jobShippingId = .Recordset!Job_Shipping_Id
-            comboSmp = SSDBComboSmpType.Text
-            description = txtDescription.Text
+            comboSmp = SSDBComboSmpType.text
+            description = txtDescription.text
             notes = .Recordset!notes
         Else
             txtQtynumber = "1"
             gSampleFileName = ""
-            txtDescription = SSDBComboSmpType.Text
+            txtDescription = SSDBComboSmpType.text
             gSampleTypeId = 0
             notes = ""
         End If
@@ -1684,17 +1687,26 @@ Public Function Valid_Sample_Form() As Boolean
     On Error GoTo Handle_Error
 
     Dim i As Long
-    Dim booHasDelimiter As Boolean
     Dim columnSqueezeLength As Long
     Dim columnSqueezeCapacity As Long
     Dim columnSqueeze As String
     Dim tmpField As String
     Dim j As Long
+    Dim r As Long, c As Long
         
     Valid_Sample_Form = False
     columnSqueeze = ""
     columnSqueezeLength = 0
     columnSqueezeCapacity = 0
+    
+    For r = 1 To jgrdData.RowCount
+        For c = 1 To jgrdData.Columns.count
+            If InStr(1, mData.Item(r).Fields(c), gRandDelimiter) Then
+                MsgBox "Row " & r & " column " & c & " contains the rand delimiter: """ & gRandDelimiter & """", vbExclamation
+                Exit Function
+            End If
+        Next c
+    Next r
     
     If mData.count = 0 Then
         Me.txtQtynumber.SetFocus
@@ -1702,15 +1714,15 @@ Public Function Valid_Sample_Form() As Boolean
         Exit Function
     End If
     
-    If SSDBComboSmpType.Text = "" Then
+    If SSDBComboSmpType.text = "" Then
         Me.SSDBComboSmpType.SetFocus
         MsgBox "Please Select a Sample Type from Drop Down Box", vbExclamation
         Exit Function
     End If
     
     'md added code to bypass this check if TYPE = Clintrak
-    If SSDBComboSmpType.Text <> "CLINTRAK" And Not CBool(frmProdPlan.chkPrintAtPackager) Then
-        If Trim(SSDBComboShip.Text) = "" Then
+    If SSDBComboSmpType.text <> "CLINTRAK" And Not CBool(frmProdPlan.chkPrintAtPackager) Then
+        If Trim(SSDBComboShip.text) = "" Then
             Me.SSDBComboShip.SetFocus
             MsgBox "Please Select a Ship To Location from Drop Down Box!", vbExclamation
             Exit Function
@@ -1720,12 +1732,12 @@ Public Function Valid_Sample_Form() As Boolean
     ' DW 2010-002 added - when print at packager is checked Clintrak samples are not required
     If Not CBool(frmProdPlan.chkPrintAtPackager.value) Then
         ' check that the first set of samples is CLINTRAK and there are 2
-        If Me.txtSmpTypeNum.Text = "1" Then
-            If Me.SSDBComboSmpType.Text <> "CLINTRAK" Then
+        If Me.txtSmpTypeNum.text = "1" Then
+            If Me.SSDBComboSmpType.text <> "CLINTRAK" Then
                 MsgBox "The first sample set must be CLINTRAK samples.", vbExclamation
                 Exit Function
             End If
-            If Me.txtQtynumber.Text <> "2" Then
+            If Me.txtQtynumber.text <> "2" Then
                 MsgBox "There must be 2 CLINTRAK samples.", vbExclamation
                 Exit Function
             End If
@@ -1735,10 +1747,6 @@ Public Function Valid_Sample_Form() As Boolean
             End If
         End If
     End If
-    
-    ' Check that the Values entered by user do not contain the delimiter
-    ' DW increasing # of columns from 20 to 30 based on client supplied data
-    booHasDelimiter = False
     
     columnSqueezeCapacity = 32
     columnSqueeze = Space$(columnSqueezeCapacity)
@@ -1867,12 +1875,6 @@ Public Function Valid_Sample_Form() As Boolean
         columnSqueezeLength = 0
         
     Next i
-    If booHasDelimiter Then
-        MsgBox _
-            "Cannot use the Rand Delimiter " & Chr(34) & gRandDelimiter & Chr(34) & _
-            " in the sample configuration.", vbExclamation
-        Exit Function
-    End If
     
     Valid_Sample_Form = True
 
@@ -1977,7 +1979,7 @@ On Error GoTo Error_this_Sub
     If SampleDataExists(Me.txtSmpTypeNum + 1) Then
         ' this code is executed if the next sample exists in the DB and the file exists.
         ' it loads the screen with the saved info for the next sample set.
-        Call Read_SampleFile(gSampleFileName, SSDBComboSmpType.Text)
+        Call Read_SampleFile(gSampleFileName, SSDBComboSmpType.text)
         Read_File (gCodingFileName)
         dirtyFlag = ""
         Call LoadShippingInfo(jobShippingId, txtShip, txtAttn, txtAdd1, txtAdd2, _
@@ -1993,13 +1995,13 @@ On Error GoTo Error_this_Sub
         Read_File (gCodingFileName)
         Set mData = New CCOLPDRFILES
         Call mData.Add(vdata, 1, _
-            SSDBComboSmpType.Columns.Item(2).Text)
+            SSDBComboSmpType.Columns.Item(2).text)
         frmProdPlan.sampleTypes = frmProdPlan.sampleTypes + 1
         dirtyFlag = "Y"
-        SSDBComboSmpType.Text = ""
-        SSDBComboShip.Text = ""
+        SSDBComboSmpType.text = ""
+        SSDBComboShip.text = ""
         comboSmp = ""
-        txtDescription.Text = ""
+        txtDescription.text = ""
         Call ClearShipFields
         description = ""
         jobShippingId = 0
@@ -2015,23 +2017,23 @@ On Error GoTo Error_this_Sub
         'populates the collection with data from file
         Set mData = New CCOLPDRFILES
          Call mData.Add(vdata, 1, _
-             SSDBComboSmpType.Columns.Item(2).Text)
+             SSDBComboSmpType.Columns.Item(2).text)
         dirtyFlag = "Y"
-        SSDBComboSmpType.Text = ""
-        SSDBComboShip.Text = ""
+        SSDBComboSmpType.text = ""
+        SSDBComboShip.text = ""
         comboSmp = ""
-        txtDescription.Text = ""
+        txtDescription.text = ""
         Call ClearShipFields
         description = ""
         jobShippingId = 0
         cmdDeleteButton.Enabled = False
     End If
 
-    txtcolumn.Text = ""
+    txtcolumn.text = ""
     columnNumber = 0
     
     ' only enable if not a replacement and not clintrak samples
-    If booReplacement Or Me.SSDBComboSmpType.Text = "CLINTRAK" Or mvarIRQsExist = True Then
+    If booReplacement Or Me.SSDBComboSmpType.text = "CLINTRAK" Or mvarIRQsExist = True Then
         Me.mnuLoadSample.Enabled = False
         Me.cmdDeleteButton.Enabled = False
     Else
@@ -2128,7 +2130,7 @@ Dim i As Long
 
     For i = 1 To mData.count
          mData.Item(i).Field1 = _
-        SSDBComboSmpType.Columns.Item(2).Text & "-" & i
+        SSDBComboSmpType.Columns.Item(2).text & "-" & i
     Next
 
 End Sub
@@ -2219,7 +2221,7 @@ Private Sub SetScreenEdit()
     Dim i As Long
     Dim booEditable As Boolean
 
-    booEditable = (SSDBComboSmpType.Text <> "CLINTRAK")
+    booEditable = (SSDBComboSmpType.text <> "CLINTRAK")
     If Not booEditable Then ClearShipFields
     
     Me.lblSelectedColumn.Enabled = booEditable
@@ -2266,15 +2268,15 @@ End Sub
 
 Private Sub ClearShipFields()
     On Error GoTo Handle_Error
-    Me.SSDBComboShip.Text = ""
-    Me.txtShip.Text = ""
-    Me.txtAttn.Text = ""
-    Me.txtAdd1.Text = ""
-    Me.txtAdd2.Text = ""
-    Me.txtAdd3.Text = ""
-    Me.txtCity.Text = ""
-    Me.txtState.Text = ""
-    Me.txtZip.Text = ""
+    Me.SSDBComboShip.text = ""
+    Me.txtShip.text = ""
+    Me.txtAttn.text = ""
+    Me.txtAdd1.text = ""
+    Me.txtAdd2.text = ""
+    Me.txtAdd3.text = ""
+    Me.txtCity.text = ""
+    Me.txtState.text = ""
+    Me.txtZip.text = ""
 Cleanup_Exit:
     Exit Sub
 Handle_Error:

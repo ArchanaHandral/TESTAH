@@ -1,14 +1,14 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "Richtx32.ocx"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "MSCOMCTL.OCX"
 Object = "{8D650141-6025-11D1-BC40-0000C042AEC0}#3.0#0"; "ssdw3b32.ocx"
 Begin VB.Form frmProdPlan 
    BorderStyle     =   0  'None
    Caption         =   "Computerization Order"
-   ClientHeight    =   8100
-   ClientLeft      =   45
-   ClientTop       =   615
-   ClientWidth     =   8415
+   ClientHeight    =   8565
+   ClientLeft      =   6780
+   ClientTop       =   4170
+   ClientWidth     =   8895
    ControlBox      =   0   'False
    BeginProperty Font 
       Name            =   "Tahoma"
@@ -21,13 +21,103 @@ Begin VB.Form frmProdPlan
    EndProperty
    Icon            =   "frmProdPlan.frx":0000
    LinkTopic       =   "Form1"
-   LockControls    =   -1  'True
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   8100
-   ScaleWidth      =   8415
+   ScaleHeight     =   8565
+   ScaleWidth      =   8895
    ShowInTaskbar   =   0   'False
-   StartUpPosition =   2  'CenterScreen
+   Begin VB.TextBox txtNonBillableNotice 
+      BackColor       =   &H8000000F&
+      BorderStyle     =   0  'None
+      BeginProperty Font 
+         Name            =   "Tahoma"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H000000FF&
+      Height          =   285
+      Left            =   7080
+      TabIndex        =   65
+      Text            =   "NON-BILLABLE"
+      Top             =   8280
+      Width           =   1215
+   End
+   Begin VB.Frame fraDescription 
+      Height          =   3375
+      Left            =   4680
+      TabIndex        =   52
+      Top             =   2760
+      Width           =   4095
+      Begin VB.CommandButton cmdSpecInst 
+         Caption         =   "Special Instructions"
+         BeginProperty Font 
+            Name            =   "MS Sans Serif"
+            Size            =   8.25
+            Charset         =   0
+            Weight          =   400
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         Height          =   315
+         Left            =   1080
+         TabIndex        =   6
+         Top             =   2880
+         Width           =   1725
+      End
+      Begin VB.CommandButton cmdAddtlData 
+         Caption         =   "Client Data"
+         Height          =   315
+         Left            =   3000
+         TabIndex        =   5
+         Top             =   2400
+         Width           =   975
+      End
+      Begin VB.TextBox txtReferanceNo 
+         Height          =   315
+         Left            =   120
+         MaxLength       =   20
+         TabIndex        =   4
+         ToolTipText     =   "NOTE: Reference No. will be appended to the Description."
+         Top             =   2400
+         Width           =   2760
+      End
+      Begin VB.TextBox txtProdDesc 
+         Height          =   1500
+         Left            =   120
+         MaxLength       =   500
+         MultiLine       =   -1  'True
+         ScrollBars      =   2  'Vertical
+         TabIndex        =   3
+         Top             =   480
+         Width           =   3855
+      End
+      Begin VB.Label lblReferenceNo 
+         AutoSize        =   -1  'True
+         BackStyle       =   0  'Transparent
+         Caption         =   "Reference No.:"
+         ForeColor       =   &H00000000&
+         Height          =   195
+         Left            =   120
+         TabIndex        =   54
+         Top             =   2160
+         Width           =   1110
+      End
+      Begin VB.Label Label12 
+         AutoSize        =   -1  'True
+         BackStyle       =   0  'Transparent
+         Caption         =   "Description:"
+         Height          =   195
+         Left            =   120
+         TabIndex        =   53
+         Top             =   240
+         Width           =   855
+      End
+   End
    Begin VB.TextBox txtPDRStatus 
       BackColor       =   &H8000000F&
       BorderStyle     =   0  'None
@@ -42,11 +132,11 @@ Begin VB.Form frmProdPlan
       EndProperty
       ForeColor       =   &H000000FF&
       Height          =   285
-      Left            =   5160
+      Left            =   3480
       TabIndex        =   60
-      Text            =   "PDR HAS BEEN PROCESSED"
-      Top             =   7860
-      Width           =   3375
+      Text            =   "COMBINED/ PDR HAS BEEN PROCESSED"
+      Top             =   8280
+      Width           =   3255
    End
    Begin VB.TextBox txtReplacement 
       BackColor       =   &H8000000F&
@@ -62,11 +152,11 @@ Begin VB.Form frmProdPlan
       EndProperty
       ForeColor       =   &H000000FF&
       Height          =   285
-      Left            =   3600
+      Left            =   1920
       TabIndex        =   59
       Text            =   "REPLACEMENT"
-      Top             =   7860
-      Width           =   1335
+      Top             =   8280
+      Width           =   1215
    End
    Begin VB.Frame Frame7 
       BackColor       =   &H00FFFFFF&
@@ -75,7 +165,7 @@ Begin VB.Form frmProdPlan
       Left            =   0
       TabIndex        =   55
       Top             =   0
-      Width           =   8535
+      Width           =   15255
       Begin VB.TextBox txtBarcodeId 
          Alignment       =   2  'Center
          BackColor       =   &H00FFFFFF&
@@ -91,7 +181,7 @@ Begin VB.Form frmProdPlan
          EndProperty
          ForeColor       =   &H00C00000&
          Height          =   345
-         Left            =   120
+         Left            =   345
          Locked          =   -1  'True
          TabIndex        =   57
          TabStop         =   0   'False
@@ -113,7 +203,7 @@ Begin VB.Form frmProdPlan
             Strikethrough   =   0   'False
          EndProperty
          Height          =   195
-         Left            =   120
+         Left            =   345
          Locked          =   -1  'True
          TabIndex        =   56
          TabStop         =   0   'False
@@ -127,94 +217,22 @@ Begin VB.Form frmProdPlan
          BackStyle       =   0  'Transparent
          Caption         =   "Created By:"
          Height          =   195
-         Left            =   120
+         Left            =   345
          TabIndex        =   58
          Top             =   405
          Width           =   8205
       End
    End
-   Begin VB.Frame Frame6 
-      Height          =   3135
-      Left            =   4680
-      TabIndex        =   52
-      Top             =   2400
-      Width           =   3615
-      Begin VB.CommandButton cmdSpecInst 
-         Caption         =   "Special Instructions"
-         BeginProperty Font 
-            Name            =   "MS Sans Serif"
-            Size            =   8.25
-            Charset         =   0
-            Weight          =   400
-            Underline       =   0   'False
-            Italic          =   0   'False
-            Strikethrough   =   0   'False
-         EndProperty
-         Height          =   315
-         Left            =   960
-         TabIndex        =   6
-         Top             =   2640
-         Width           =   1725
-      End
-      Begin VB.CommandButton cmdAddtlData 
-         Caption         =   "Client Data"
-         Height          =   315
-         Left            =   2520
-         TabIndex        =   5
-         Top             =   2160
-         Width           =   975
-      End
-      Begin VB.TextBox txtReferanceNo 
-         Height          =   315
-         Left            =   120
-         MaxLength       =   20
-         TabIndex        =   4
-         ToolTipText     =   "NOTE: Reference No. will be appended to the Description."
-         Top             =   2160
-         Width           =   2280
-      End
-      Begin VB.TextBox txtProdDesc 
-         Height          =   1260
-         Left            =   120
-         MaxLength       =   500
-         MultiLine       =   -1  'True
-         ScrollBars      =   2  'Vertical
-         TabIndex        =   3
-         Top             =   480
-         Width           =   3375
-      End
-      Begin VB.Label lblReferenceNo 
-         AutoSize        =   -1  'True
-         BackStyle       =   0  'Transparent
-         Caption         =   "Reference No.:"
-         ForeColor       =   &H00000000&
-         Height          =   195
-         Left            =   120
-         TabIndex        =   54
-         Top             =   1920
-         Width           =   1110
-      End
-      Begin VB.Label Label12 
-         AutoSize        =   -1  'True
-         BackStyle       =   0  'Transparent
-         Caption         =   "Description:"
-         Height          =   195
-         Left            =   120
-         TabIndex        =   53
-         Top             =   240
-         Width           =   855
-      End
-   End
    Begin VB.Frame Frame5 
-      Height          =   1575
+      Height          =   1935
       Left            =   4680
       TabIndex        =   50
       Top             =   840
-      Width           =   3615
+      Width           =   4095
       Begin VB.CheckBox chkPrintAtPackager 
          Caption         =   "Print at packager"
          Height          =   255
-         Left            =   720
+         Left            =   120
          TabIndex        =   0
          Top             =   240
          Width           =   2175
@@ -222,17 +240,17 @@ Begin VB.Form frmProdPlan
       Begin VB.CommandButton cmdViewShipping 
          Caption         =   "View Shipping"
          Height          =   315
-         Left            =   1080
+         Left            =   1320
          TabIndex        =   2
-         Top             =   1080
+         Top             =   1440
          Width           =   1455
       End
       Begin SSDataWidgets_B.SSDBCombo SSDBComboShip 
          Height          =   300
-         Left            =   720
+         Left            =   120
          TabIndex        =   1
-         Top             =   600
-         Width           =   2775
+         Top             =   960
+         Width           =   3855
          DataFieldList   =   "Column 0"
          AllowInput      =   0   'False
          AllowNull       =   0   'False
@@ -257,7 +275,7 @@ Begin VB.Form frmProdPlan
          Columns(0).Width=   3200
          Columns(0).DataType=   8
          Columns(0).FieldLen=   4096
-         _ExtentX        =   4895
+         _ExtentX        =   6800
          _ExtentY        =   529
          _StockProps     =   93
          BackColor       =   -2147483643
@@ -278,7 +296,7 @@ Begin VB.Form frmProdPlan
       Height          =   1095
       Left            =   120
       TabIndex        =   35
-      Top             =   6000
+      Top             =   6600
       Width           =   4455
       Begin VB.CheckBox chkReOrientation 
          Caption         =   "PDR is to be Reoriented"
@@ -339,10 +357,10 @@ Begin VB.Form frmProdPlan
          Caption         =   "Apply to Labels && Samples"
          ForeColor       =   &H00008000&
          Height          =   195
-         Left            =   2040
+         Left            =   2400
          TabIndex        =   37
-         Top             =   360
-         Width           =   2295
+         Top             =   240
+         Width           =   1935
          WordWrap        =   -1  'True
       End
    End
@@ -356,11 +374,33 @@ Begin VB.Form frmProdPlan
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   1575
+      Height          =   2175
       Left            =   120
       TabIndex        =   33
       Top             =   2400
       Width           =   4455
+      Begin VB.TextBox txtClientTGId 
+         BackColor       =   &H8000000F&
+         BorderStyle     =   0  'None
+         BeginProperty Font 
+            Name            =   "Tahoma"
+            Size            =   8.25
+            Charset         =   0
+            Weight          =   700
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         ForeColor       =   &H00000000&
+         Height          =   285
+         Left            =   1080
+         Locked          =   -1  'True
+         TabIndex        =   63
+         TabStop         =   0   'False
+         Text            =   "XXXXXXXXXXXXXXXXXXX"
+         Top             =   1800
+         Width           =   3180
+      End
       Begin VB.TextBox txtGroupName 
          BackColor       =   &H8000000F&
          BorderStyle     =   0  'None
@@ -380,7 +420,7 @@ Begin VB.Form frmProdPlan
          MultiLine       =   -1  'True
          TabIndex        =   47
          TabStop         =   0   'False
-         Top             =   960
+         Top             =   1200
          Width           =   3300
       End
       Begin VB.TextBox txtCoding 
@@ -396,14 +436,15 @@ Begin VB.Form frmProdPlan
             Strikethrough   =   0   'False
          EndProperty
          ForeColor       =   &H00000000&
-         Height          =   285
+         Height          =   645
          Left            =   1080
          Locked          =   -1  'True
+         MultiLine       =   -1  'True
          TabIndex        =   43
          TabStop         =   0   'False
-         Text            =   "XXXXXXXXXXXXXXXXXXX"
+         Text            =   "frmProdPlan.frx":1272
          Top             =   240
-         Width           =   3315
+         Width           =   3195
       End
       Begin VB.TextBox txtFileName 
          BackColor       =   &H8000000F&
@@ -424,8 +465,19 @@ Begin VB.Form frmProdPlan
          TabIndex        =   42
          TabStop         =   0   'False
          Text            =   "XXXXXXXXXXXXXXXXXXX"
-         Top             =   600
+         Top             =   840
          Width           =   3180
+      End
+      Begin VB.Label lblClientTGId 
+         AutoSize        =   -1  'True
+         BackStyle       =   0  'Transparent
+         Caption         =   "Client TG ID:"
+         ForeColor       =   &H00000000&
+         Height          =   195
+         Left            =   120
+         TabIndex        =   64
+         Top             =   1800
+         Width           =   915
       End
       Begin VB.Label Label3 
          AutoSize        =   -1  'True
@@ -435,7 +487,7 @@ Begin VB.Form frmProdPlan
          Height          =   390
          Left            =   120
          TabIndex        =   46
-         Top             =   960
+         Top             =   1200
          Width           =   885
          WordWrap        =   -1  'True
       End
@@ -458,7 +510,7 @@ Begin VB.Form frmProdPlan
          Height          =   285
          Left            =   120
          TabIndex        =   44
-         Top             =   600
+         Top             =   840
          Width           =   750
       End
    End
@@ -575,35 +627,6 @@ Begin VB.Form frmProdPlan
          Width           =   540
       End
    End
-   Begin MSComctlLib.StatusBar StatusBar1 
-      Align           =   2  'Align Bottom
-      Height          =   285
-      Left            =   0
-      TabIndex        =   32
-      Top             =   7815
-      Width           =   8415
-      _ExtentX        =   14843
-      _ExtentY        =   503
-      _Version        =   393216
-      BeginProperty Panels {8E3867A5-8586-11D1-B16A-00C0F0283628} 
-         NumPanels       =   3
-         BeginProperty Panel1 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
-            AutoSize        =   2
-            Object.Width           =   6165
-            MinWidth        =   6174
-            Text            =   "System User Processing in "
-            TextSave        =   "System User Processing in "
-         EndProperty
-         BeginProperty Panel2 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
-            Object.Width           =   2646
-            MinWidth        =   2646
-         EndProperty
-         BeginProperty Panel3 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
-            Object.Width           =   7699
-            MinWidth        =   7699
-         EndProperty
-      EndProperty
-   End
    Begin VB.CommandButton cmdClose 
       Caption         =   "&Close"
       BeginProperty Font 
@@ -616,9 +639,9 @@ Begin VB.Form frmProdPlan
          Strikethrough   =   0   'False
       EndProperty
       Height          =   375
-      Left            =   7080
+      Left            =   7560
       TabIndex        =   11
-      Top             =   7320
+      Top             =   7800
       Width           =   1215
    End
    Begin VB.Frame Frame2 
@@ -634,7 +657,7 @@ Begin VB.Form frmProdPlan
       Height          =   2055
       Left            =   120
       TabIndex        =   25
-      Top             =   3960
+      Top             =   4560
       Width           =   4455
       Begin VB.TextBox txtOnsertDie 
          BackColor       =   &H8000000F&
@@ -812,11 +835,11 @@ Begin VB.Form frmProdPlan
       EndProperty
       ForeColor       =   &H00FF0000&
       Height          =   285
-      Left            =   4560
+      Left            =   5640
       Locked          =   -1  'True
       TabIndex        =   17
       TabStop         =   0   'False
-      Top             =   7320
+      Top             =   7920
       Visible         =   0   'False
       Width           =   165
    End
@@ -833,12 +856,12 @@ Begin VB.Form frmProdPlan
       Height          =   1575
       Left            =   4680
       TabIndex        =   14
-      Top             =   5520
-      Width           =   3615
+      Top             =   6120
+      Width           =   4095
       Begin VB.TextBox txtSampleGroups 
          Enabled         =   0   'False
          Height          =   315
-         Left            =   1995
+         Left            =   2235
          TabIndex        =   8
          Top             =   600
          Width           =   840
@@ -846,7 +869,7 @@ Begin VB.Form frmProdPlan
       Begin VB.CommandButton cmdSamples 
          Caption         =   "Configure Types"
          Height          =   315
-         Left            =   1080
+         Left            =   1200
          TabIndex        =   9
          Top             =   1080
          Width           =   1455
@@ -854,7 +877,7 @@ Begin VB.Form frmProdPlan
       Begin VB.TextBox txtSamples 
          Enabled         =   0   'False
          Height          =   315
-         Left            =   1995
+         Left            =   2235
          TabIndex        =   7
          Top             =   240
          Width           =   840
@@ -862,15 +885,15 @@ Begin VB.Form frmProdPlan
       Begin VB.Label Label6 
          Caption         =   "QTY Samples:"
          Height          =   270
-         Left            =   840
+         Left            =   1080
          TabIndex        =   15
-         Top             =   262
+         Top             =   255
          Width           =   1080
       End
       Begin VB.Label lblSampleGroups 
          Caption         =   "Sample Types:"
          Height          =   285
-         Left            =   840
+         Left            =   1080
          TabIndex        =   16
          Top             =   615
          Width           =   1110
@@ -890,7 +913,7 @@ Begin VB.Form frmProdPlan
       Height          =   375
       Left            =   120
       TabIndex        =   13
-      Top             =   7320
+      Top             =   7800
       Width           =   1095
    End
    Begin VB.TextBox txtDirtyFlag 
@@ -904,10 +927,10 @@ Begin VB.Form frmProdPlan
          Strikethrough   =   0   'False
       EndProperty
       Height          =   285
-      Left            =   4800
+      Left            =   5880
       TabIndex        =   12
       TabStop         =   0   'False
-      Top             =   7320
+      Top             =   7920
       Visible         =   0   'False
       Width           =   210
    End
@@ -923,38 +946,10 @@ Begin VB.Form frmProdPlan
          Strikethrough   =   0   'False
       EndProperty
       Height          =   375
-      Left            =   5760
+      Left            =   6240
       TabIndex        =   10
-      Top             =   7320
+      Top             =   7800
       Width           =   1215
-   End
-   Begin RichTextLib.RichTextBox rtbLinkInstructions 
-      Height          =   360
-      Left            =   2760
-      TabIndex        =   19
-      TabStop         =   0   'False
-      Top             =   7320
-      Visible         =   0   'False
-      Width           =   1335
-      _ExtentX        =   2355
-      _ExtentY        =   635
-      _Version        =   393217
-      Enabled         =   -1  'True
-      TextRTF         =   $"frmProdPlan.frx":1272
-   End
-   Begin RichTextLib.RichTextBox rtbPDRInstructions 
-      Height          =   360
-      Left            =   1320
-      TabIndex        =   20
-      TabStop         =   0   'False
-      Top             =   7320
-      Visible         =   0   'False
-      Width           =   1335
-      _ExtentX        =   2355
-      _ExtentY        =   635
-      _Version        =   393217
-      Enabled         =   -1  'True
-      TextRTF         =   $"frmProdPlan.frx":12ED
    End
    Begin VB.TextBox txtStockIRQ 
       Appearance      =   0  'Flat
@@ -970,16 +965,86 @@ Begin VB.Form frmProdPlan
       EndProperty
       ForeColor       =   &H00FF0000&
       Height          =   285
-      Left            =   4320
+      Left            =   5400
       Locked          =   -1  'True
       TabIndex        =   18
       TabStop         =   0   'False
-      Top             =   7320
+      Top             =   7920
       Visible         =   0   'False
       Width           =   165
    End
-   Begin VB.Menu mnuActions 
-      Caption         =   "&Replacement Labels"
+   Begin RichTextLib.RichTextBox rtbLinkInstructions 
+      Height          =   360
+      Left            =   2760
+      TabIndex        =   19
+      TabStop         =   0   'False
+      Top             =   7800
+      Visible         =   0   'False
+      Width           =   1335
+      _ExtentX        =   2355
+      _ExtentY        =   635
+      _Version        =   393217
+      Enabled         =   -1  'True
+      TextRTF         =   $"frmProdPlan.frx":1286
+   End
+   Begin RichTextLib.RichTextBox rtbPDRInstructions 
+      Height          =   360
+      Left            =   1320
+      TabIndex        =   20
+      TabStop         =   0   'False
+      Top             =   7800
+      Visible         =   0   'False
+      Width           =   1335
+      _ExtentX        =   2355
+      _ExtentY        =   635
+      _Version        =   393217
+      Enabled         =   -1  'True
+      TextRTF         =   $"frmProdPlan.frx":1301
+   End
+   Begin MSComctlLib.StatusBar StatusBar1 
+      Align           =   2  'Align Bottom
+      Height          =   285
+      Left            =   0
+      TabIndex        =   32
+      Top             =   8280
+      Width           =   8895
+      _ExtentX        =   15690
+      _ExtentY        =   503
+      _Version        =   393216
+      BeginProperty Panels {8E3867A5-8586-11D1-B16A-00C0F0283628} 
+         NumPanels       =   4
+         BeginProperty Panel1 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
+            Object.Width           =   3263
+            MinWidth        =   3263
+            Text            =   "<User Location>"
+            TextSave        =   "<User Location>"
+         EndProperty
+         BeginProperty Panel2 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
+            Object.Width           =   2646
+            MinWidth        =   2646
+         EndProperty
+         BeginProperty Panel3 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
+            AutoSize        =   1
+            Object.Width           =   6262
+            MinWidth        =   3087
+         EndProperty
+         BeginProperty Panel4 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
+            Object.Width           =   2910
+            MinWidth        =   2910
+         EndProperty
+      EndProperty
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Tahoma"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+   End
+   Begin VB.Menu mnuReplacementList 
+      Caption         =   "&Replacements"
       Begin VB.Menu mnuReplacements 
          Caption         =   "&Create Production Run"
       End
@@ -1038,11 +1103,20 @@ Begin VB.Form frmProdPlan
          Visible         =   0   'False
       End
    End
-   Begin VB.Menu duplicateConfig 
-      Caption         =   "&Duplicate Sample Configuration"
+   Begin VB.Menu mnuActions 
+      Caption         =   "&Actions"
+      Begin VB.Menu duplicateConfig 
+         Caption         =   "&Duplicate Sample Configuration"
+      End
+      Begin VB.Menu mnuViewComputerizationOrder 
+         Caption         =   "Vie&w Computerization Order Form"
+      End
    End
-   Begin VB.Menu mnuViewComputerizationOrder 
-      Caption         =   "Vie&w Computerization Order Form"
+   Begin VB.Menu mnuNonBillable 
+      Caption         =   "&Non-Billable"
+      Begin VB.Menu mnuNonBillableView 
+         Caption         =   "View..."
+      End
    End
    Begin VB.Menu mnuHelp 
       Caption         =   "&Help"
@@ -1091,10 +1165,19 @@ Private mvarOrigOnsertDieToolId As Long
 Private mvarOrigOnsertDiePartNumber As String
 Public booSamplesDirtyFlag As Boolean
 
+Private Function CheckOverrides() As Boolean
+    CheckOverrides = True
+    
+    If ProductionRun.NonBillable.PerformOverride = False Then
+        CheckOverrides = False
+    End If
+End Function
 
 Private Sub Form_Load()
     
     On Error GoTo Error_this_Sub
+    
+    CenterForm Me
 
     Dim strLabelId As String
     Dim lngQtyReq As Long
@@ -1113,6 +1196,7 @@ Private Sub Form_Load()
     booSamplesDirtyFlag = False
     Call Me.txtReplacement.Move(Me.StatusBar1.Panels(2).Left + 50, Me.StatusBar1.Top + 50)
     Call Me.txtPDRStatus.Move(Me.StatusBar1.Panels(3).Left + 50, Me.StatusBar1.Top + 50)
+    Call Me.txtNonBillableNotice.Move(Me.StatusBar1.Panels(4).Left + 50, Me.StatusBar1.Top + 50)
     
     Set CCBlindLamApplyCol = New Collection
     Call CCBlindLamApplyCol.Add(LABELS_ONLY_TEXT, "0")
@@ -1143,6 +1227,7 @@ Private Sub Form_Load()
     Call Enable_Fields
     
     Set ProductionRun = New CProdrun
+    ProductionRun.NonBillable.NoticeForm = frmProdPlan
     Set Planning = New CPlanningMethods
   
     Screen.MousePointer = vbHourglass
@@ -1158,11 +1243,12 @@ Private Sub Form_Load()
     strLabelId = gLabelId
     Me.txtFileName = GetFileNameFromFilePath(gCodingFileName)
     Me.txtGroupName = gGroupName
+    Me.txtClientTGId = gClientGroupName
     Me.txtCoding = gCodingName
     strGroupNum = gGroupNumber
     'loads the ship to combobox with all associated shipping addresses
     Call LoadShipToCombo2Column(Me.SSDBComboShip)
-
+    
     HoldStockProofId = 0
     HoldScratchStockProofId = 0
     
@@ -1178,11 +1264,11 @@ Private Sub Form_Load()
             Me.txtQty = ProductionRun.Qty_Requested
             Me.txtSamples = ProductionRun.Samples_Requested
             Me.txtSampleGroups = ProductionRun.Sample_Number
-            Me.txtStockNo.Text = ProductionRun.stock
+            Me.txtStockNo.text = ProductionRun.stock
             Me.txtOnsertDie = ProductionRun.OnsertDiePartNumber
             HoldStockProofId = ProductionRun.Stock_Proof_Id
             Me.txtProducedBy = ProductionRun.Produced_By
-            Me.txtScratchStockNo.Text = ProductionRun.Scratch_Stock
+            Me.txtScratchStockNo.text = ProductionRun.Scratch_Stock
             HoldScratchStockProofId = ProductionRun.Scratch_Proof_Id
 
             Me.lblApplyBlindLam.Caption = BlindLamApplyCol(CStr(ProductionRun.Apply_ScratchOff))
@@ -1252,17 +1338,19 @@ Private Sub Form_Load()
         ProductionRun.Proof_Id = lngProofId
         ProductionRun.Campaign_No = strGroupNum
         ProductionRun.File_Name = gCodingFileName
-        Me.txtStockNo.Text = gStockLabelId
+        Me.txtStockNo.text = gStockLabelId
         ProductionRun.stock = gStockLabelId
         ProductionRun.Stock_Proof_Id = gStockProofId
-        Me.txtScratchStockNo.Text = gBlindLabelId
+        Me.txtScratchStockNo.text = gBlindLabelId
         ProductionRun.Scratch_Stock = gBlindLabelId
         ProductionRun.Scratch_Proof_Id = gBlindProofId
-        Me.txtOnsertDie.Text = gOnsertDiePartNumber
+        Me.txtOnsertDie.text = gOnsertDiePartNumber
         ProductionRun.OnsertDiePartNumber = gOnsertDiePartNumber
         ProductionRun.OnsertDieToolId = gOnsertDieToolId
-        txtSamples.Text = "0"
-        txtSampleGroups.Text = "0"
+        txtSamples.text = "0"
+        txtSampleGroups.text = "0"
+        ProductionRun.NonBillable.SetNew ProductionRun.Job_Log_Id
+        
         Me.lblApplyBlindLam.Caption = CCBlindLamApplyCol(CStr(gBlindLamApply))
         If Me.lblApplyBlindLam.Caption = NA_TEXT Or Me.lblApplyBlindLam.Caption = NOT_BLINDED_TEXT Then
             Me.lblApplyBlindLam.Caption = ""
@@ -1325,7 +1413,7 @@ Private Sub Form_Load()
                 ' check here to see if any samples are on PKS
                 ' and if so, disable the button.  only do the check if the
                 ' number of sample types is greater than 1
-                If Me.txtSampleGroups.Text > 1 Then
+                If Me.txtSampleGroups.text > 1 Then
                     If DeterminePDROnPKS("S") Then
                         cmdSamples.Enabled = False
                     End If
@@ -1343,7 +1431,7 @@ Private Sub Form_Load()
             If ProductionRun.Barcode_Id <> "" Then
                 If Planning.CheckIfCombined(ProductionRun.Barcode_Id) Then
                     booPdrIsCombined = True
-                    txtPDRStatus.Text = "COMBINED PDR HAS BEEN PROCESSED"
+                    txtPDRStatus.text = "COMBINED PDR HAS BEEN PROCESSED"
                 End If
             End If
         Else
@@ -1361,7 +1449,7 @@ Private Sub Form_Load()
                     booPdrIsCombined = True
                     Call Lock_Out_PDRForm(False, True)
                     txtProdDesc.Enabled = True
-                    txtPDRStatus.Text = "COMBINED PDR"
+                    txtPDRStatus.text = "COMBINED PDR"
                 End If
             End If
         End If
@@ -1380,7 +1468,7 @@ Private Sub Form_Load()
                 Call Lock_Out_PDRForm(False, True)
                 cmdSamples.Enabled = False
                 txtProdDesc.Enabled = True
-                txtPDRStatus.Text = "COMBINED PDR"
+                txtPDRStatus.text = "COMBINED PDR"
             End If
         End If
     End If
@@ -1433,7 +1521,7 @@ Private Sub Form_Load()
                         "Label Specs's stock is currently " & gStockLabelId & "." & vbCrLf & vbCrLf & _
                         "Do you want to update the PDR Stock to match Label Specs?", _
                         vbYesNo + vbQuestion, "Update Stock") = vbYes Then
-                    Me.txtStockNo.Text = gStockLabelId
+                    Me.txtStockNo.text = gStockLabelId
                     ProductionRun.stock = gStockLabelId
                     ProductionRun.Stock_Proof_Id = gStockProofId
                     
@@ -1481,7 +1569,7 @@ Private Sub Form_Load()
                         End If
                     Next i
                     
-                    Me.txtScratchStockNo.Text = gBlindLabelId
+                    Me.txtScratchStockNo.text = gBlindLabelId
                     ProductionRun.Scratch_Stock = gBlindLabelId
                     ProductionRun.Scratch_Proof_Id = gBlindProofId
                     
@@ -1510,7 +1598,7 @@ Private Sub Form_Load()
                     "The PDR's Onsert die is currently " & ProductionRun.OnsertDiePartNumber & "." & vbCrLf & _
                     "Label Specs's Onsert die is currently " & gOnsertDiePartNumber & "." & vbCrLf & vbCrLf & _
                     "Do you want to update the PDR's die to match Label Specs?", vbYesNo + vbQuestion, "Update Die") = vbYes Then
-                    Me.txtOnsertDie.Text = gOnsertDiePartNumber
+                    Me.txtOnsertDie.text = gOnsertDiePartNumber
                     ProductionRun.OnsertDiePartNumber = gOnsertDiePartNumber
                     ProductionRun.OnsertDieToolId = gOnsertDieToolId
                     MsgBox _
@@ -1527,17 +1615,17 @@ Private Sub Form_Load()
         End If
         
         If booChange = True Then
-            Me.txtDirtyFlag.Text = "Y"
+            Me.txtDirtyFlag.text = "Y"
             Me.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
         End If
 
     End If
         
     ' DW 2012-001 added
-    If txtPDRStatus.Text = "COMBINED PDR" Then Me.chkReOrientation.Enabled = False
+    If txtPDRStatus.text = "COMBINED PDR" Then Me.chkReOrientation.Enabled = False
     
     ' DW 2008-017 added
-    Me.StatusBar1.Panels(1).Text = Me.StatusBar1.Panels(1).Text & gClintrakLocations(gApplicationUser.ClintrakLocationId).Display
+    Me.StatusBar1.Panels(1).text = gClintrakLocations(gApplicationUser.ClintrakLocationId).Display
     Me.StatusBar1.Panels(1).Picture = LoadPicture(gDomainIconPath & gApplicationUser.ClintrakLocationId & ".ico")
 
 Exit_this_Sub:
@@ -1579,17 +1667,17 @@ Private Sub cmdSamples_Click()
         End If
     End If
    
-    lngExistingSampleQTY = CLng(Me.txtSamples.Text)
-    lngExistingSampleTypes = CLng(Me.txtSampleGroups.Text)
+    lngExistingSampleQTY = CLng(Me.txtSamples.text)
+    lngExistingSampleTypes = CLng(Me.txtSampleGroups.text)
     
     frmSmpConfig.Show vbModal
     
-    lngNewSampleQTY = CLng(Me.txtSamples.Text)
-    lngNewSampleTypes = CLng(Me.txtSampleGroups.Text)
+    lngNewSampleQTY = CLng(Me.txtSamples.text)
+    lngNewSampleTypes = CLng(Me.txtSampleGroups.text)
     
     ' Check to see if the sample quantities changed
     If (lngExistingSampleQTY <> lngNewSampleQTY) Or (lngExistingSampleTypes <> lngNewSampleTypes) Or booSamplesDirtyFlag = True Then
-        Me.txtProducedBy.Text = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
+        Me.txtProducedBy.text = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
         ProductionRun.Produced_By = Me.txtProducedBy
         ProductionRun.UpdateSampleQuantities
         booSamplesDirtyFlag = False
@@ -1626,6 +1714,11 @@ Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
             If Me.txtDirtyFlag = "Y" Then Cancel = True
     End Select
     
+End Sub
+
+
+Private Sub mnuNonBillableView_Click()
+    frmNonBillable.ShowNonBillable
 End Sub
 
 Private Sub mnuViewComputerizationOrder_Click()
@@ -1708,6 +1801,12 @@ Private Sub cmdDeleteProdRun_Click()
         MsgBox _
             "This PDR cannot be deleted." & vbCrLf & _
             "An associated Digital Overage Order exists: " & digitalOverageOrder, vbExclamation
+        Exit Sub
+    End If
+    
+    If ProductionRun.IsOnRushRequest Then
+        MsgBox "This PDR cannot be deleted." & vbCrLf & _
+        "It is associated to a rush request.", vbExclamation
         Exit Sub
     End If
 
@@ -1801,6 +1900,7 @@ Private Sub Form_Unload(Cancel As Integer)
     gCodingNumber = 0
     gGroupNumber = 0
     gGroupName = ""
+    gClientGroupName = ""
     gRandIDNumber = ""
     vdata = ""
     columnNumber = 0
@@ -1856,7 +1956,7 @@ Private Sub mnuAbout_Click()
 End Sub
 
 Private Sub cmdViewShipping_Click()
-    If SSDBComboShip.Text = "" Then
+    If SSDBComboShip.text = "" Then
         MsgBox "Please select a Ship To.", vbExclamation
     Else
         frmShipTo.Show vbModal
@@ -2103,9 +2203,9 @@ Private Sub mnuReplacements_Click()
     
     'md added for Samples project
      If gReprintFile_Type = "REPLACEMENT" Then
-        Me.txtReplacement.Text = "REPLACEMENT"
+        Me.txtReplacement.text = "REPLACEMENT"
      Else
-        Me.txtReplacement.Text = "RESUPPLY"
+        Me.txtReplacement.text = "RESUPPLY"
         Me.txtProdDesc = ProductionRun.LabelDescription
      End If
      
@@ -2135,6 +2235,12 @@ Private Sub mnuReplacements_Click()
     ProductionRun.Qty_Requested = lngReprintQty
     ProductionRun.Samples_Requested = 0
     ProductionRun.Reprint_File_Id = mReprintFile_id
+    ProductionRun.NonBillable.SetNew ProductionRun.Job_Log_Id
+    If ProductionRun.NonBillable.IsJobLevel = False Then
+        ' If we haven't found a job-level non-billable, force the combo box to
+        ' empty. This forces the user to pick a value on save.
+        ProductionRun.NonBillable.ReasonId = -1
+    End If
     
     Me.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
     Me.chkReOrientation.value = 0
@@ -2172,7 +2278,7 @@ Private Sub mnuReplacements_Click()
                 "Label Specs's stock is currently " & gStockLabelId & "." & vbCrLf & vbCrLf & _
                 "Do you want to update this Replacement PDR Stock to match Label Specs?", _
                 vbYesNo + vbQuestion, "Update Stock") = vbYes Then
-            Me.txtStockNo.Text = gStockLabelId
+            Me.txtStockNo.text = gStockLabelId
             ProductionRun.stock = gStockLabelId
             ProductionRun.Stock_Proof_Id = gStockProofId
 
@@ -2209,7 +2315,7 @@ Private Sub mnuReplacements_Click()
                 End If
             Next n
             
-            Me.txtScratchStockNo.Text = gBlindLabelId
+            Me.txtScratchStockNo.text = gBlindLabelId
             ProductionRun.Scratch_Stock = gBlindLabelId
             ProductionRun.Scratch_Proof_Id = gBlindProofId
 
@@ -2223,7 +2329,7 @@ Private Sub mnuReplacements_Click()
             "Label Specs's Onsert die is currently " & gOnsertDiePartNumber & "." & vbCrLf & vbCrLf & _
             "Do you want to update the Replacement PDR die to match Label Specs?", _
             vbYesNo + vbQuestion, "Update Die") = vbYes Then
-            Me.txtOnsertDie.Text = gOnsertDiePartNumber
+            Me.txtOnsertDie.text = gOnsertDiePartNumber
             ProductionRun.OnsertDiePartNumber = gOnsertDiePartNumber
             ProductionRun.OnsertDieToolId = gOnsertDieToolId
         End If
@@ -2296,7 +2402,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
         Me.txtReplacement.Visible = True
         
         ' reset the text of the PDR status field back to the default value from when the screen was originally loaded.
-        txtPDRStatus.Text = "PDR HAS BEEN PROCESSED"
+        txtPDRStatus.text = "PDR HAS BEEN PROCESSED"
     
         ProductionRun.LookupRecord
         
@@ -2336,7 +2442,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
                 SSDBComboShip.Enabled = False
                 Me.chkPrintAtPackager.Enabled = False
                 ' check for samples on PKS
-                If Me.txtSampleGroups.Text > 1 Then
+                If Me.txtSampleGroups.text > 1 Then
                     If DeterminePDROnPKS("S") Then
                         cmdSamples.Enabled = False
                     End If
@@ -2348,7 +2454,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
             End If
             If ProductionRun.Barcode_Id <> "" Then
                 If Planning.CheckIfCombined(ProductionRun.Barcode_Id) Then
-                    txtPDRStatus.Text = "COMBINED PDR HAS BEEN PROCESSED"
+                    txtPDRStatus.text = "COMBINED PDR HAS BEEN PROCESSED"
                     chkPrintAtPackager.Enabled = False
                 End If
             End If
@@ -2362,7 +2468,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
                 If Planning.CheckIfCombined(ProductionRun.Barcode_Id) Then
                     Call Lock_Out_PDRForm(False, True)
                     txtProdDesc.Enabled = True
-                    txtPDRStatus.Text = "COMBINED PDR"
+                    txtPDRStatus.text = "COMBINED PDR"
                     chkPrintAtPackager.Enabled = False
                 End If
             End If
@@ -2380,7 +2486,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
         Call SetSSDBComboText(Me.SSDBComboShip, ProductionRun.Ship_To_Id)
         ' hold the orig pdr number
         If gOrigPDRNumber = "" Then
-            gOrigPDRNumber = Me.txtBarcodeId.Text
+            gOrigPDRNumber = Me.txtBarcodeId.text
         End If
         Me.txtBarcodeId = ProductionRun.Barcode_Id
         Me.txtProdDesc = ProductionRun.Prod_Description
@@ -2388,17 +2494,17 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
         ' tj - IRQ stuff 2
         HoldStockProofId = ProductionRun.Stock_Proof_Id
         HoldScratchStockProofId = ProductionRun.Scratch_Proof_Id
-        Me.txtStockNo.Text = ProductionRun.stock
-        Me.txtOnsertDie.Text = ProductionRun.OnsertDiePartNumber
-        Me.txtScratchStockNo.Text = ProductionRun.Scratch_Stock
+        Me.txtStockNo.text = ProductionRun.stock
+        Me.txtOnsertDie.text = ProductionRun.OnsertDiePartNumber
+        Me.txtScratchStockNo.text = ProductionRun.Scratch_Stock
         Me.lblApplyBlindLam.Caption = BlindLamApplyCol(CStr(ProductionRun.Apply_ScratchOff))
         If Me.lblApplyBlindLam.Caption = NA_TEXT Or Me.lblApplyBlindLam.Caption = NOT_BLINDED_TEXT Then
             Me.lblApplyBlindLam.Caption = ""
         End If
         
         ' tj - IRQ stuff 2
-        Me.txtStockIRQ.Text = ""
-        Me.txtScratchIRQ.Text = ""
+        Me.txtStockIRQ.text = ""
+        Me.txtScratchIRQ.text = ""
         Call GetIRQInfo
         If Not oCollIRQInfo Is Nothing Then
             For Each oIRQInfo In oCollIRQInfo
@@ -2412,8 +2518,8 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
                 End If
             Next
         Else
-            Me.txtStockIRQ.Text = ""
-            Me.txtScratchIRQ.Text = ""
+            Me.txtStockIRQ.text = ""
+            Me.txtScratchIRQ.text = ""
         End If
         
         Me.chkPrintAtPackager.value = ProductionRun.PrintAtPackager
@@ -2423,13 +2529,13 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
     Call GetReprintFile_For_PDR(RPFound)
     If RPFound Then
         If gReprintFile_Type = "REPLACEMENT" Then
-            Me.txtReplacement.Text = "REPLACEMENT"
+            Me.txtReplacement.text = "REPLACEMENT"
         Else
-            Me.txtReplacement.Text = "RESUPPLY"
+            Me.txtReplacement.text = "RESUPPLY"
         End If
     Else
         'use as default for any older PDR's created before this impelementation
-        Me.txtReplacement.Text = "REPLACEMENT"
+        Me.txtReplacement.text = "REPLACEMENT"
     End If
     
     Me.chkReOrientation.value = ProductionRun.Reorient_Ind
@@ -2443,15 +2549,15 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
     
     ' Clear dirty flag here because if the flag was tripped as
     ' part of the data load process it doesn't count.
-    Me.txtDirtyFlag.Text = ""
+    Me.txtDirtyFlag.text = ""
     
     If DeterminePDROnPKS = False Then
         strReason = ""
-        If InStr(txtPDRStatus.Text, "PROCESSED") > 0 And Me.txtPDRStatus.Visible = True Then
+        If InStr(txtPDRStatus.text, "PROCESSED") > 0 And Me.txtPDRStatus.Visible = True Then
             strReason = "has been run."
         ElseIf booIRQsExist Then
             strReason = "has an IRQ."
-        ElseIf InStr(txtPDRStatus.Text, "COMBINED") > 0 And Me.txtPDRStatus.Visible = True Then
+        ElseIf InStr(txtPDRStatus.text, "COMBINED") > 0 And Me.txtPDRStatus.Visible = True Then
             strReason = "is part of a PRG."
         End If
     
@@ -2461,7 +2567,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
                         "The Original PDR's stock is " & mvarOrigStockId & "." & vbCrLf & vbCrLf & _
                         "Do you want to update this Replacement PDR Stock to match the Original PDR?", _
                         vbYesNo + vbQuestion, "Update Stock") = vbYes Then
-                    Me.txtStockNo.Text = mvarOrigStockId
+                    Me.txtStockNo.text = mvarOrigStockId
                     ProductionRun.stock = mvarOrigStockId
                     ProductionRun.Stock_Proof_Id = mvarOrigStockProofId
                     
@@ -2483,7 +2589,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
                         "Label Specs's stock is currently " & gStockLabelId & "." & vbCrLf & vbCrLf & _
                         "Do you want to update this Replacement PDR Stock to match Label Specs?", _
                         vbYesNo + vbQuestion, "Update Stock") = vbYes Then
-                    Me.txtStockNo.Text = gStockLabelId
+                    Me.txtStockNo.text = gStockLabelId
                     ProductionRun.stock = gStockLabelId
                     ProductionRun.Stock_Proof_Id = gStockProofId
                     
@@ -2532,7 +2638,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
                         End If
                     Next i
                     
-                    Me.txtScratchStockNo.Text = mvarOrigScratchStockId
+                    Me.txtScratchStockNo.text = mvarOrigScratchStockId
                     ProductionRun.Scratch_Stock = mvarOrigScratchStockId
                     ProductionRun.Scratch_Proof_Id = mvarOrigScratchStockProofId
                     
@@ -2579,7 +2685,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
                         End If
                     Next i
                     
-                    Me.txtScratchStockNo.Text = gBlindLabelId
+                    Me.txtScratchStockNo.text = gBlindLabelId
                     ProductionRun.Scratch_Stock = gBlindLabelId
                     ProductionRun.Scratch_Proof_Id = gBlindProofId
                     
@@ -2605,7 +2711,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
                     "The Original PDR's Onsert die is " & mvarOrigOnsertDiePartNumber & "." & vbCrLf & vbCrLf & _
                     "Do you want to update the Replacement PDR die to match the Original PDR?", _
                     vbYesNo + vbQuestion, "Update Die") = vbYes Then
-                    Me.txtOnsertDie.Text = mvarOrigOnsertDiePartNumber
+                    Me.txtOnsertDie.text = mvarOrigOnsertDiePartNumber
                     ProductionRun.OnsertDiePartNumber = mvarOrigOnsertDiePartNumber
                     ProductionRun.OnsertDieToolId = mvarOrigOnsertDieToolId
                     MsgBox _
@@ -2629,7 +2735,7 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
                     "Label Specs's Onsert die is currently " & gOnsertDiePartNumber & "." & vbCrLf & vbCrLf & _
                     "Do you want to update the Replacement PDR die to match Label Specs?", _
                     vbYesNo + vbQuestion, "Update Die") = vbYes Then
-                    Me.txtOnsertDie.Text = gOnsertDiePartNumber
+                    Me.txtOnsertDie.text = gOnsertDiePartNumber
                     ProductionRun.OnsertDiePartNumber = gOnsertDiePartNumber
                     ProductionRun.OnsertDieToolId = gOnsertDieToolId
                     MsgBox _
@@ -2668,7 +2774,7 @@ Private Sub Enable_Fields()
 End Sub
 
 Private Sub SSDBComboShip_Click()
-    Me.cmdViewShipping.Enabled = (Me.SSDBComboShip.Text <> "")
+    Me.cmdViewShipping.Enabled = (Me.SSDBComboShip.text <> "")
 End Sub
 
 Private Sub SSDBComboShip_InitColumnProps()
@@ -2681,31 +2787,37 @@ Private Sub cmdSave_Click()
     Dim booInitialSave As Boolean
     Dim strCodingFileHeader As String
     
-    On Error GoTo Exit_this_Sub
-
-    Screen.MousePointer = vbHourglass
+    On Error GoTo Error_this_Sub
 
     ' DW 2010-002 added
     ' Check for Replacement PDRs (Add/Remove Clintrak Samples based on Print at Packager
     ' ----------------------------------------------------------------------------------
     If booReplacement Then
+        Screen.MousePointer = vbHourglass
         If ProductionRun.Production_Run_Id > 0 Then
             If Me.chkPrintAtPackager.value <> ProductionRun.PrintAtPackager Then
                 Call DeleteSample(ProductionRun.Production_Run_Id, 0)
                 'change PDR sample counts for new samples just configured
-                Me.txtSamples.Text = 0
-                Me.txtSampleGroups.Text = 0
+                Me.txtSamples.text = 0
+                Me.txtSampleGroups.text = 0
                 ProductionRun.Samples_Requested = CLng(Me.txtSamples)
                 ProductionRun.Sample_Number = CInt(Me.txtSampleGroups)
                 ProductionRun.UpdateSampleQuantities
                 mReprintFile_id = ProductionRun.Reprint_File_Id
             End If
         End If
+        Screen.MousePointer = vbDefault
     End If
     
     If Not ValidScreen Then
         GoTo Exit_this_Sub
     End If
+    
+    If Not CheckOverrides Then
+        GoTo Exit_this_Sub
+    End If
+    
+    Screen.MousePointer = vbHourglass
 
     'added the following to prevent production runs from being saved if
     'their IRQs have been issued & the user is attempting to change the quantity or stock or IRQs have
@@ -2739,8 +2851,8 @@ Private Sub cmdSave_Click()
     
     With ProductionRun
         .Prod_Run_Updated = False
-        If Me.txtDirtyFlag.Text = "Y" Then
-            Me.txtProducedBy.Text = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
+        If Me.txtDirtyFlag.text = "Y" Then
+            Me.txtProducedBy.text = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
         End If
         .Produced_By = Me.txtProducedBy
         .Samples_Requested = CLng(Me.txtSamples)
@@ -2754,17 +2866,19 @@ Private Sub cmdSave_Click()
             .Ship_To_Id = 0
             .Ship_Description = ""
         Else
-            .Ship_To_Id = SSDBComboShip.Columns.Item(1).Text
-            .Ship_Description = SSDBComboShip.Text
+            .Ship_To_Id = SSDBComboShip.Columns.Item(1).text
+            .Ship_Description = SSDBComboShip.text
         End If
         .PrintAtPackager = Me.chkPrintAtPackager.value  ' DW 2010-002 added
         If Not .Clintrak_Location_Id > 0 Then
             .Clintrak_Location_Id = gApplicationUser.ClintrakLocationId
         End If
         .Reorient_Ind = Me.chkReOrientation.value
+        ' non billable reason is updated as the combo box is changed (so that the UI can be made read-only as necessary)
     End With
     
     ProductionRun.SaveProdRun
+    
     If ProductionRun.Prod_Run_Updated Then
         Call DupLinksSpecInstructions
         
@@ -2889,18 +3003,22 @@ Private Function ValidScreen() As Boolean
             "This information must be entered in Label Specs before creating a Production Run.", vbExclamation
         Exit Function
     End If
-    If Trim$(Me.SSDBComboShip.Text) = "" And Not CBool(Me.chkPrintAtPackager.value) Then
+    If Trim$(Me.SSDBComboShip.text) = "" And Not CBool(Me.chkPrintAtPackager.value) Then
         Me.SSDBComboShip.SetFocus
         MsgBox "Must enter the Ship To.", vbExclamation
         Exit Function
     End If
-    If gClientRefReqInd = True And Trim$(Me.txtReferanceNo.Text) = "" And Me.txtReplacement.Visible = False Then
+    If gClientRefReqInd = True And Trim$(Me.txtReferanceNo.text) = "" And Me.txtReplacement.Visible = False Then
         Me.txtReferanceNo.SetFocus
         MsgBox "Reference Number cannot be blank.", vbExclamation
         Exit Function
     End If
+    If ProductionRun.NonBillable.ReasonId < 0 Then
+        MsgBox "The PDR must either be marked as billable or a non-billable reason must be selected.", vbExclamation
+        Exit Function
+    End If
     ' checking reference number for commas
-    If InStr(Me.txtReferanceNo.Text, ",") Then
+    If InStr(Me.txtReferanceNo.text, ",") Then
         Me.txtReferanceNo.SetFocus
         MsgBox "Reference Number cannot contain any commas.", vbExclamation
         Exit Function
@@ -2943,6 +3061,7 @@ Private Function ValidScreen() As Boolean
         Me.cmdSamples.SetFocus
         Exit Function
     End If
+   
     
     ValidScreen = True
 
@@ -3021,10 +3140,12 @@ Private Sub CheckData()
     On Error GoTo Handle_Error
 
     Dim i As Long
-
+    
+    If ProductionRun.Production_Run_Id = 0 Then GoTo Flag_Dirty
     If Trim$(Me.txtProdDesc) <> Trim$(ProductionRun.Prod_Description) Then GoTo Flag_Dirty
     If Trim$(Me.txtReferanceNo) <> Trim$(ProductionRun.Reference_No) Then GoTo Flag_Dirty
     If Me.chkReOrientation.value <> ProductionRun.Reorient_Ind Then GoTo Flag_Dirty
+    If ProductionRun.NonBillable.HasChange() Then GoTo Flag_Dirty
     
     ' Determine whether client required fields have changed
     If Not ClientReqdFields Is Nothing Then
@@ -3039,8 +3160,8 @@ Private Sub CheckData()
     
     ' check that descriptions match still
     If Not CBool(Me.chkPrintAtPackager.value) Then
-        If (ProductionRun.Ship_To_Id <> SSDBComboShip.Columns.Item(1).Text) Or _
-                ProductionRun.Ship_Description <> SSDBComboShip.Columns(0).Text Then
+        If (ProductionRun.Ship_To_Id <> SSDBComboShip.Columns.Item(1).text) Or _
+                ProductionRun.Ship_Description <> SSDBComboShip.Columns(0).text Then
             GoTo Flag_Dirty
         End If
     End If
@@ -3060,7 +3181,7 @@ Data_Changed:
 
 Flag_Dirty:
     Me.txtDirtyFlag = "Y"
-    Me.txtProducedBy.Text = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
+    Me.txtProducedBy.text = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
     GoTo Data_Changed
 
 Cleanup_Exit:
@@ -3091,7 +3212,7 @@ Dim i As Long
 
 
     'check to see if samples exist
-    If Trim$(txtSampleGroups.Text) = "" Or txtSampleGroups.Text = "0" Then
+    If Trim$(txtSampleGroups.text) = "" Or txtSampleGroups.text = "0" Then
         Exit Sub
     End If
 
@@ -3884,29 +4005,29 @@ End Function
 Private Sub DupLinksSpecInstructions()
     On Error GoTo Handle_Error
 
-    If Trim$(Me.rtbLinkInstructions.Text) <> "" Then
+    If Trim$(Me.rtbLinkInstructions.text) <> "" Then
         Me.rtbPDRInstructions.TextRTF = ProductionRun.Special_Inst
-        If InStr(Me.rtbPDRInstructions.Text, Trim$(Me.rtbLinkInstructions.Text)) = 0 Then
+        If InStr(Me.rtbPDRInstructions.text, Trim$(Me.rtbLinkInstructions.text)) = 0 Then
         
             If MsgBox( _
                 "Would you like to append the Links Special Instructions " & vbCrLf & _
                 "to the PDR's Special Instructions?", vbQuestion + vbYesNo) = vbYes Then
                 
-                If Trim$(Me.rtbPDRInstructions.Text) <> "" Then
-                    Me.rtbPDRInstructions.Text = _
-                        Me.rtbPDRInstructions.Text & vbCrLf & vbCrLf & _
-                        Me.rtbLinkInstructions.Text & " - " & _
+                If Trim$(Me.rtbPDRInstructions.text) <> "" Then
+                    Me.rtbPDRInstructions.text = _
+                        Me.rtbPDRInstructions.text & vbCrLf & vbCrLf & _
+                        Me.rtbLinkInstructions.text & " - " & _
                         Now & " " & gClintrakLocations(gApplicationUser.ClintrakLocationId).Time_Zone_Display
                 Else
-                    Me.rtbPDRInstructions.Text = _
-                        Me.rtbLinkInstructions.Text & " - " & _
+                    Me.rtbPDRInstructions.text = _
+                        Me.rtbLinkInstructions.text & " - " & _
                         Now & " " & gClintrakLocations(gApplicationUser.ClintrakLocationId).Time_Zone_Display
                 End If
                 
                 Call writetext
                 
-                If Len(Me.rtbPDRInstructions.Text) > _
-                    Len(Me.rtbLinkInstructions.Text & " - " & _
+                If Len(Me.rtbPDRInstructions.text) > _
+                    Len(Me.rtbLinkInstructions.text & " - " & _
                         Now & " " & gClintrakLocations(gApplicationUser.ClintrakLocationId).Time_Zone_Display) Then
                     Load frmSpecInst
                     frmSpecInst.rtbInstructions = ProductionRun.Special_Inst
@@ -3954,21 +4075,21 @@ Private Sub AppendRefNumber()
     On Error GoTo Error_this_Sub
 
     If Trim$(ProductionRun.Reference_No) <> "" Then 'there had previously been a reference no. for the pdr
-            If InStr(Me.txtProdDesc.Text, Trim$(ProductionRun.Reference_No)) > 0 Then 'the old reference no. had been in the desc.
-                If Trim$(Me.txtReferanceNo.Text) = "" Then 'the reference no. has been removed so remove it from the desc.
-                    Me.txtProdDesc.Text = Replace(Me.txtProdDesc.Text, Trim$(ProductionRun.Reference_No), "")
+            If InStr(Me.txtProdDesc.text, Trim$(ProductionRun.Reference_No)) > 0 Then 'the old reference no. had been in the desc.
+                If Trim$(Me.txtReferanceNo.text) = "" Then 'the reference no. has been removed so remove it from the desc.
+                    Me.txtProdDesc.text = Replace(Me.txtProdDesc.text, Trim$(ProductionRun.Reference_No), "")
                 Else 'the reference no. has just been changed, so swap the old one in the desc. for the new one
-                    Me.txtProdDesc.Text = Replace(Me.txtProdDesc.Text, Trim$(ProductionRun.Reference_No), Trim$(Me.txtReferanceNo.Text))
+                    Me.txtProdDesc.text = Replace(Me.txtProdDesc.text, Trim$(ProductionRun.Reference_No), Trim$(Me.txtReferanceNo.text))
                 End If
             Else 'the old reference no. was not in the desc. so add it
-                If InStr(Me.txtProdDesc.Text, Me.txtReferanceNo.Text) = 0 Then
-                    Me.txtProdDesc.Text = Me.txtProdDesc.Text & " " & Trim$(Me.txtReferanceNo.Text)
+                If InStr(Me.txtProdDesc.text, Me.txtReferanceNo.text) = 0 Then
+                    Me.txtProdDesc.text = Me.txtProdDesc.text & " " & Trim$(Me.txtReferanceNo.text)
                 End If
             End If
     Else 'there hadn't previously been a reference no. for the pdr
-        If Trim$(Me.txtReferanceNo.Text) <> "" Then 'there is now a reference no for the pdr, so add to desc
-            If InStr(Me.txtProdDesc.Text, Me.txtReferanceNo.Text) = 0 Then
-                Me.txtProdDesc.Text = Me.txtProdDesc.Text & " " & Trim$(Me.txtReferanceNo.Text)
+        If Trim$(Me.txtReferanceNo.text) <> "" Then 'there is now a reference no for the pdr, so add to desc
+            If InStr(Me.txtProdDesc.text, Me.txtReferanceNo.text) = 0 Then
+                Me.txtProdDesc.text = Me.txtProdDesc.text & " " & Trim$(Me.txtReferanceNo.text)
             End If
         End If
     End If
@@ -3990,13 +4111,13 @@ Private Sub AppendClientReqdFields()
         
     For i = 1 To ClientReqdFields.count
         If mColClientFields.Item(i).Field_Name_Value <> "" Then ' there had previously been a value for the client field
-            If InStr(Me.txtProdDesc.Text, mColClientFields.Item(i).Client_Required_Field_Name & " " & mColClientFields.Item(i).Field_Name_Value) > 0 Then 'the old value had been in the desc.
+            If InStr(Me.txtProdDesc.text, mColClientFields.Item(i).Client_Required_Field_Name & " " & mColClientFields.Item(i).Field_Name_Value) > 0 Then 'the old value had been in the desc.
                 If ClientReqdFields.Item(i).Field_Name_Value <> "" Then
-                    Me.txtProdDesc.Text = Replace(Me.txtProdDesc.Text, mColClientFields.Item(i).Field_Name_Value, ClientReqdFields.Item(i).Field_Name_Value)
+                    Me.txtProdDesc.text = Replace(Me.txtProdDesc.text, mColClientFields.Item(i).Field_Name_Value, ClientReqdFields.Item(i).Field_Name_Value)
                 End If
             Else 'the old value was not in the desc. so add it
-                If InStr(Me.txtProdDesc.Text, ClientReqdFields.Item(i).Client_Required_Field_Name & " " & ClientReqdFields.Item(i).Field_Name_Value) = 0 Then
-                    Me.txtProdDesc.Text = Me.txtProdDesc.Text & " " & _
+                If InStr(Me.txtProdDesc.text, ClientReqdFields.Item(i).Client_Required_Field_Name & " " & ClientReqdFields.Item(i).Field_Name_Value) = 0 Then
+                    Me.txtProdDesc.text = Me.txtProdDesc.text & " " & _
                                             ClientReqdFields.Item(i).Client_Required_Field_Name & " " & _
                                     ClientReqdFields.Item(i).Field_Name_Value
                 End If
@@ -4004,7 +4125,7 @@ Private Sub AppendClientReqdFields()
 
         Else ' there hadn't previously been a value for this client field
             If ClientReqdFields.Item(i).Field_Name_Value <> "" Then 'there is now a value for the client field
-                Me.txtProdDesc.Text = Me.txtProdDesc.Text & " " & _
+                Me.txtProdDesc.text = Me.txtProdDesc.text & " " & _
                                     ClientReqdFields.Item(i).Client_Required_Field_Name & " " & _
                                     ClientReqdFields.Item(i).Field_Name_Value
             End If
@@ -4087,12 +4208,12 @@ Private Sub AppendOrigRunToSpecInstructions()
     strOrigRun = "Original Run: " & GetOriginalRunBarcode
 
         Me.rtbPDRInstructions.TextRTF = ProductionRun.Special_Inst
-        If InStr(Me.rtbPDRInstructions.Text, strOrigRun) = 0 Then
+        If InStr(Me.rtbPDRInstructions.text, strOrigRun) = 0 Then
 
-            If Me.rtbPDRInstructions.Text = "" Then
-                Me.rtbPDRInstructions.Text = strOrigRun
+            If Me.rtbPDRInstructions.text = "" Then
+                Me.rtbPDRInstructions.text = strOrigRun
             Else
-                Me.rtbPDRInstructions.Text = Me.rtbPDRInstructions.Text & vbCrLf & strOrigRun
+                Me.rtbPDRInstructions.text = Me.rtbPDRInstructions.text & vbCrLf & strOrigRun
             End If
             
                     
@@ -4155,23 +4276,23 @@ Private Sub chkPrintAtPackager_Click()
     On Error GoTo Handle_Error
     
     If CBool(Me.chkPrintAtPackager.value) Then
-        If Me.txtStockIRQ.Text <> "" Then
+        If Me.txtStockIRQ.text <> "" Then
             MsgBox _
-                "Inventory for this PDR has been requested on " & Me.txtStockIRQ.Text & "." & vbCrLf & _
+                "Inventory for this PDR has been requested on " & Me.txtStockIRQ.text & "." & vbCrLf & _
                 "Please remove the PDR from the IRQ, reload this screen and try again.", vbExclamation
             Me.chkPrintAtPackager.value = 0
         Else
-            Me.SSDBComboShip.Text = ""
+            Me.SSDBComboShip.text = ""
             Me.SSDBComboShip.Enabled = False
             Me.cmdViewShipping.Enabled = False
         End If
     Else
         ' Enable combo if it was screen editable to begin with
         Me.SSDBComboShip.Enabled = Me.cmdSave.Enabled
-        Me.cmdViewShipping.Enabled = (Me.SSDBComboShip.Text <> "")
+        Me.cmdViewShipping.Enabled = (Me.SSDBComboShip.text <> "")
     End If
     
-    Me.txtDirtyFlag.Text = "Y"
+    Me.txtDirtyFlag.text = "Y"
     
 Cleanup_Exit:
      Exit Sub
@@ -4183,7 +4304,8 @@ Handle_Error:
 End Sub
 
 Private Sub txtDirtyFlag_Change()
-    If LCase$(Me.txtDirtyFlag.Text) = "y" Then
-        Me.txtProducedBy.Text = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
+    If LCase$(Me.txtDirtyFlag.text) = "y" Then
+        Me.txtProducedBy.text = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
     End If
 End Sub
+

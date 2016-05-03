@@ -16,6 +16,7 @@ Public booReplacement As Boolean
 Public gJob_Id As Long
 Public gJobNumber As String
 Public gProtocol As String
+Public gJobNonBillableId As Long
 Public gFileLinksId As Long
 Public gRandomizationId As Long
 Public booNewProdRun As Boolean
@@ -35,6 +36,7 @@ Public gCodingName As String
 Public gCodingNumber As Long
 Public gGroupNumber As Long
 Public gGroupName As String
+Public gClientGroupName As String
 Public gRandIDNumber As String
 Public vdata As String
 Public columnNumber As Integer
@@ -91,6 +93,23 @@ Public gDomainIconPath As String
 ' DW 2012-001 added
 Public Const DPIRQDELIMITER As String = ","
 
+Public Enum SecurityLevels
+    NonBillableAuthorize = 1
+End Enum
+
+Public Sub CenterForm(frmIn As Form)
+    On Error GoTo PROC_ERR
+
+    frmIn.Move (Screen.Width - frmIn.Width) / 2, (Screen.Height - frmIn.Height) / 2
+
+Proc_EXIT:
+    Exit Sub
+
+PROC_ERR:
+    MsgBox "Error: " & Err.Number & ". " & Err.description, , "CenterForm"
+    Resume Proc_EXIT
+End Sub
+
 Public Sub getFileLinksInfo()
     
     'this is the first instantiation point of this object so first
@@ -133,6 +152,7 @@ Public Sub getFileLinksInfo()
                 gCodingNumber = .Recordset!Coding_Number
                 gGroupNumber = .Recordset!Group_Number
                 gGroupName = .Recordset!Group_Name
+                gClientGroupName = .Recordset!Client_Group_Name
                 gCodingRepeatCnt = .Recordset!Repeat_Count
                 .Recordset.MoveNext
             Loop
@@ -183,6 +203,7 @@ Public Sub getReplacementFileLinksInfo()
                 gCodingNumber = .Recordset!Coding_Number
                 gGroupNumber = .Recordset!Group_Number
                 gGroupName = .Recordset!Group_Name
+                gClientGroupName = .Recordset!Client_Group_Name
                 .Recordset.MoveNext
             Loop
         End If
@@ -235,6 +256,7 @@ Public Sub GetJobInformation()
                 nYear = .Recordset!Year
                 nReleaseNo = .Recordset!Release_No
                 gProtocol = .Recordset!description
+                gJobNonBillableId = .Recordset!Non_Billable_Id
                 .Recordset.MoveNext
             Loop
         End If
@@ -300,6 +322,15 @@ Public Function CheckNulls(Teststr As String) As String
     CheckNulls = tempstr
          
 End Function
+
+Public Function CheckEmptyString(text As String) As String
+    If Len(text) = 0 Then
+        CheckEmptyString = " "
+    Else
+        CheckEmptyString = text
+    End If
+End Function
+
 
 Public Sub GetClientName()
     On Error GoTo Error_this_Sub
@@ -432,7 +463,7 @@ Public Sub GetRandDelimiter()
         .Recordset.Close
     End With
     
-    frmProdPlan.rtbLinkInstructions.Text = gLinksSpecInstr
+    frmProdPlan.rtbLinkInstructions.text = gLinksSpecInstr
     
 Exit_this_Sub:
     Exit Sub
@@ -564,16 +595,16 @@ Public Sub SetSSDBComboText(ssdbCbo As SSDBCombo, sTextID As String, Optional sT
 
     ssdbCbo.MoveFirst
     For i = 0 To ssdbCbo.Rows - 1
-        If ssdbCbo.Columns(1).Text = sTextID Or (Trim$(sText) > "" And UCase$(ssdbCbo.Columns(0).Text) = UCase$(sText)) Then
+        If ssdbCbo.Columns(1).text = sTextID Or (Trim$(sText) > "" And UCase$(ssdbCbo.Columns(0).text) = UCase$(sText)) Then
             ssdbCbo.Bookmark = ssdbCbo.AddItemBookmark(i)
-            ssdbCbo.Text = ssdbCbo.Columns(0).Text
+            ssdbCbo.text = ssdbCbo.Columns(0).text
             Exit Sub
         End If
         ssdbCbo.MoveNext
     Next
     
     ' if it gets here then no value found
-    ssdbCbo.Text = ""
+    ssdbCbo.text = ""
     'For i = 0 To ssdbCbo.Cols - 1
     '    ssdbCbo.Columns(i).Text = ""
     'Next
@@ -857,14 +888,14 @@ End If
         .OpenRecordSetFromSP "get_ShipToAddress"
 
         If Not .Recordset.EOF Then
-            ship.Text = .Recordset!ShipTo_Description
-                                    attn.Text = .Recordset!Attn_Description
-                                    add1.Text = .Recordset!Address_Line_1
-                                    add2.Text = .Recordset!Address_Line_2
-                                    city.Text = .Recordset!city
-                                    state.Text = .Recordset!state
-                                    zip.Text = .Recordset!zip
-                                    add3.Text = .Recordset!Address_Line_3       ' DW 2010-002 added
+            ship.text = .Recordset!ShipTo_Description
+                                    attn.text = .Recordset!Attn_Description
+                                    add1.text = .Recordset!Address_Line_1
+                                    add2.text = .Recordset!Address_Line_2
+                                    city.text = .Recordset!city
+                                    state.text = .Recordset!state
+                                    zip.text = .Recordset!zip
+                                    add3.text = .Recordset!Address_Line_3       ' DW 2010-002 added
         End If
         .Recordset.Close
     End With
@@ -1268,10 +1299,10 @@ deleteCount = sdata.count
             Set mData = New CCOLPDRFILES
             'md added code for clintrak samples
             If sdata.Item(j).sampleType = "CLINTRAK" Then
-                Call ReadProcess_File(dData.Item(i).filename, _
+                Call ReadProcess_File(dData.Item(i).fileName, _
                     sdata.Item(j).quantity, sdata.Item(j).sampleType)
             Else
-                Read_File (dData.Item(i).filename)
+                Read_File (dData.Item(i).fileName)
                 'duplicates for each sample type number
                 For k = 1 To sdata.Item(j).quantity
                     Call mData.Add(vdata, k, sdata.Item(j).sampleType)
@@ -2007,7 +2038,7 @@ deleteCount = sdata.count
 
 'goes through all the production files
     For i = 1 To dupcount
-        Read_File (dData.Item(i).filename)
+        Read_File (dData.Item(i).fileName)
         strCodingData = vdata
         arrCodingData = Split(strCodingData, gRandDelimiter)
         If UBound(arrCodingData) - gCodingRepeatCnt + 1 <= 0 Then
@@ -2022,7 +2053,7 @@ deleteCount = sdata.count
             Set mData = New CCOLPDRFILES
             'md added code for clintrak samples
             If sdata.Item(j).sampleType = "CLINTRAK" Then
-                Call ReadProcess_File(dData.Item(i).filename, _
+                Call ReadProcess_File(dData.Item(i).fileName, _
                     sdata.Item(j).quantity, sdata.Item(j).sampleType)
             Else
                 Read_File (sdata.Item(j).smpfileName)
@@ -2406,7 +2437,7 @@ Handle_Error:
     Resume Cleanup_Exit
 End Sub
 
-Public Function GetNumberLinesInFile(filename As String) As Long
+Public Function GetNumberLinesInFile(fileName As String) As Long
     Dim lngSourceFile As Long
     Dim strData As String
     
@@ -2416,7 +2447,7 @@ Public Function GetNumberLinesInFile(filename As String) As Long
     
     ' Open the source file
     lngSourceFile = FreeFile
-    Open filename For Input Access Read As lngSourceFile
+    Open fileName For Input Access Read As lngSourceFile
    
     Do Until EOF(lngSourceFile)
         Line Input #lngSourceFile, strData
@@ -2435,7 +2466,7 @@ Handle_Error:
 
 End Function
 
-Public Function GetLineOfData(filename As String, LineNumber As Long) As String
+Public Function GetLineOfData(fileName As String, LineNumber As Long) As String
 '
 'comments:  reads the specified line of data in the specified file
 'parameters:    FileName - path of file to read
@@ -2453,7 +2484,7 @@ Public Function GetLineOfData(filename As String, LineNumber As Long) As String
     
     ' Open the source file
     lngSourceFile = FreeFile
-    Open filename For Input Access Read As lngSourceFile
+    Open fileName For Input Access Read As lngSourceFile
     Do Until lngLineCount > LineNumber Or EOF(lngSourceFile)
         If lngLineCount = LineNumber Then
             Line Input #lngSourceFile, GetLineOfData
@@ -2469,7 +2500,7 @@ Public Function GetLineOfData(filename As String, LineNumber As Long) As String
     If GetLineOfData = "" Then
         ' Open the source file
         lngSourceFile = FreeFile
-        Open filename For Input Access Read As lngSourceFile
+        Open fileName For Input Access Read As lngSourceFile
         Line Input #lngSourceFile, GetLineOfData
         Close lngSourceFile
     End If
@@ -2484,3 +2515,128 @@ PROC_ERR:
 
 End Function
 
+Private Function GetNonBillableReasonsHelper() As Recordset
+    Dim objData As nADOData.CADOData
+    Set objData = New nADOData.CADOData
+    With objData
+        Set .Connection = GetDBConnection
+        .CursorType = adOpenForwardOnly
+        .CommandType = adCmdStoredProc
+        .LockType = adLockReadOnly
+        .ResetParameters
+        .OpenRecordSetFromSP "get_Non_Billable_Reasons_Tree"
+        Set GetNonBillableReasonsHelper = .Recordset
+    End With
+
+    Set objData = Nothing
+End Function
+
+Public Sub GetNonBillableReasons(ctrl As ComboBox)
+    Static nonBillableReasonList As Recordset
+    On Error GoTo Handle_Error
+    Dim reason As String
+    Dim Id As Long
+    
+    ' because VB6 doesn't support short-circuit evaluations...
+    If nonBillableReasonList Is Nothing Then
+        Set nonBillableReasonList = GetNonBillableReasonsHelper
+    ElseIf nonBillableReasonList.state = 0 Then
+        Set nonBillableReasonList = GetNonBillableReasonsHelper
+    End If
+    
+    nonBillableReasonList.MoveFirst
+    While Not nonBillableReasonList.EOF
+        reason = nonBillableReasonList!Reason_Text
+        Id = nonBillableReasonList!Reason_Id
+        If reason <> "" Then
+            ctrl.AddItem reason
+            ctrl.itemData(ctrl.NewIndex) = Id
+        End If
+        nonBillableReasonList.MoveNext
+    Wend
+
+Cleanup_Exit:
+    Exit Sub
+    
+Handle_Error:
+    Err.Raise Err.Number, Err.Source, Err.description
+    Resume Cleanup_Exit
+End Sub
+
+Public Function GetEmployeeName(employeeId As Long)
+    Dim objData As nADOData.CADOData
+    On Error GoTo Error_this_Sub
+            
+    Set objData = New CADOData
+    With objData
+        Set .Connection = GetDBConnection
+        .CursorType = adOpenForwardOnly
+        .CommandType = adCmdStoredProc
+        .LockType = adLockReadOnly
+
+        .ResetParameters
+    
+        .AddParameter "Employee Id", employeeId, adInteger, adParamInput
+        .OpenRecordSetFromSP "get_Employee_By_Id"
+            
+        If Not .Recordset.EOF Then
+            GetEmployeeName = Trim$(.Recordset!Last_Name) & ", " & Trim$(.Recordset!First_Name)
+            '
+            .Recordset.Close
+        End If
+    End With
+
+Exit_this_Sub:
+    Exit Function
+    
+Error_this_Sub:
+    MsgBox "Error: " & Err.Number & " " & Err.description, vbCritical, _
+    "Error Occurred Finding Employee " & employeeId & "."
+    Resume Exit_this_Sub
+
+End Function
+
+Public Function CreateNewSPCall(Optional t As CommandTypeEnum = adCmdStoredProc)
+    Dim objData As nADOData.CADOData
+    Set objData = New nADOData.CADOData
+    With objData
+        Set .Connection = GetDBConnection
+        .ResetParameters
+        .CursorType = adOpenForwardOnly
+        .CommandType = t
+        .LockType = adLockReadOnly
+    End With
+    
+    Set CreateNewSPCall = objData
+End Function
+
+Public Sub ResetSPCall(objData As nADOData.CADOData)
+    With objData
+        .ResetParameters
+    End With
+End Sub
+
+Public Function ConvertDateWithTimeZone(d As Date, location As Long) As String
+    Dim dateText As String
+    dateText = Format$(d, "MM/dd/yyyy hh:mm AM/PM")
+    ConvertDateWithTimeZone = dateText & " " & gClintrakLocations(CStr(location)).Time_Zone_Display
+End Function
+
+Public Function ConvertDate(d As Date, location As Long) As Date
+    If location = 1 Then
+        ConvertDate = d
+    Else
+        Dim objData As nADOData.CADOData
+        Dim rs As Recordset
+        Set objData = CreateNewSPCall(adCmdText)
+        
+        objData.SQL = "SELECT dbo.Convert_From_Est('" & Format$(d, "yyyy-MM-dd HH:mm:ss") & "', '" & location & "')"
+        
+        Set rs = objData.OpenRecordSet
+        
+        If Not rs.EOF Then
+            Dim it As Object
+            ConvertDate = rs(0)
+        End If
+    End If
+End Function

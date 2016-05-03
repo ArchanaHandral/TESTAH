@@ -62,6 +62,24 @@ Private mvarPrintAtPackagerInd As Integer
 Private mvarOnsertDiePartNumber As String
 Private mvarOnsertDieToolId As Long
 Private mvarDigitalLabelParts As String
+Private mvarNonBillable As CNonBillable
+
+Public Function IsOnRushRequest() As Boolean
+    Dim objData As nADOData.CADOData
+    Set objData = basGlobals.CreateNewSPCall
+    Dim rs As Recordset
+    With objData
+        .AddParameter "@in_PDR_Id", mvarProduction_Run_Id
+        .AddParameter "@in_Job_Id", mvarJob_Log_Id
+        
+        Set rs = .OpenRecordSetFromSP("get_If_PDR_Is_On_Rush_Request")
+        If rs.EOF = False Then
+            IsOnRushRequest = CInt(rs(0).value) <> 0
+        Else
+            Err.Raise vbObjectError + 1, "IsOnRushRequest", "Error determining if this PDR is on a rush request: no data set."
+        End If
+    End With
+End Function
 
 Public Property Let Production_Run_Id(ByVal vdata As Long)
     mvarProduction_Run_Id = vdata
@@ -399,6 +417,8 @@ Public Sub LookupRecord()
                 mvarPrintAtPackagerInd = .Recordset!Print_At_Packager_Ind
                 mvarOnsertDiePartNumber = .Recordset!Onsert_Die_Part_Number
                 mvarOnsertDieToolId = .Recordset!Onsert_Die_Tool_Id
+                mvarNonBillable.Load .Recordset
+
                 mvarDigitalLabelParts = _
                     .Recordset!BK1_Identification & _
                     IIf(.Recordset!BK2_Identification <> "", ", ", "") & .Recordset!BK2_Identification & _
@@ -426,6 +446,7 @@ Error_this_Sub:
     Resume Exit_this_Sub
 
 End Sub
+
 Public Sub SaveProdRun()
     Dim objData As nADOData.CADOData
     Dim nreturn As Long
@@ -433,7 +454,7 @@ Public Sub SaveProdRun()
     On Error GoTo Error_this_Sub
                                                         
     mbooProdRunUpdated = False
-                                                        
+    
     Set objData = New CADOData
     With objData
         ' DW 2010-002 added
@@ -441,9 +462,14 @@ Public Sub SaveProdRun()
         .CursorType = adOpenForwardOnly
         .CommandType = adCmdStoredProc
         .LockType = adLockReadOnly
+        .Connection.BeginTrans
+        
+        .ResetParameters
+        
+        NonBillable.Save mvarJob_Log_Id, objData
 
         .ResetParameters
-                
+
         .AddParameter "Prod Run ID", mvarProduction_Run_Id, adInteger, adParamInput
         .AddParameter "Job Log ID", mvarJob_Log_Id, adInteger, adParamInput
         .AddParameter "Randomization ID", mvarRandomization_Id, adInteger, adParamInput
@@ -476,6 +502,7 @@ Public Sub SaveProdRun()
         ' DW 2010-002 added
         .AddParameter "Print At Packager Ind", mvarPrintAtPackagerInd, adInteger, adParamInput
         .AddParameter "Onsert_Die_Tool_Id", mvarOnsertDieToolId, adInteger, adParamInput
+        .AddParameter "Non_Billable_Id", NonBillable.NonBillableId, adInteger, adParamInput
         
         .AddParameter "return", "   ", adInteger, adParamOutput
         .AddParameter "identity", "   ", adInteger, adParamOutput
@@ -504,8 +531,14 @@ Public Sub SaveProdRun()
                 Call GetScratchStockDesc
             End If
         End If
+        
+        If mbooProdRunUpdated Then
+            .Connection.CommitTrans
+        Else
+            .Connection.RollbackTrans
+        End If
     End With
-
+   
 Exit_this_Sub:
     Exit Sub
     
@@ -742,6 +775,11 @@ Public Sub DeleteRecord()
             End If
         End If
         
+        If mbooProdRunUpdated = True Then
+            .ResetParameters
+            ProductionRun.NonBillable.Delete objData
+        End If
+        
         .Connection.CommitTrans
         
     End With
@@ -786,13 +824,13 @@ Public Sub Determine_Clintrak_Samples()
         End If
     End With
         
-PROC_EXIT:
+Proc_EXIT:
   Exit Sub
   
 PROC_ERR:
   MsgBox "Error: " & Err.Number & ". " & Err.description, , _
     "Determine_ClintrakSamples"
-  Resume PROC_EXIT
+  Resume Proc_EXIT
 
 End Sub
 
@@ -830,4 +868,12 @@ Cleanup_Exit:
 Handle_Error:
     Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
+End Sub
+
+Public Property Get NonBillable() As CNonBillable
+    Set NonBillable = mvarNonBillable
+End Property
+
+Private Sub Class_Initialize()
+    Set mvarNonBillable = New CNonBillable
 End Sub

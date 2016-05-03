@@ -23,6 +23,7 @@ Begin VB.Form frmNotes
    Begin VB.TextBox txtNotes 
       Height          =   3015
       Left            =   0
+      MultiLine       =   -1  'True
       TabIndex        =   0
       Top             =   0
       Width           =   4695

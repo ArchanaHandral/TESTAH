@@ -23,7 +23,7 @@ Dim Counter As Long  'page count in multiple IRQ report
 
 Public Function Initialize(Username As String, Token As String, Server As String, Database As String, Optional DomainIconPath As String) As Boolean
     ' DW 2008-017 added
-    Dim objLocation As ClintrakCommon.Location
+    Dim objLocation As ClintrakCommon.location
     
     Set gApplicationUser = New ClintrakCommon.ApplicationUser
         
@@ -41,7 +41,7 @@ Public Function Initialize(Username As String, Token As String, Server As String
         
         ' DW 2008-017 added
         ' Retrieve collection of Clintrak locations
-        Set objLocation = New ClintrakCommon.Location
+        Set objLocation = New ClintrakCommon.location
         Set gClintrakLocations = objLocation.GetClintrakLocations(gadoConnection.Connection)
         gDomainIconPath = DomainIconPath
     End If
@@ -116,6 +116,7 @@ Public Sub PrintAll_ProdPlanning_Forms(barCode As String, booPDF As Boolean)
 
 
     Set ProductionRun = New CProdrun
+    ProductionRun.NonBillable.NoticeForm = frmProdPlan
     'Set ProductionGroup = New CProdGroup    ' DW 2012-001 seems to have been mia
     
     Set Planning = New CPlanningMethods
@@ -306,6 +307,7 @@ Public Sub Print_PRGPlanning_Form(barCode As String, booPDF As Boolean)
     Dim n As Long
 
     Set ProductionRun = New CProdrun
+    ProductionRun.NonBillable.NoticeForm = frmProdPlan
     Set ProductionGroup = New CProdGroup
     Set Planning = New CPlanningMethods
     Set PlanningList = New CColPlanningInfo
