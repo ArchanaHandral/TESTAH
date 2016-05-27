@@ -128,13 +128,12 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
-Private Sub UpdateNonBillableUIReadOnlyStatus(nb As CNonBillable)
-    Dim IsJobLevel As Boolean, isLocalWithReason As Boolean
+Private Sub UpdateNonBillableUIReadOnlyStatus(isJobLevel As Boolean)
+    Dim isLocalWithReason As Boolean
     
-    IsJobLevel = nb.IsJobLevel
-    isLocalWithReason = ((IsJobLevel = False) And (nb.ReasonId > 0))
+    isLocalWithReason = ((isJobLevel = False) And (GetNonBillableReasonSelected() > 0))
     
-    Me.cmbNonBillableReason.Enabled = (IsJobLevel = False) ' it is assumed job level is set to false if the PDR is billable
+    Me.cmbNonBillableReason.Enabled = (isJobLevel = False) ' it is assumed job level is set to false if the PDR is billable
     Me.txtNonBillablePRNumber.Enabled = isLocalWithReason
     Me.txtNonBillableNotes.Enabled = isLocalWithReason
 End Sub
@@ -144,7 +143,7 @@ Private Sub UpdateNonBillableUI(nb As CNonBillable)
         Me.cmbNonBillableReason.ListIndex = GetNonBillableReasonListIndex(0)
     Else
         ' also come here if we have no reason, since that will fail IsBillable
-        Me.cmbNonBillableReason.ListIndex = GetNonBillableReasonListIndex(nb.ReasonId)
+        Me.cmbNonBillableReason.ListIndex = GetNonBillableReasonListIndex(nb.reasonId)
     End If
 
     Me.txtNonBillablePRNumber.text = nb.PRNumber
@@ -159,13 +158,13 @@ Private Sub UpdateNonBillableUI(nb As CNonBillable)
     End If
     
     ' may get called when changing ListIndex but this ensures it was called
-    UpdateNonBillableUIReadOnlyStatus nb
+    UpdateNonBillableUIReadOnlyStatus nb.isJobLevel
 End Sub
 
-Private Function GetNonBillableReasonListIndex(ReasonId As Long)
+Private Function GetNonBillableReasonListIndex(reasonId As Long)
     Dim i As Long
     For i = 0 To Me.cmbNonBillableReason.ListCount - 1
-        If cmbNonBillableReason.itemData(i) = ReasonId Then
+        If cmbNonBillableReason.itemData(i) = reasonId Then
             GetNonBillableReasonListIndex = i
             Exit Function
         End If
@@ -182,15 +181,14 @@ Private Function GetNonBillableReasonSelected() As Long
     End If
 End Function
 
-Private Sub cmbNonBillableReason_Click()
-    ProductionRun.NonBillable.ReasonId = GetNonBillableReasonSelected
-    UpdateNonBillableUI ProductionRun.NonBillable
-End Sub
-
 Public Static Sub ShowNonBillable()
     Dim frm As frmNonBillable
     Set frm = New frmNonBillable
     frm.Show vbModal
+End Sub
+
+Private Sub cmbNonBillableReason_Click()
+    UpdateNonBillableUIReadOnlyStatus ProductionRun.NonBillable.isJobLevel
 End Sub
 
 Private Sub Form_Load()
@@ -199,13 +197,39 @@ Private Sub Form_Load()
     UpdateNonBillableUI ProductionRun.NonBillable
 End Sub
 
-Private Sub Form_Unload(Cancel As Integer)
-    If ProductionRun.NonBillable.HasChange() = True Then
-        frmProdPlan.txtDirtyFlag.text = "Y"
+Private Function IsValidSelection() As Boolean
+    Dim newDept As String
+    
+    newDept = basGlobals.GetNonBillableDepartment(GetNonBillableReasonSelected)
+    
+    ' must use WasFCSDepartment because the original reason id is (intentionally) not a public property
+    If ProductionRun.NonBillable.WasFCSDepartment And newDept <> "FCS" And GetNonBillableReasonSelected > 0 And basGlobals.gReprintFile_Type = "REPLACEMENT" Then
+        ' This exists because the DB trigger that fires off an email when a reason is selected from billable
+        ' cannot determine a reason change since it is on the PDR table. We want to send out an email when
+        ' going from FCS to any other department but can't because the trigger can't detect that. So, as an
+        ' interim solution, let's block that scenario: you can't go from FCS to anyone else. You must go
+        ' through billable first.
+        MsgBox "Please make this replacement PDR billable and save before switching the non-billable reason from FCS.", vbOKOnly + vbInformation, "Non-Billable Reason"
+        IsValidSelection = False
+    Else
+        IsValidSelection = True
     End If
-    If ProductionRun.NonBillable.ReasonId > 0 Then
-        ProductionRun.NonBillable.PRNumber = txtNonBillablePRNumber.text
-        ProductionRun.NonBillable.notes = txtNonBillableNotes.text
+End Function
+
+Private Sub Form_Unload(Cancel As Integer)
+    If IsValidSelection() = False Then
+        Cancel = 1
+    Else
+        ProductionRun.NonBillable.reasonId = GetNonBillableReasonSelected
+        'UpdateNonBillableUI ProductionRun.NonBillable
+        
+        If ProductionRun.NonBillable.HasChange() = True Then
+            frmProdPlan.txtDirtyFlag.text = "Y"
+        End If
+        If ProductionRun.NonBillable.reasonId > 0 Then
+            ProductionRun.NonBillable.PRNumber = txtNonBillablePRNumber.text
+            ProductionRun.NonBillable.notes = txtNonBillableNotes.text
+        End If
     End If
 End Sub
 

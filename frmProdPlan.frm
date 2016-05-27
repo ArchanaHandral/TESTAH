@@ -1,6 +1,6 @@
 VERSION 5.00
 Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{8D650141-6025-11D1-BC40-0000C042AEC0}#3.0#0"; "ssdw3b32.ocx"
 Begin VB.Form frmProdPlan 
    BorderStyle     =   0  'None
@@ -984,7 +984,6 @@ Begin VB.Form frmProdPlan
       _ExtentX        =   2355
       _ExtentY        =   635
       _Version        =   393217
-      Enabled         =   -1  'True
       TextRTF         =   $"frmProdPlan.frx":1286
    End
    Begin RichTextLib.RichTextBox rtbPDRInstructions 
@@ -998,7 +997,6 @@ Begin VB.Form frmProdPlan
       _ExtentX        =   2355
       _ExtentY        =   635
       _Version        =   393217
-      Enabled         =   -1  'True
       TextRTF         =   $"frmProdPlan.frx":1301
    End
    Begin MSComctlLib.StatusBar StatusBar1 
@@ -1166,10 +1164,10 @@ Private mvarOrigOnsertDiePartNumber As String
 Public booSamplesDirtyFlag As Boolean
 
 Private Function CheckOverrides() As Boolean
-    CheckOverrides = True
-    
     If ProductionRun.NonBillable.PerformOverride = False Then
         CheckOverrides = False
+    Else
+        CheckOverrides = True
     End If
 End Function
 
@@ -2236,10 +2234,10 @@ Private Sub mnuReplacements_Click()
     ProductionRun.Samples_Requested = 0
     ProductionRun.Reprint_File_Id = mReprintFile_id
     ProductionRun.NonBillable.SetNew ProductionRun.Job_Log_Id
-    If ProductionRun.NonBillable.IsJobLevel = False Then
+    If ProductionRun.NonBillable.isJobLevel = False Then
         ' If we haven't found a job-level non-billable, force the combo box to
         ' empty. This forces the user to pick a value on save.
-        ProductionRun.NonBillable.ReasonId = -1
+        ProductionRun.NonBillable.reasonId = -1
     End If
     
     Me.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
@@ -2348,7 +2346,7 @@ Error_this_Sub:
 End Sub
 
 ' this loads an existing Replacement Run
-Private Sub mnuRepProdRuns_Click(Index As Integer)
+Private Sub mnuRepProdRuns_Click(index As Integer)
     Dim objData As nADOData.CADOData
     Dim strMessageOrig As String
     Dim strMessage As String
@@ -2373,10 +2371,10 @@ Private Sub mnuRepProdRuns_Click(Index As Integer)
         .CommandType = adCmdStoredProc
         .CursorType = adOpenForwardOnly
         .RowsetSize = 1
-        .AddParameter "prod run barcode", mnuRepProdRuns(Index).Caption, adVarChar, adParamInput
+        .AddParameter "prod run barcode", mnuRepProdRuns(index).Caption, adVarChar, adParamInput
         .OpenRecordSetFromSP "get_ProductionRunByBarcode"
         If .Recordset.EOF Then
-            MsgBox "The selected Production Run, " & mnuRepProdRuns(Index).Caption & ", was not found.", vbExclamation
+            MsgBox "The selected Production Run, " & mnuRepProdRuns(index).Caption & ", was not found.", vbExclamation
             Exit Sub
          End If
                          
@@ -3013,7 +3011,7 @@ Private Function ValidScreen() As Boolean
         MsgBox "Reference Number cannot be blank.", vbExclamation
         Exit Function
     End If
-    If ProductionRun.NonBillable.ReasonId < 0 Then
+    If ProductionRun.NonBillable.reasonId < 0 Then
         MsgBox "The PDR must either be marked as billable or a non-billable reason must be selected.", vbExclamation
         Exit Function
     End If
@@ -3586,7 +3584,7 @@ End Sub
 Private Sub Get_ReprintSamples_ID_For_Replacements()
 'get sample reprints
 
-    Dim Index As Long
+    Dim index As Long
     Dim objData As nADOData.CADOData
     
     On Error GoTo Error_this_Sub
@@ -3608,14 +3606,14 @@ Private Sub Get_ReprintSamples_ID_For_Replacements()
         Do While Not .Recordset.EOF
             Me.txtSamples = Me.txtSamples + .Recordset!File_Record_Count
             Me.txtSampleGroups = Me.txtSampleGroups + 1
-            Index = Me.txtSampleGroups
+            index = Me.txtSampleGroups
             
             'load the collection
               Call smpData.Add(ProductionRun.Production_Run_Id, Me.txtSampleGroups, .Recordset!Sample_Type, ProductionRun.Ship_To_Id, _
-                .Recordset!File_Record_Count, .Recordset!Sample_Type, Determine_ReplacementSample_Path(Index), "", .Recordset!sample_type_id)
+                .Recordset!File_Record_Count, .Recordset!Sample_Type, Determine_ReplacementSample_Path(index), "", .Recordset!sample_type_id)
                 
             'create the file from the reprint sample file
-            Call FileCopy(.Recordset!Reprint_Sample_File_Name, smpData.Item(Index).smpfileName)
+            Call FileCopy(.Recordset!Reprint_Sample_File_Name, smpData.Item(index).smpfileName)
             
             .Recordset.MoveNext
         Loop

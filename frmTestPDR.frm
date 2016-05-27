@@ -2,10 +2,10 @@ VERSION 5.00
 Begin VB.Form frmTestPDR 
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Form1"
-   ClientHeight    =   4815
+   ClientHeight    =   2175
    ClientLeft      =   45
-   ClientTop       =   435
-   ClientWidth     =   4695
+   ClientTop       =   450
+   ClientWidth     =   9750
    BeginProperty Font 
       Name            =   "Tahoma"
       Size            =   8.25
@@ -18,9 +18,8 @@ Begin VB.Form frmTestPDR
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   4815
-   ScaleWidth      =   4695
-   StartUpPosition =   3  'Windows Default
+   ScaleHeight     =   2175
+   ScaleWidth      =   9750
    Begin VB.Frame fraConnectionSettings 
       Caption         =   "Connection settings"
       BeginProperty Font 
@@ -33,66 +32,18 @@ Begin VB.Form frmTestPDR
          Strikethrough   =   0   'False
       EndProperty
       ForeColor       =   &H8000000D&
-      Height          =   3135
+      Height          =   615
       Left            =   120
       TabIndex        =   4
       Top             =   120
-      Width           =   4455
+      Width           =   9495
       Begin VB.TextBox txtToken 
          Height          =   285
          Left            =   960
-         TabIndex        =   11
-         Top             =   2760
-         Width           =   3375
-      End
-      Begin VB.TextBox txtDomain 
-         Height          =   285
-         Left            =   960
-         TabIndex        =   10
-         Top             =   1920
-         Width           =   3375
-      End
-      Begin VB.TextBox txtPassword 
-         Height          =   285
-         IMEMode         =   3  'DISABLE
-         Left            =   960
-         PasswordChar    =   "*"
-         TabIndex        =   9
-         Text            =   "Winter!2#"
-         Top             =   1560
-         Width           =   3375
-      End
-      Begin VB.TextBox txtUsername 
-         Height          =   285
-         Left            =   960
-         TabIndex        =   8
-         Top             =   1200
-         Width           =   3375
-      End
-      Begin VB.TextBox txtDatabase 
-         Height          =   285
-         Left            =   960
-         TabIndex        =   7
-         Text            =   "karentest"
-         Top             =   720
-         Width           =   3375
-      End
-      Begin VB.TextBox txtServer 
-         Height          =   285
-         Left            =   960
-         TabIndex        =   6
-         Text            =   "ClkALSQLDev\CLINTRAKSQLDEV01,1433"
-         Top             =   360
-         Width           =   3375
-      End
-      Begin VB.CommandButton cmdConnect 
-         Caption         =   "Connect"
-         Default         =   -1  'True
-         Height          =   360
-         Left            =   2880
          TabIndex        =   5
-         Top             =   2280
-         Width           =   1470
+         Text            =   "ross.lombardi 926062e1-e43f-464e-b65a-dc36bf5ad90f USBOH-SQLDEV01\USBOHSQLDEV01 QIClintrak"
+         Top             =   240
+         Width           =   8415
       End
       Begin VB.Label Label6 
          AutoSize        =   -1  'True
@@ -100,64 +51,13 @@ Begin VB.Form frmTestPDR
          Caption         =   "Token"
          Height          =   195
          Left            =   120
-         TabIndex        =   17
-         Top             =   2760
+         TabIndex        =   6
+         Top             =   240
          Width           =   465
-      End
-      Begin VB.Label Label5 
-         AutoSize        =   -1  'True
-         BackStyle       =   0  'Transparent
-         Caption         =   "Domain"
-         Height          =   195
-         Left            =   120
-         TabIndex        =   16
-         Top             =   1965
-         Width           =   540
-      End
-      Begin VB.Label Label4 
-         AutoSize        =   -1  'True
-         BackStyle       =   0  'Transparent
-         Caption         =   "Password"
-         Height          =   195
-         Left            =   120
-         TabIndex        =   15
-         Top             =   1605
-         Width           =   690
-      End
-      Begin VB.Label Label3 
-         AutoSize        =   -1  'True
-         BackStyle       =   0  'Transparent
-         Caption         =   "Username"
-         Height          =   195
-         Left            =   120
-         TabIndex        =   14
-         Top             =   1245
-         Width           =   720
-      End
-      Begin VB.Label lblDatabase 
-         AutoSize        =   -1  'True
-         BackStyle       =   0  'Transparent
-         Caption         =   "Database"
-         Height          =   195
-         Left            =   120
-         TabIndex        =   13
-         Top             =   720
-         Width           =   690
-      End
-      Begin VB.Label lblServer 
-         AutoSize        =   -1  'True
-         BackStyle       =   0  'Transparent
-         Caption         =   "Server"
-         Height          =   195
-         Left            =   120
-         TabIndex        =   12
-         Top             =   360
-         Width           =   480
       End
    End
    Begin VB.Frame fraPDR 
       Caption         =   "PDR"
-      Enabled         =   0   'False
       BeginProperty Font 
          Name            =   "MS Sans Serif"
          Size            =   8.25
@@ -171,21 +71,21 @@ Begin VB.Form frmTestPDR
       Height          =   1335
       Left            =   120
       TabIndex        =   0
-      Top             =   3360
-      Width           =   4455
+      Top             =   720
+      Width           =   9495
       Begin VB.TextBox txtJobLogId 
          Height          =   285
          Left            =   1080
-         TabIndex        =   20
-         Text            =   "35092"
+         TabIndex        =   9
+         Text            =   "39277"
          Top             =   960
          Width           =   1455
       End
       Begin VB.TextBox txtCodingNum 
          Height          =   285
          Left            =   1080
-         TabIndex        =   18
-         Text            =   "0"
+         TabIndex        =   7
+         Text            =   "274784"
          Top             =   600
          Width           =   1455
       End
@@ -193,11 +93,11 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   1080
          TabIndex        =   2
-         Text            =   "649390"
+         Text            =   "664688"
          Top             =   240
          Width           =   1455
       End
-      Begin VB.CommandButton Command1 
+      Begin VB.CommandButton cmdOpen 
          Caption         =   "Open"
          Height          =   375
          Left            =   2880
@@ -211,7 +111,7 @@ Begin VB.Form frmTestPDR
          Caption         =   "Job Log Id"
          Height          =   195
          Left            =   120
-         TabIndex        =   21
+         TabIndex        =   10
          Top             =   960
          Width           =   825
       End
@@ -221,7 +121,7 @@ Begin VB.Form frmTestPDR
          Caption         =   "Coding #"
          Height          =   195
          Left            =   120
-         TabIndex        =   19
+         TabIndex        =   8
          Top             =   600
          Width           =   825
       End
@@ -247,24 +147,7 @@ Option Explicit
 Private mvarUser As ClintrakCommon.ApplicationUser
 
 Private Sub Form_Load()
-    Dim WshNetwork As Object
-    
-    Set WshNetwork = CreateObject("WScript.Network")
-    Me.txtDomain.Text = WshNetwork.UserDomain
-    Me.txtUsername.Text = WshNetwork.Username
-    Set WshNetwork = Nothing
-End Sub
-
-
-Private Sub cmdConnect_Click()
-    If mvarUser Is Nothing Then
-        If Authenticate(Me.txtUsername.Text, Me.txtPassword.Text, Me.txtDomain.Text) Then
-            Me.txtToken.Text = mvarUser.Token
-            Me.fraPDR.Enabled = True
-        Else
-            Set mvarUser = Nothing
-        End If
-    End If
+    Me.txtToken.Text = Command$
 End Sub
 
 Private Function Authenticate(ByVal Username As String, ByVal Password As String, ByVal Domain As String) As Boolean
@@ -278,18 +161,18 @@ Private Function Authenticate(ByVal Username As String, ByVal Password As String
     End With
 End Function
 
-Private Sub Command1_Click()
+Private Sub cmdOpen_Click()
     Dim pdr As ProductionRuns.ProdRunMain
     
     Set pdr = New ProductionRuns.ProdRunMain
     With pdr
-        If .Initialize(Me.txtUsername.Text, Me.txtToken.Text, Me.txtServer.Text, Me.txtDatabase.Text, "\\ClkAlData\Clintrak_Data\ICONS\") Then
+        Dim loginString() As String
+        loginString = Split(Me.txtToken.Text, " ")
+        If .Initialize(loginString(0), loginString(1), loginString(2), loginString(3), "\\ClkAlData\Clintrak_Data\ICONS\") Then
             Call .Load_Prod_Run(CLng(txtFileLinksId.Text), CLng(Me.txtCodingNum.Text), CLng(Me.txtJobLogId.Text))
-            
         End If
       
     End With
-        
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
@@ -299,3 +182,4 @@ Private Sub Form_Unload(Cancel As Integer)
     End If
 
 End Sub
+

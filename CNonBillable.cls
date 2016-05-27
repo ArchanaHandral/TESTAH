@@ -42,12 +42,12 @@ Public Property Let NoticeForm(newValue As frmProdPlan)
     Set mvarNoticeForm = newValue
 End Property
 
-Public Property Let ReasonId(newValue As Long)
+Public Property Let reasonId(newValue As Long)
     mvarReasonId = newValue
     UpdateNonBillableNoticeVisibility
 End Property
-Public Property Get ReasonId() As Long
-    ReasonId = mvarReasonId
+Public Property Get reasonId() As Long
+    reasonId = mvarReasonId
 End Property
 
 Public Property Let notes(newValue As String)
@@ -84,12 +84,12 @@ Public Property Get AuthorizedBy() As Long
     AuthorizedBy = mvarAuthorizedBy
 End Property
 
-Public Property Get IsJobLevel() As Boolean
+Public Property Get isJobLevel() As Boolean
     ' We should really also check IsBillable, because a billable
     ' job would never be job-level non-billable. But, if we do
     ' rely on that, it would allow bugs to slip through because
     ' this should just need to rely on a single variable.
-    IsJobLevel = mvarIsJobLevel
+    isJobLevel = mvarIsJobLevel
 End Property
 
 Public Property Get HasReason() As Boolean
@@ -105,23 +105,47 @@ Public Property Get IsBillable() As Boolean
 End Property
 
 Private Property Get DoesRequireOverride() As Boolean
-    ' changing the non-billable status (not the reason) requires an override
-    ' we track that by keeping tabs on what IsBillable is when loading the record
-    ' and then reset the value when the record is saved
-    DoesRequireOverride = mvarOriginalReasonId <> mvarReasonId
+    ' changing the non-billable reason requires an override
+    ' don't request an override if:
+    ' - replacement PDR reason involves FCS, don't request an override
+    ' - replacement PDR goes from FCS to billable
+    
+    If IsFCSDepartment Then
+        DoesRequireOverride = False
+        
+    ElseIf WasFCSDepartment = True And IsBillable = True Then
+        DoesRequireOverride = False
+        
+    Else
+        DoesRequireOverride = mvarOriginalReasonId <> mvarReasonId
+        
+    End If
 End Property
 
 Public Function PerformOverride() As Boolean
-    If DoesRequireOverride = False Then
-        PerformOverride = True
-    Else
-        Dim overrideEmployeeId As Long
+    Dim needsOverride As Boolean
+    Dim overrideEmployeeId As Long
+    
+    overrideEmployeeId = 0
+    needsOverride = DoesRequireOverride
+    
+    If needsOverride = True Then
         overrideEmployeeId = frmOverride.GetOverrideUser(SecurityLevels.NonBillableAuthorize, "Changing the non-billable status of a production run requires Non-Billable Authorization.")
-        If overrideEmployeeId > 0 Then
-            mvarAuthorizedBy = overrideEmployeeId
-            mvarAuthorizedDate = Now
-        End If
         PerformOverride = (overrideEmployeeId > 0)
+        
+    ElseIf mvarReasonId > 0 And IsFCSDepartment And mvarOriginalReasonId <> mvarReasonId Then
+        MsgBox "An FCS non-billable reason does not require an override for replacement PDRs but your name and the current date have been used as the authorization.", vbOKOnly + vbInformation, "Non-Billable Authorization"
+        overrideEmployeeId = basGlobals.gApplicationUser.employeeId
+        PerformOverride = True
+        
+    Else
+        PerformOverride = True
+        
+    End If
+    
+    If overrideEmployeeId > 0 Then
+        mvarAuthorizedBy = overrideEmployeeId
+        mvarAuthorizedDate = Now
     End If
 End Function
 
@@ -161,9 +185,9 @@ Public Sub Load(data As Recordset)
     mvarNonBillableId = data!Non_Billable_Id
     
     If mvarNonBillableId > 0 Then
-        ReasonId = data!Reason_Id
+        reasonId = data!Reason_Id
     Else
-        ReasonId = 0
+        reasonId = 0
     End If
     
     If IsBillable = False Then
@@ -251,7 +275,7 @@ End Sub
 
 Private Sub Clear(resetOriginal As Boolean)
     ' sets defaults, which happens to mean billable
-    ReasonId = 0
+    reasonId = 0
     mvarNonBillableId = 0
     mvarPRNumber = ""
     mvarNotes = ""
@@ -287,7 +311,7 @@ Private Sub GrabJobLevelNonBillableIfExists(JobId As Long)
                 mvarNonBillableId = rs!Non_Billable_Id
                 mvarAuthorizedBy = rs!Authorized_By
                 mvarAuthorizedDate = rs!Effective_Date
-                ReasonId = rs!Reason_Id
+                reasonId = rs!Reason_Id
                 mvarIsJobLevel = True
                 mvarNotes = rs!notes
                 mvarPRNumber = rs!PR_Number
@@ -297,6 +321,16 @@ Private Sub GrabJobLevelNonBillableIfExists(JobId As Long)
         Loop
     End With
 End Sub
+
+Public Property Get IsFCSDepartment() As Boolean
+    ' it's ok keeping the REPLACEMENT global in here because it's impossible to change once a PDR is created
+    IsFCSDepartment = (basGlobals.gReprintFile_Type = "REPLACEMENT" And basGlobals.GetNonBillableDepartment(mvarReasonId) = "FCS")
+End Property
+
+Public Property Get WasFCSDepartment() As Boolean
+    ' it's ok keeping the REPLACEMENT global in here because it's impossible to change once a PDR is created
+    WasFCSDepartment = (basGlobals.gReprintFile_Type = "REPLACEMENT" And basGlobals.GetNonBillableDepartment(mvarOriginalReasonId) = "FCS")
+End Property
 
 Private Sub Class_Initialize()
     Clear True

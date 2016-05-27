@@ -9,6 +9,7 @@ Option Explicit
 'declare database access objects
 Public gadoConnection As nADOConn.CADOConn
 Private madoData As nADOData.CADOData
+Private nonBillableReasonList As Recordset
 Public gClintrakLocations As ClintrakCommon.LocationCollection
 
 'declare global variables
@@ -2532,17 +2533,11 @@ Private Function GetNonBillableReasonsHelper() As Recordset
 End Function
 
 Public Sub GetNonBillableReasons(ctrl As ComboBox)
-    Static nonBillableReasonList As Recordset
     On Error GoTo Handle_Error
     Dim reason As String
     Dim Id As Long
     
-    ' because VB6 doesn't support short-circuit evaluations...
-    If nonBillableReasonList Is Nothing Then
-        Set nonBillableReasonList = GetNonBillableReasonsHelper
-    ElseIf nonBillableReasonList.state = 0 Then
-        Set nonBillableReasonList = GetNonBillableReasonsHelper
-    End If
+    EnsureNonBillableReasonsLoaded
     
     nonBillableReasonList.MoveFirst
     While Not nonBillableReasonList.EOF
@@ -2562,6 +2557,20 @@ Handle_Error:
     Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 End Sub
+
+Public Function GetNonBillableDepartment(reasonId As Long) As String
+    EnsureNonBillableReasonsLoaded
+    nonBillableReasonList.MoveFirst
+    While Not nonBillableReasonList.EOF
+        If nonBillableReasonList!Reason_Id = reasonId Then
+            GetNonBillableDepartment = nonBillableReasonList!Department_Name
+            Exit Function
+        End If
+        nonBillableReasonList.MoveNext
+    Wend
+   
+    GetNonBillableDepartment = ""
+End Function
 
 Public Function GetEmployeeName(employeeId As Long)
     Dim objData As nADOData.CADOData
@@ -2640,3 +2649,12 @@ Public Function ConvertDate(d As Date, location As Long) As Date
         End If
     End If
 End Function
+
+Public Sub EnsureNonBillableReasonsLoaded()
+    ' because VB6 doesn't support short-circuit evaluations...
+    If nonBillableReasonList Is Nothing Then
+        Set nonBillableReasonList = GetNonBillableReasonsHelper
+    ElseIf nonBillableReasonList.state = 0 Then
+        Set nonBillableReasonList = GetNonBillableReasonsHelper
+    End If
+End Sub
