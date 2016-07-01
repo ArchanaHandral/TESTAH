@@ -984,6 +984,7 @@ Begin VB.Form frmProdPlan
       _ExtentX        =   2355
       _ExtentY        =   635
       _Version        =   393217
+      Enabled         =   -1  'True
       TextRTF         =   $"frmProdPlan.frx":1286
    End
    Begin RichTextLib.RichTextBox rtbPDRInstructions 
@@ -997,6 +998,7 @@ Begin VB.Form frmProdPlan
       _ExtentX        =   2355
       _ExtentY        =   635
       _Version        =   393217
+      Enabled         =   -1  'True
       TextRTF         =   $"frmProdPlan.frx":1301
    End
    Begin MSComctlLib.StatusBar StatusBar1 

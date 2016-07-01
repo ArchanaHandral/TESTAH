@@ -116,7 +116,6 @@ Public Sub PrintAll_ProdPlanning_Forms(barCode As String, booPDF As Boolean)
 
 
     Set ProductionRun = New CProdrun
-    ProductionRun.NonBillable.NoticeForm = frmProdPlan
     'Set ProductionGroup = New CProdGroup    ' DW 2012-001 seems to have been mia
     
     Set Planning = New CPlanningMethods
@@ -307,7 +306,6 @@ Public Sub Print_PRGPlanning_Form(barCode As String, booPDF As Boolean)
     Dim n As Long
 
     Set ProductionRun = New CProdrun
-    ProductionRun.NonBillable.NoticeForm = frmProdPlan
     Set ProductionGroup = New CProdGroup
     Set Planning = New CPlanningMethods
     Set PlanningList = New CColPlanningInfo

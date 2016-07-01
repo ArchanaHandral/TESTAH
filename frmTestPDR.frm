@@ -1,11 +1,11 @@
 VERSION 5.00
 Begin VB.Form frmTestPDR 
    BorderStyle     =   1  'Fixed Single
-   Caption         =   "Form1"
-   ClientHeight    =   2175
-   ClientLeft      =   45
-   ClientTop       =   450
-   ClientWidth     =   9750
+   Caption         =   "Production Runs Stub"
+   ClientHeight    =   2295
+   ClientLeft      =   13200
+   ClientTop       =   4305
+   ClientWidth     =   9735
    BeginProperty Font 
       Name            =   "Tahoma"
       Size            =   8.25
@@ -18,8 +18,42 @@ Begin VB.Form frmTestPDR
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   2175
-   ScaleWidth      =   9750
+   ScaleHeight     =   2295
+   ScaleWidth      =   9735
+   Begin VB.Frame fraRepReport 
+      Caption         =   "Replacement Report"
+      Height          =   1335
+      Left            =   4800
+      TabIndex        =   11
+      Top             =   840
+      Width           =   4815
+      Begin VB.TextBox txtRunBarcode 
+         Height          =   285
+         Left            =   1080
+         TabIndex        =   13
+         Text            =   "PDR247289"
+         Top             =   240
+         Width           =   1455
+      End
+      Begin VB.CommandButton cmdOpenRepReport 
+         Caption         =   "Open"
+         Height          =   375
+         Left            =   3240
+         TabIndex        =   12
+         Top             =   840
+         Width           =   1455
+      End
+      Begin VB.Label Label2 
+         AutoSize        =   -1  'True
+         BackStyle       =   0  'Transparent
+         Caption         =   "Run Barcode"
+         Height          =   195
+         Left            =   120
+         TabIndex        =   14
+         Top             =   240
+         Width           =   915
+      End
+   End
    Begin VB.Frame fraConnectionSettings 
       Caption         =   "Connection settings"
       BeginProperty Font 
@@ -71,8 +105,8 @@ Begin VB.Form frmTestPDR
       Height          =   1335
       Left            =   120
       TabIndex        =   0
-      Top             =   720
-      Width           =   9495
+      Top             =   840
+      Width           =   4455
       Begin VB.TextBox txtJobLogId 
          Height          =   285
          Left            =   1080
@@ -97,7 +131,7 @@ Begin VB.Form frmTestPDR
          Top             =   240
          Width           =   1455
       End
-      Begin VB.CommandButton cmdOpen 
+      Begin VB.CommandButton cmdOpenPDRWindow 
          Caption         =   "Open"
          Height          =   375
          Left            =   2880
@@ -146,6 +180,28 @@ Option Explicit
 
 Private mvarUser As ClintrakCommon.ApplicationUser
 
+Private Sub cmdOpenRepReport_Click()
+    Dim reprpt As ProductionRuns.ProdRunMain
+    Dim loginString() As String
+    
+    loginString = Split(Me.txtToken.Text, " ")
+    Set reprpt = New ProductionRuns.ProdRunMain
+    If reprpt.Initialize(loginString(0), loginString(1), loginString(2), loginString(3), "\\ClkAlData\Clintrak_Data\ICONS\") Then
+        reprpt.CreateMultiReport
+        If Left$(Me.txtRunBarcode.Text, 3) = "PRG" Then
+            reprpt.Print_PRGPlanning_Form Me.txtRunBarcode.Text, True
+        End If
+        reprpt.PrintAll_ProdPlanning_Forms Me.txtRunBarcode.Text, True
+        On Error Resume Next
+        Shell "del C:\Users\LombarR\Documents\yo.pdf"
+        On Error GoTo 0
+        reprpt.SaveToFile "C:\Users\LombarR\Documents\yo.pdf"
+        Set reprpt = Nothing
+    Else
+        Set reprpt = Nothing
+    End If
+End Sub
+
 Private Sub Form_Load()
     Me.txtToken.Text = Command$
 End Sub
@@ -161,7 +217,7 @@ Private Function Authenticate(ByVal Username As String, ByVal Password As String
     End With
 End Function
 
-Private Sub cmdOpen_Click()
+Private Sub cmdOpenPDRWindow_Click()
     Dim pdr As ProductionRuns.ProdRunMain
     
     Set pdr = New ProductionRuns.ProdRunMain
