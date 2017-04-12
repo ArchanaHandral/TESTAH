@@ -14,6 +14,7 @@ Begin VB.Form frmOverride
    ScaleMode       =   0  'User
    ScaleWidth      =   3521.047
    ShowInTaskbar   =   0   'False
+   StartUpPosition =   1  'CenterOwner
    Begin VB.TextBox txtUserName 
       Height          =   345
       Left            =   1290

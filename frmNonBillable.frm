@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin VB.Form frmNonBillable 
    BorderStyle     =   3  'Fixed Dialog
-   Caption         =   "Non-Billable Details"
+   Caption         =   "Billing Details"
    ClientHeight    =   3270
    ClientLeft      =   2505
    ClientTop       =   4605
@@ -13,6 +13,7 @@ Begin VB.Form frmNonBillable
    ScaleHeight     =   3270
    ScaleWidth      =   6495
    ShowInTaskbar   =   0   'False
+   StartUpPosition =   1  'CenterOwner
    Begin VB.Frame fraNonBillableDetailsFrame 
       Height          =   3135
       Left            =   120
@@ -195,6 +196,7 @@ Private Sub Form_Load()
     CenterForm Me
     basGlobals.GetNonBillableReasons cmbNonBillableReason
     UpdateNonBillableUI ProductionRun.NonBillable
+    frmProdPlan.mvarBillingDirty = False
 End Sub
 
 Private Function IsValidSelection() As Boolean
@@ -225,7 +227,11 @@ Private Sub Form_Unload(Cancel As Integer)
         
         If ProductionRun.NonBillable.HasChange() = True Then
             frmProdPlan.txtDirtyFlag.text = "Y"
+            frmProdPlan.mvarBillingDirty = True
+        Else
+            frmProdPlan.mvarBillingDirty = False
         End If
+        
         If ProductionRun.NonBillable.reasonId > 0 Then
             ProductionRun.NonBillable.PRNumber = txtNonBillablePRNumber.text
             ProductionRun.NonBillable.notes = txtNonBillableNotes.text

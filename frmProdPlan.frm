@@ -1,14 +1,14 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "mscomctl.ocx"
 Object = "{8D650141-6025-11D1-BC40-0000C042AEC0}#3.0#0"; "ssdw3b32.ocx"
 Begin VB.Form frmProdPlan 
    BorderStyle     =   0  'None
    Caption         =   "Computerization Order"
-   ClientHeight    =   8565
+   ClientHeight    =   8850
    ClientLeft      =   6780
    ClientTop       =   4170
-   ClientWidth     =   8895
+   ClientWidth     =   10620
    ControlBox      =   0   'False
    BeginProperty Font 
       Name            =   "Tahoma"
@@ -23,9 +23,10 @@ Begin VB.Form frmProdPlan
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   8565
-   ScaleWidth      =   8895
+   ScaleHeight     =   8850
+   ScaleWidth      =   10620
    ShowInTaskbar   =   0   'False
+   StartUpPosition =   1  'CenterOwner
    Begin VB.TextBox txtNonBillableNotice 
       BackColor       =   &H8000000F&
       BorderStyle     =   0  'None
@@ -40,7 +41,7 @@ Begin VB.Form frmProdPlan
       EndProperty
       ForeColor       =   &H000000FF&
       Height          =   285
-      Left            =   7080
+      Left            =   6600
       TabIndex        =   65
       Text            =   "NON-BILLABLE"
       Top             =   8280
@@ -48,10 +49,10 @@ Begin VB.Form frmProdPlan
    End
    Begin VB.Frame fraDescription 
       Height          =   3375
-      Left            =   4680
+      Left            =   5520
       TabIndex        =   52
       Top             =   2760
-      Width           =   4095
+      Width           =   5055
       Begin VB.CommandButton cmdSpecInst 
          Caption         =   "Special Instructions"
          BeginProperty Font 
@@ -64,7 +65,7 @@ Begin VB.Form frmProdPlan
             Strikethrough   =   0   'False
          EndProperty
          Height          =   315
-         Left            =   1080
+         Left            =   1800
          TabIndex        =   6
          Top             =   2880
          Width           =   1725
@@ -72,7 +73,7 @@ Begin VB.Form frmProdPlan
       Begin VB.CommandButton cmdAddtlData 
          Caption         =   "Client Data"
          Height          =   315
-         Left            =   3000
+         Left            =   3840
          TabIndex        =   5
          Top             =   2400
          Width           =   975
@@ -84,7 +85,7 @@ Begin VB.Form frmProdPlan
          TabIndex        =   4
          ToolTipText     =   "NOTE: Reference No. will be appended to the Description."
          Top             =   2400
-         Width           =   2760
+         Width           =   3480
       End
       Begin VB.TextBox txtProdDesc 
          Height          =   1500
@@ -94,7 +95,7 @@ Begin VB.Form frmProdPlan
          ScrollBars      =   2  'Vertical
          TabIndex        =   3
          Top             =   480
-         Width           =   3855
+         Width           =   4695
       End
       Begin VB.Label lblReferenceNo 
          AutoSize        =   -1  'True
@@ -132,7 +133,7 @@ Begin VB.Form frmProdPlan
       EndProperty
       ForeColor       =   &H000000FF&
       Height          =   285
-      Left            =   3480
+      Left            =   3240
       TabIndex        =   60
       Text            =   "COMBINED/ PDR HAS BEEN PROCESSED"
       Top             =   8280
@@ -187,7 +188,7 @@ Begin VB.Form frmProdPlan
          TabStop         =   0   'False
          Text            =   "PDR______"
          Top             =   80
-         Width           =   8205
+         Width           =   9510
       End
       Begin VB.TextBox txtProducedBy 
          Alignment       =   2  'Center
@@ -209,7 +210,7 @@ Begin VB.Form frmProdPlan
          TabStop         =   0   'False
          Text            =   "XXXXX XXXXXXXXXX"
          Top             =   600
-         Width           =   8205
+         Width           =   9630
       End
       Begin VB.Label Label9 
          Alignment       =   2  'Center
@@ -220,15 +221,15 @@ Begin VB.Form frmProdPlan
          Left            =   345
          TabIndex        =   58
          Top             =   405
-         Width           =   8205
+         Width           =   9630
       End
    End
    Begin VB.Frame Frame5 
       Height          =   1935
-      Left            =   4680
+      Left            =   5520
       TabIndex        =   50
       Top             =   840
-      Width           =   4095
+      Width           =   5055
       Begin VB.CheckBox chkPrintAtPackager 
          Caption         =   "Print at packager"
          Height          =   255
@@ -240,7 +241,7 @@ Begin VB.Form frmProdPlan
       Begin VB.CommandButton cmdViewShipping 
          Caption         =   "View Shipping"
          Height          =   315
-         Left            =   1320
+         Left            =   1800
          TabIndex        =   2
          Top             =   1440
          Width           =   1455
@@ -250,7 +251,7 @@ Begin VB.Form frmProdPlan
          Left            =   120
          TabIndex        =   1
          Top             =   960
-         Width           =   3855
+         Width           =   4695
          DataFieldList   =   "Column 0"
          AllowInput      =   0   'False
          AllowNull       =   0   'False
@@ -275,7 +276,7 @@ Begin VB.Form frmProdPlan
          Columns(0).Width=   3200
          Columns(0).DataType=   8
          Columns(0).FieldLen=   4096
-         _ExtentX        =   6800
+         _ExtentX        =   8281
          _ExtentY        =   529
          _StockProps     =   93
          BackColor       =   -2147483643
@@ -297,7 +298,7 @@ Begin VB.Form frmProdPlan
       Left            =   120
       TabIndex        =   35
       Top             =   6600
-      Width           =   4455
+      Width           =   5295
       Begin VB.CheckBox chkReOrientation 
          Caption         =   "PDR is to be Reoriented"
          BeginProperty Font 
@@ -378,7 +379,7 @@ Begin VB.Form frmProdPlan
       Left            =   120
       TabIndex        =   33
       Top             =   2400
-      Width           =   4455
+      Width           =   5295
       Begin VB.TextBox txtClientTGId 
          BackColor       =   &H8000000F&
          BorderStyle     =   0  'None
@@ -399,7 +400,7 @@ Begin VB.Form frmProdPlan
          TabStop         =   0   'False
          Text            =   "XXXXXXXXXXXXXXXXXXX"
          Top             =   1800
-         Width           =   3180
+         Width           =   4020
       End
       Begin VB.TextBox txtGroupName 
          BackColor       =   &H8000000F&
@@ -421,7 +422,7 @@ Begin VB.Form frmProdPlan
          TabIndex        =   47
          TabStop         =   0   'False
          Top             =   1200
-         Width           =   3300
+         Width           =   4020
       End
       Begin VB.TextBox txtCoding 
          BackColor       =   &H8000000F&
@@ -444,7 +445,7 @@ Begin VB.Form frmProdPlan
          TabStop         =   0   'False
          Text            =   "frmProdPlan.frx":1272
          Top             =   240
-         Width           =   3195
+         Width           =   4035
       End
       Begin VB.TextBox txtFileName 
          BackColor       =   &H8000000F&
@@ -466,7 +467,7 @@ Begin VB.Form frmProdPlan
          TabStop         =   0   'False
          Text            =   "XXXXXXXXXXXXXXXXXXX"
          Top             =   840
-         Width           =   3180
+         Width           =   4020
       End
       Begin VB.Label lblClientTGId 
          AutoSize        =   -1  'True
@@ -528,7 +529,7 @@ Begin VB.Form frmProdPlan
       Left            =   120
       TabIndex        =   21
       Top             =   840
-      Width           =   4455
+      Width           =   5295
       Begin VB.TextBox txtJobNumber 
          BackColor       =   &H8000000F&
          BorderStyle     =   0  'None
@@ -549,7 +550,7 @@ Begin VB.Form frmProdPlan
          TabStop         =   0   'False
          Text            =   "0000-000-00 RL#00"
          Top             =   600
-         Width           =   2655
+         Width           =   3975
       End
       Begin VB.TextBox txtProtocol 
          BackColor       =   &H8000000F&
@@ -571,7 +572,7 @@ Begin VB.Form frmProdPlan
          TabIndex        =   23
          TabStop         =   0   'False
          Top             =   975
-         Width           =   3330
+         Width           =   4050
       End
       Begin VB.TextBox txtClientName 
          BackColor       =   &H8000000F&
@@ -593,7 +594,7 @@ Begin VB.Form frmProdPlan
          TabStop         =   0   'False
          Text            =   "XXXXXXXXXXXXXXXXX"
          Top             =   240
-         Width           =   3345
+         Width           =   4065
       End
       Begin VB.Label Label23 
          AutoSize        =   -1  'True
@@ -639,7 +640,7 @@ Begin VB.Form frmProdPlan
          Strikethrough   =   0   'False
       EndProperty
       Height          =   375
-      Left            =   7560
+      Left            =   9360
       TabIndex        =   11
       Top             =   7800
       Width           =   1215
@@ -658,7 +659,7 @@ Begin VB.Form frmProdPlan
       Left            =   120
       TabIndex        =   25
       Top             =   4560
-      Width           =   4455
+      Width           =   5295
       Begin VB.TextBox txtOnsertDie 
          BackColor       =   &H8000000F&
          BorderStyle     =   0  'None
@@ -679,7 +680,7 @@ Begin VB.Form frmProdPlan
          TabStop         =   0   'False
          Text            =   "XXXX.XXXX.XX.XXX.XXXX.XX"
          Top             =   1680
-         Width           =   3255
+         Width           =   4095
       End
       Begin VB.TextBox txtQty 
          BackColor       =   &H8000000F&
@@ -723,7 +724,7 @@ Begin VB.Form frmProdPlan
          TabStop         =   0   'False
          Text            =   "XXXXXXXXXXXX"
          Top             =   1320
-         Width           =   2175
+         Width           =   3855
       End
       Begin VB.TextBox txtDesc 
          BackColor       =   &H8000000F&
@@ -745,7 +746,7 @@ Begin VB.Form frmProdPlan
          TabIndex        =   27
          TabStop         =   0   'False
          Top             =   600
-         Width           =   3300
+         Width           =   4065
       End
       Begin VB.TextBox txtLabelId 
          BackColor       =   &H8000000F&
@@ -835,7 +836,7 @@ Begin VB.Form frmProdPlan
       EndProperty
       ForeColor       =   &H00FF0000&
       Height          =   285
-      Left            =   5640
+      Left            =   7440
       Locked          =   -1  'True
       TabIndex        =   17
       TabStop         =   0   'False
@@ -854,14 +855,14 @@ Begin VB.Form frmProdPlan
          Strikethrough   =   0   'False
       EndProperty
       Height          =   1575
-      Left            =   4680
+      Left            =   5520
       TabIndex        =   14
       Top             =   6120
-      Width           =   4095
+      Width           =   5055
       Begin VB.TextBox txtSampleGroups 
          Enabled         =   0   'False
          Height          =   315
-         Left            =   2235
+         Left            =   2835
          TabIndex        =   8
          Top             =   600
          Width           =   840
@@ -869,7 +870,7 @@ Begin VB.Form frmProdPlan
       Begin VB.CommandButton cmdSamples 
          Caption         =   "Configure Types"
          Height          =   315
-         Left            =   1200
+         Left            =   1800
          TabIndex        =   9
          Top             =   1080
          Width           =   1455
@@ -877,7 +878,7 @@ Begin VB.Form frmProdPlan
       Begin VB.TextBox txtSamples 
          Enabled         =   0   'False
          Height          =   315
-         Left            =   2235
+         Left            =   2835
          TabIndex        =   7
          Top             =   240
          Width           =   840
@@ -885,7 +886,7 @@ Begin VB.Form frmProdPlan
       Begin VB.Label Label6 
          Caption         =   "QTY Samples:"
          Height          =   270
-         Left            =   1080
+         Left            =   1680
          TabIndex        =   15
          Top             =   255
          Width           =   1080
@@ -893,7 +894,7 @@ Begin VB.Form frmProdPlan
       Begin VB.Label lblSampleGroups 
          Caption         =   "Sample Types:"
          Height          =   285
-         Left            =   1080
+         Left            =   1680
          TabIndex        =   16
          Top             =   615
          Width           =   1110
@@ -927,7 +928,7 @@ Begin VB.Form frmProdPlan
          Strikethrough   =   0   'False
       EndProperty
       Height          =   285
-      Left            =   5880
+      Left            =   7680
       TabIndex        =   12
       TabStop         =   0   'False
       Top             =   7920
@@ -946,7 +947,7 @@ Begin VB.Form frmProdPlan
          Strikethrough   =   0   'False
       EndProperty
       Height          =   375
-      Left            =   6240
+      Left            =   8040
       TabIndex        =   10
       Top             =   7800
       Width           =   1215
@@ -965,7 +966,7 @@ Begin VB.Form frmProdPlan
       EndProperty
       ForeColor       =   &H00FF0000&
       Height          =   285
-      Left            =   5400
+      Left            =   7200
       Locked          =   -1  'True
       TabIndex        =   18
       TabStop         =   0   'False
@@ -1006,31 +1007,35 @@ Begin VB.Form frmProdPlan
       Height          =   285
       Left            =   0
       TabIndex        =   32
-      Top             =   8280
-      Width           =   8895
-      _ExtentX        =   15690
+      Top             =   8565
+      Width           =   10620
+      _ExtentX        =   18733
       _ExtentY        =   503
       _Version        =   393216
       BeginProperty Panels {8E3867A5-8586-11D1-B16A-00C0F0283628} 
-         NumPanels       =   4
+         NumPanels       =   5
          BeginProperty Panel1 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
-            Object.Width           =   3263
-            MinWidth        =   3263
+            Object.Width           =   3087
+            MinWidth        =   3087
             Text            =   "<User Location>"
             TextSave        =   "<User Location>"
          EndProperty
          BeginProperty Panel2 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
-            Object.Width           =   2646
-            MinWidth        =   2646
+            Object.Width           =   2293
+            MinWidth        =   2293
          EndProperty
          BeginProperty Panel3 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
-            AutoSize        =   1
-            Object.Width           =   6262
-            MinWidth        =   3087
+            Object.Width           =   5909
+            MinWidth        =   5909
          EndProperty
          BeginProperty Panel4 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
-            Object.Width           =   2910
-            MinWidth        =   2910
+            AutoSize        =   1
+            Object.Width           =   4728
+            MinWidth        =   2505
+         EndProperty
+         BeginProperty Panel5 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
+            AutoSize        =   2
+            Key             =   "stsMessage"
          EndProperty
       EndProperty
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
@@ -1113,7 +1118,7 @@ Begin VB.Form frmProdPlan
       End
    End
    Begin VB.Menu mnuNonBillable 
-      Caption         =   "&Non-Billable"
+      Caption         =   "&Billing"
       Begin VB.Menu mnuNonBillableView 
          Caption         =   "View..."
       End
@@ -1164,6 +1169,10 @@ Private mvarOrigScratchStockId As String
 Private mvarOrigOnsertDieToolId As Long
 Private mvarOrigOnsertDiePartNumber As String
 Public booSamplesDirtyFlag As Boolean
+Private mvarDebugText As String
+Private mvarDebugIcoPath As String
+Public mvarBillingDirty As Boolean
+
 
 Private Function CheckOverrides() As Boolean
     If ProductionRun.NonBillable.PerformOverride = False Then
@@ -1192,6 +1201,7 @@ Private Sub Form_Load()
     Dim strReason As String
     Dim booPdrHasRun As Boolean
     Dim booPdrIsCombined As Boolean
+    Dim xmls As New ClintrakCommon.XmlSettings
     
     booSamplesDirtyFlag = False
     Call Me.txtReplacement.Move(Me.StatusBar1.Panels(2).Left + 50, Me.StatusBar1.Top + 50)
@@ -1625,8 +1635,25 @@ Private Sub Form_Load()
     If txtPDRStatus.text = "COMBINED PDR" Then Me.chkReOrientation.Enabled = False
     
     ' DW 2008-017 added
-    Me.StatusBar1.Panels(1).text = gClintrakLocations(gApplicationUser.ClintrakLocationId).Display
+    Me.StatusBar1.Panels(1).text = gClintrakLocations(gApplicationUser.ClintrakLocationId).Display & " User "
     Me.StatusBar1.Panels(1).Picture = LoadPicture(gDomainIconPath & gApplicationUser.ClintrakLocationId & ".ico")
+    
+    mvarDebugText = xmls.GetSetting("DebugText")
+    mvarDebugIcoPath = xmls.GetSetting("DebugIcoPath")
+    
+    If Len(mvarDebugText) > 0 Then
+        StatusBar1.Panels("stsMessage").Visible = True
+        StatusBar1.Panels("stsMessage").text = mvarDebugText
+        StatusBar1.Panels("stsMessage").ToolTipText = mvarDebugText
+        
+        If Dir(mvarDebugIcoPath) <> "" Then
+            StatusBar1.Panels("stsMessage").Picture = LoadPicture(mvarDebugIcoPath)
+        End If
+        
+    Else
+        StatusBar1.Panels("stsMessage").Visible = False
+    End If
+    
 
 Exit_this_Sub:
     Screen.MousePointer = vbDefault
@@ -1719,6 +1746,12 @@ End Sub
 
 Private Sub mnuNonBillableView_Click()
     frmNonBillable.ShowNonBillable
+    
+    If Me.mvarBillingDirty And (Not cmdSave.Enabled) Then
+        cmdSave.Enabled = True
+    End If
+    
+    
 End Sub
 
 Private Sub mnuViewComputerizationOrder_Click()
@@ -2132,7 +2165,7 @@ Private Sub mnuReplacements_Click()
     Dim objData As nADOData.CADOData
     
     Message = "Scan the Barcode from the Reprint Report!"
-    Title = "Reprint File"   '
+    Title = "Reprint File"
     Default = "0"
     txtInputSeqNum = InputBox(Message, Title, Default, 4320, 4320)
     If Len(txtInputSeqNum) = 0 Then
@@ -2880,7 +2913,9 @@ Private Sub cmdSave_Click()
     ProductionRun.SaveProdRun
     
     If ProductionRun.Prod_Run_Updated Then
-        Call DupLinksSpecInstructions
+        If (Not (Determine_If_PDR_HasRun And (Not booNewProdRun))) Or booReplacement Then
+            Call DupLinksSpecInstructions
+        End If
         
         If booReplacement Then
             Call AppendOrigRunToSpecInstructions
@@ -2945,6 +2980,8 @@ Private Sub cmdSave_Click()
         
         txtDirtyFlag = ""
         Me.cmdSpecInst.Enabled = True
+        Me.mvarBillingDirty = False 'set dirty billing indicator to false
+        
     Else
         MsgBox "Record was not Saved." & Chr$(13) & "Check data and retry.", vbCritical
         GoTo Exit_this_Sub
@@ -2955,12 +2992,18 @@ Private Sub cmdSave_Click()
         strCodingFileHeader = ProductionRun.Coding_File_Header
     End If
     
-    'refresh the class
-    ProductionRun.LookupRecord
-    Me.txtBarcodeId = ProductionRun.Barcode_Id
-    Me.cmdDeleteProdRun.Enabled = True
-    Call Load_Menu
     
+    'refresh the class
+    If (Not (Determine_If_PDR_HasRun And (Not booNewProdRun))) Or booReplacement Then
+        'if we are here because this pdr is processed, then billing was changed and ,
+        'we should not do this!
+        ProductionRun.LookupRecord
+        Me.txtBarcodeId = ProductionRun.Barcode_Id
+        Me.cmdDeleteProdRun.Enabled = True
+        Call Load_Menu
+    
+    End If
+
     ' hold main's barcode info
     If booReplacement = True Then
         ProductionRun.Coding_File_Header = strCodingFileHeader
@@ -3167,7 +3210,10 @@ Private Sub CheckData()
     End If
     
 Data_Changed:
+    
+
     If Me.txtDirtyFlag = "Y" Then
+
         Select Case MsgBox("Do you want to save changes?", vbYesNo + vbQuestion)
             Case vbNo
                 Me.txtDirtyFlag = ""

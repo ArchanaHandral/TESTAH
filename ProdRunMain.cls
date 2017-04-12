@@ -42,7 +42,8 @@ Public Function Initialize(Username As String, Token As String, Server As String
         ' DW 2008-017 added
         ' Retrieve collection of Clintrak locations
         Set objLocation = New ClintrakCommon.location
-        Set gClintrakLocations = objLocation.GetClintrakLocations(gadoConnection.Connection)
+        Call objLocation.LoadClintrakLocations(gadoConnection.Connection)
+        Set gClintrakLocations = objLocation.ClintrakLocations
         gDomainIconPath = DomainIconPath
     End If
     

@@ -1,13 +1,13 @@
 VERSION 5.00
 Begin {9EB8768B-CDFA-44DF-8F3E-857A8405E1DB} ARProdPlan 
    Caption         =   "Computerization Order Form"
-   ClientHeight    =   13830
-   ClientLeft      =   165
+   ClientHeight    =   12930
+   ClientLeft      =   225
    ClientTop       =   555
    ClientWidth     =   17970
    StartUpPosition =   3  'Windows Default
    _ExtentX        =   31697
-   _ExtentY        =   24395
+   _ExtentY        =   22807
    SectionData     =   "ARProdPlan.dsx":0000
 End
 Attribute VB_Name = "ARProdPlan"
@@ -113,9 +113,9 @@ Private Sub Detail_Format()
     End If
 
     ' Linebreak filename portion of path
-    arrFilePath = Split(Me.otxtFileName.Text, "\")
+    arrFilePath = Split(Me.otxtFileName.text, "\")
     arrFilePath(UBound(arrFilePath)) = vbCrLf & arrFilePath(UBound(arrFilePath))
-    Me.otxtFileName.Text = Join(arrFilePath, "\")
+    Me.otxtFileName.text = Join(arrFilePath, "\")
     
     Me.otxtProducedBy = ProductionRun.Produced_By
     Me.otxtDateProduced = ProductionRun.Produced_Date & " " & gClintrakLocations(CStr(ProductionRun.Clintrak_Location_Id)).Time_Zone_Display
@@ -123,8 +123,8 @@ Private Sub Detail_Format()
     With oRichEdit1
         ' Get the plain text portion of the RichText and set the RTB back to empty.
         .TextRTF = ProductionRun.Special_Inst
-        strPlainText = .Text
-        .Text = ""
+        strPlainText = .text
+        .text = ""
         ' Set the style for the RTB and re-enter the plain text
         .SelStart = 0
         .SelFontName = "Arial"
@@ -206,30 +206,30 @@ Private Sub LoadShippingInfo()
         .OpenRecordSetFromSP "get_ShipToAddress"
 
         If Not .Recordset.EOF Then
-            Me.otxtShip.Text = Trim$(.Recordset!ShipTo_Description)
+            Me.otxtShip.text = Trim$(.Recordset!ShipTo_Description)
             If Trim$(.Recordset!Address_Line_1) <> "" Then
-                Me.otxtShip.Text = Me.otxtShip.Text & vbCrLf & Trim$(.Recordset!Address_Line_1)
+                Me.otxtShip.text = Me.otxtShip.text & vbCrLf & Trim$(.Recordset!Address_Line_1)
             End If
             If Trim$(.Recordset!Address_Line_2) <> "" Then
-                Me.otxtShip.Text = Me.otxtShip.Text & vbCrLf & Trim$(.Recordset!Address_Line_2)
+                Me.otxtShip.text = Me.otxtShip.text & vbCrLf & Trim$(.Recordset!Address_Line_2)
             End If
             If Trim$(.Recordset!Address_Line_3) <> "" Then
-                Me.otxtShip.Text = Me.otxtShip.Text & vbCrLf & Trim$(.Recordset!Address_Line_3)
+                Me.otxtShip.text = Me.otxtShip.text & vbCrLf & Trim$(.Recordset!Address_Line_3)
             End If
-            Me.otxtShip.Text = Me.otxtShip.Text & vbCrLf
+            Me.otxtShip.text = Me.otxtShip.text & vbCrLf
             If Trim$(.Recordset!city) <> "" Then
-                Me.otxtShip.Text = Me.otxtShip.Text & Trim$(.Recordset!city) & ", "
+                Me.otxtShip.text = Me.otxtShip.text & Trim$(.Recordset!city) & ", "
             End If
             If Trim$(.Recordset!state) <> "" Then
-                Me.otxtShip.Text = Me.otxtShip.Text & Trim$(.Recordset!state) & " "
+                Me.otxtShip.text = Me.otxtShip.text & Trim$(.Recordset!state) & " "
             End If
             If Trim$(.Recordset!zip) <> "" Then
-                Me.otxtShip.Text = Me.otxtShip.Text & Trim$(.Recordset!zip) & " "
+                Me.otxtShip.text = Me.otxtShip.text & Trim$(.Recordset!zip) & " "
             End If
             If Trim$(.Recordset!Country_Name) <> "" Then
-                Me.otxtShip.Text = Me.otxtShip.Text & Trim$(.Recordset!Country_Name)
+                Me.otxtShip.text = Me.otxtShip.text & Trim$(.Recordset!Country_Name)
             End If
-            Me.otxtAttn.Text = Trim$(.Recordset!Attn_Description)
+            Me.otxtAttn.text = Trim$(.Recordset!Attn_Description)
         End If
         .Recordset.Close
     End With
@@ -254,7 +254,7 @@ Private Sub Void_Quarantine_Tag()
     Call Planning.CheckIfCombined(ProductionRun.Barcode_Id)
     
     Me.otxtLabel3Description.Left = 10200
-    Me.otxtLabel3Description.Text = "DO NOT USE THIS QUARANTINE TAG - THIS PDR IS ASSOCIATED TO GROUPED RUN " '& gProdGroupBarcode
+    Me.otxtLabel3Description.text = "DO NOT USE THIS QUARANTINE TAG - THIS PDR IS ASSOCIATED TO GROUPED RUN " '& gProdGroupBarcode
     Me.oLbl3Clintrak = " **** VOID ****** VOID ****** VOID *****"
 
 End Sub
