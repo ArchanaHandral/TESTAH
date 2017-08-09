@@ -63,6 +63,12 @@ Private mvarOnsertDiePartNumber As String
 Private mvarOnsertDieToolId As Long
 Private mvarDigitalLabelParts As String
 Private mvarNonBillable As CNonBillable
+Private mvarUseClientInventory As Boolean
+Private mvarUseClientInventoryModifiedBy As Long
+Private mvarUseClientInventoryDate As Date
+Private mvarUseClientInventoryReason As String
+Private mvarOriginalUseClientInventoryReason As String
+Private mvarIsProductionRunDeleted As Boolean
 
 Public Function IsOnRushRequest() As Boolean
     Dim objData As nADOData.CADOData
@@ -363,6 +369,56 @@ Public Property Get DigitalLabelParts() As String
     DigitalLabelParts = mvarDigitalLabelParts
 End Property
 
+Public Property Let UseClientInventory(ByVal vdata As Boolean)
+    mvarUseClientInventory = vdata
+End Property
+
+Public Property Get UseClientInventory() As Boolean
+    UseClientInventory = mvarUseClientInventory
+End Property
+
+Public Property Let UseClientInventoryModifiedBy(ByVal vdata As Long)
+    mvarUseClientInventoryModifiedBy = vdata
+End Property
+
+Public Property Get UseClientInventoryModifiedBy() As Long
+    UseClientInventoryModifiedBy = mvarUseClientInventoryModifiedBy
+End Property
+
+Public Property Let UseClientInventoryDate(ByVal vdata As Date)
+    mvarUseClientInventoryDate = vdata
+End Property
+
+Public Property Get UseClientInventoryDate() As Date
+    UseClientInventoryDate = mvarUseClientInventoryDate
+End Property
+
+Public Property Let UseClientInventoryReason(ByVal vdata As String)
+    mvarUseClientInventoryReason = vdata
+End Property
+
+Public Property Get UseClientInventoryReason() As String
+    UseClientInventoryReason = mvarUseClientInventoryReason
+End Property
+
+Public Property Get HasExistingUseClientInventoryReason() As Boolean
+    HasExistingUseClientInventoryReason = (Len(mvarUseClientInventoryReason) > 0)
+End Property
+
+Public Property Get IsProductionRunDeleted() As Boolean
+    IsProductionRunDeleted = mvarIsProductionRunDeleted
+End Property
+
+Public Sub ResetUseClientInventoryReasonDetails()
+    mvarUseClientInventoryModifiedBy = 0
+    mvarUseClientInventoryDate = "1/1/1900"
+    mvarUseClientInventoryReason = ""
+End Sub
+
+Public Function HasUseClientInventoryAccess() As Boolean
+    HasUseClientInventoryAccess = gApplicationUser.HasAccess(SecurityLevels.UseClientInventoryAuthorize)
+End Function
+
 
 Public Sub LookupRecord()
     Dim objData As nADOData.CADOData
@@ -418,7 +474,12 @@ Public Sub LookupRecord()
                 mvarOnsertDiePartNumber = .Recordset!Onsert_Die_Part_Number
                 mvarOnsertDieToolId = .Recordset!Onsert_Die_Tool_Id
                 mvarNonBillable.Load .Recordset
-
+                mvarUseClientInventory = .Recordset!UseClientInventory
+                mvarUseClientInventoryReason = .Recordset!UseClientInventoryReason
+                mvarOriginalUseClientInventoryReason = mvarUseClientInventoryReason
+                mvarUseClientInventoryDate = .Recordset!UseClientInventoryDate
+                mvarUseClientInventoryModifiedBy = .Recordset!UseClientInventoryModifiedBy
+                                
                 mvarDigitalLabelParts = _
                     .Recordset!BK1_Identification & _
                     IIf(.Recordset!BK2_Identification <> "", ", ", "") & .Recordset!BK2_Identification & _
@@ -495,7 +556,6 @@ Public Sub SaveProdRun()
         .AddParameter "Apply ScratchOff", mvarApplyScratchOff, adInteger, adParamInput
         .AddParameter "Combined Ind", mvarCombinedRun, adInteger, adParamInput
         ' DW 2008-017
-        '.AddParameter "Processing Loc", CheckNulls(mvarProcessingLocation), adVarChar, adParamInput
         .AddParameter "Clintrak Location Id", mvarClintrakLocationId, adInteger, adParamInput
         .AddParameter "Reorient Ind", mvarReorientInd, adInteger, adParamInput
         .AddParameter "Reference Number", CheckNulls(mvarReferenceNo), adVarChar, adParamInput
@@ -503,7 +563,13 @@ Public Sub SaveProdRun()
         .AddParameter "Print At Packager Ind", mvarPrintAtPackagerInd, adInteger, adParamInput
         .AddParameter "Onsert_Die_Tool_Id", mvarOnsertDieToolId, adInteger, adParamInput
         .AddParameter "Non_Billable_Id", NonBillable.NonBillableId, adInteger, adParamInput
+        .AddParameter "UseClientInventory", mvarUseClientInventory, adBoolean, adParamInput
+        .AddParameter "UseClientInventoryReason", IIf(Len(mvarUseClientInventoryReason) > 0, mvarUseClientInventoryReason, "Null"), adVarChar, adParamInput
+        .AddParameter "UseClientInventoryDate", mvarUseClientInventoryDate, adDate, adParamInput
+        .AddParameter "UseClientInventoryModifiedBy", mvarUseClientInventoryModifiedBy, adInteger, adParamInput
         
+        mvarOriginalUseClientInventoryReason = mvarUseClientInventoryReason
+         
         .AddParameter "return", "   ", adInteger, adParamOutput
         .AddParameter "identity", "   ", adInteger, adParamOutput
         .AddParameter "barcodeId", "               ", adVarChar, adParamOutput
@@ -530,6 +596,7 @@ Public Sub SaveProdRun()
             If Trim$(mvarScratch_Stock) > "" Then
                 Call GetScratchStockDesc
             End If
+            
         End If
         
         If mbooProdRunUpdated Then
@@ -736,7 +803,6 @@ Public Sub DeleteRecord()
             Exit Sub
         End If
         
-
         .ResetParameters
                 
         .AddParameter "Prod Run ID", mvarProduction_Run_Id, adInteger, adParamInput
@@ -780,6 +846,7 @@ Public Sub DeleteRecord()
             ProductionRun.NonBillable.Delete objData
         End If
         
+        mvarIsProductionRunDeleted = mbooProdRunUpdated
         .Connection.CommitTrans
         
     End With
@@ -877,3 +944,7 @@ End Property
 Private Sub Class_Initialize()
     Set mvarNonBillable = New CNonBillable
 End Sub
+
+Public Function HasChanges() As Boolean
+    HasChanges = (mvarUseClientInventoryReason <> mvarOriginalUseClientInventoryReason)
+End Function

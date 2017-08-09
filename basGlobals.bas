@@ -11,6 +11,8 @@ Public gadoConnection As nADOConn.CADOConn
 Private madoData As nADOData.CADOData
 Private nonBillableReasonList As Recordset
 Public gClintrakLocations As ClintrakCommon.LocationCollection
+Public gLocationHandler As ClintrakCommon.location
+Public gUserLocation As ClintrakCommon.LocationClass
 
 'declare global variables
 Public booReplacement As Boolean
@@ -96,6 +98,7 @@ Public Const DPIRQDELIMITER As String = ","
 
 Public Enum SecurityLevels
     NonBillableAuthorize = 1
+    UseClientInventoryAuthorize = 2
 End Enum
 
 Public Sub CenterForm(frmIn As Form)

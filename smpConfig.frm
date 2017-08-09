@@ -1115,9 +1115,7 @@ End Sub
 Private Sub cmdSaveButton_Click()
     Dim colCount As Long
     Dim j As Long
-    Dim r As Long
-    Dim c As Long
-
+    
     jgrdData.ItemCount = mData.count
     jgrdData.Update
     jgrdData.Refresh
@@ -1691,7 +1689,6 @@ Public Function Valid_Sample_Form() As Boolean
     Dim columnSqueezeCapacity As Long
     Dim columnSqueeze As String
     Dim tmpField As String
-    Dim j As Long
     Dim r As Long, c As Long
         
     Valid_Sample_Form = False

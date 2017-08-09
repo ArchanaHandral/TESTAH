@@ -22,9 +22,7 @@ Private rpt As ARProdPlan
 Dim Counter As Long  'page count in multiple IRQ report
 
 Public Function Initialize(Username As String, Token As String, Server As String, Database As String, Optional DomainIconPath As String) As Boolean
-    ' DW 2008-017 added
-    Dim objLocation As ClintrakCommon.location
-    
+        
     Set gApplicationUser = New ClintrakCommon.ApplicationUser
         
     If gApplicationUser.AuthenticateFromToken(Username, Token, Server, Database, App.Title) Then
@@ -39,16 +37,15 @@ Public Function Initialize(Username As String, Token As String, Server As String
         
         Initialize = True
         
-        ' DW 2008-017 added
         ' Retrieve collection of Clintrak locations
-        Set objLocation = New ClintrakCommon.location
-        Call objLocation.LoadClintrakLocations(gadoConnection.Connection)
-        Set gClintrakLocations = objLocation.ClintrakLocations
+        Set gLocationHandler = New ClintrakCommon.location
+        Call gLocationHandler.LoadClintrakLocations(gadoConnection.Connection)
+        Set gClintrakLocations = gLocationHandler.ClintrakLocations
+        Set gUserLocation = gLocationHandler.ClintrakLocations((gApplicationUser.ClintrakLocationId))
+        
         gDomainIconPath = DomainIconPath
     End If
     
-    ' DW 2008-017 added
-    Set objLocation = Nothing
     
 End Function
 

@@ -99,9 +99,13 @@ Public Property Get HasReason() As Boolean
     ' selected is separate from being billable, which is reason id 0.
     HasReason = (mvarReasonId > 0)
 End Property
-
+ 
 Public Property Get IsBillable() As Boolean
     IsBillable = (mvarReasonId = 0)
+End Property
+
+Public Property Get IsBillableStatusSet() As Boolean
+    IsBillableStatusSet = (mvarReasonId >= 0)
 End Property
 
 Private Property Get DoesRequireOverride() As Boolean

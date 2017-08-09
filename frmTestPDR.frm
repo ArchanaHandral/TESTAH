@@ -75,7 +75,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   960
          TabIndex        =   5
-         Text            =   "frank.li 5dee2cbc-5ad7-44b7-8b6c-fa9c80b8916e USBOH-SQLDEV01\USBOHSQLDEV01 FLClintrak3"
+         Text            =   "Daniel.Wenke 5fcc1a4a-81bb-4268-b6f4-7b2bb4b6dfe5 USBOH-SQLDEV01\USBOHSQLDEV01 DWClintrak"
          Top             =   240
          Width           =   8415
       End
@@ -111,7 +111,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   1080
          TabIndex        =   9
-         Text            =   "18134"
+         Text            =   "58828"
          Top             =   960
          Width           =   1455
       End
@@ -119,7 +119,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   1080
          TabIndex        =   7
-         Text            =   "274784"
+         Text            =   "376483"
          Top             =   600
          Width           =   1455
       End
@@ -127,7 +127,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   1080
          TabIndex        =   2
-         Text            =   "574851"
+         Text            =   "723635"
          Top             =   240
          Width           =   1455
       End
@@ -206,16 +206,16 @@ Private Sub Form_Load()
     Me.txtToken.Text = Command$
 End Sub
 
-'Private Function Authenticate(ByVal Username As String, ByVal Password As String, ByVal Domain As String) As Boolean
-'    Set mvarUser = New ApplicationUser
-'    With mvarUser
-'        If .Authenticate(Username, Password, Domain, AuthenticationPurpose.Login, Me.txtServer.Text, Me.txtDatabase.Text, "LabelProof") Then 'Application.ProductName
-'            Authenticate = True
-'        Else
-'            Authenticate = False
-'        End If
-'    End With
-'End Function
+Private Function Authenticate(ByVal Username As String, ByVal Password As String, ByVal Domain As String) As Boolean
+    Set mvarUser = New ApplicationUser
+    With mvarUser
+        If .Authenticate(Username, Password, Domain, AuthenticationPurpose.Login, Me.txtServer.Text, Me.txtDatabase.Text, "LabelProof") Then 'Application.ProductName
+            Authenticate = True
+        Else
+            Authenticate = False
+        End If
+    End With
+End Function
 
 Private Sub cmdOpenPDRWindow_Click()
     Dim pdr As ProductionRuns.ProdRunMain
