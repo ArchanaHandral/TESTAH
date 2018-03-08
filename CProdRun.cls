@@ -69,6 +69,12 @@ Private mvarUseClientInventoryDate As Date
 Private mvarUseClientInventoryReason As String
 Private mvarOriginalUseClientInventoryReason As String
 Private mvarIsProductionRunDeleted As Boolean
+Private mvarOverLaminate As String
+Private mvarOverLaminateDescription As String
+Private mvarPRGBarCode As String
+Private mvarPRGCount As Long
+Private mvarTotalPDRs As Long
+
 
 Public Function IsOnRushRequest() As Boolean
     Dim objData As nADOData.CADOData
@@ -86,6 +92,42 @@ Public Function IsOnRushRequest() As Boolean
         End If
     End With
 End Function
+
+Public Property Let PRGBarcode(ByVal vdata As String)
+    mvarPRGBarCode = vdata
+End Property
+Public Property Get PRGBarcode() As String
+    PRGBarcode = mvarPRGBarCode
+End Property
+
+Public Property Let PRGCount(ByVal vdata As Long)
+    mvarPRGCount = vdata
+End Property
+Public Property Get PRGCount() As Long
+    PRGCount = mvarPRGCount
+End Property
+
+Public Property Let TotalPDRs(ByVal vdata As Long)
+    mvarTotalPDRs = vdata
+End Property
+Public Property Get TotalPDRs() As Long
+    TotalPDRs = mvarTotalPDRs
+End Property
+
+
+Public Property Let OverLaminateDescription(ByVal vdata As String)
+    mvarOverLaminateDescription = vdata
+End Property
+Public Property Get OverLaminateDescription() As String
+    OverLaminateDescription = mvarOverLaminateDescription
+End Property
+
+Public Property Let OverLaminate(ByVal vdata As String)
+    mvarOverLaminate = vdata
+End Property
+Public Property Get OverLaminate() As String
+    OverLaminate = mvarOverLaminate
+End Property
 
 Public Property Let Production_Run_Id(ByVal vdata As Long)
     mvarProduction_Run_Id = vdata
@@ -423,7 +465,7 @@ End Function
 Public Sub LookupRecord()
     Dim objData As nADOData.CADOData
     On Error GoTo Error_this_Sub
-   
+    
     mbooProdRunFound = False
         
     Set objData = New CADOData
@@ -479,7 +521,12 @@ Public Sub LookupRecord()
                 mvarOriginalUseClientInventoryReason = mvarUseClientInventoryReason
                 mvarUseClientInventoryDate = .Recordset!UseClientInventoryDate
                 mvarUseClientInventoryModifiedBy = .Recordset!UseClientInventoryModifiedBy
-                                
+                mvarOverLaminate = IIf(IsNull(.Recordset!OverLaminate), "N/A", .Recordset!OverLaminate)
+                mvarOverLaminateDescription = IIf(IsNull(.Recordset!OverLaminateDescription), "", .Recordset!OverLaminateDescription)
+                mvarPRGBarCode = .Recordset!PRGBarcode
+                mvarPRGCount = IIf(IsNull(.Recordset!PRGCount), 0, .Recordset!PRGCount)
+                mvarTotalPDRs = .Recordset!PDRsInPRG
+                
                 mvarDigitalLabelParts = _
                     .Recordset!BK1_Identification & _
                     IIf(.Recordset!BK2_Identification <> "", ", ", "") & .Recordset!BK2_Identification & _
@@ -933,7 +980,7 @@ Cleanup_Exit:
     Set objData = Nothing
     Exit Sub
 Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Cleanup_Exit
 End Sub
 

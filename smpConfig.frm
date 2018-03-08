@@ -680,7 +680,7 @@ Private Sub Form_Load()
         dirtyFlag = ""              'sets the dirty flag to "" for existing data
         Call LoadShippingInfo(jobShippingId, txtShip, txtAttn, txtAdd1, txtAdd2, _
                         txtCity, txtState, txtZip, txtAdd3)
-        cmdDeleteButton.Enabled = True
+        cmdDeleteButton.enabled = True
     Else
         'Clintrak sample data does not exist
         Read_File (ProductionRun.File_Name)
@@ -692,7 +692,7 @@ Private Sub Form_Load()
         Me.txtQtynumber.text = 2
         Call Update_Click
         jobShippingId = 0
-        cmdDeleteButton.Enabled = False
+        cmdDeleteButton.enabled = False
         dirtyFlag = "Y"
         'counts the number of columns
         colCount = CountDelimitedWords(vdata, gRandDelimiter)
@@ -710,12 +710,12 @@ Private Sub Form_Load()
     Next j
     
     'greys out the back button at initial form launch
-    cmdBackButton.Enabled = False
+    cmdBackButton.enabled = False
     
     If getExistingSampleTypes(0) < 1 Then
-        mnuLoadSample.Enabled = False
+        mnuLoadSample.enabled = False
     Else
-        mnuLoadSample.Enabled = True
+        mnuLoadSample.enabled = True
     End If
     
     Call CheckAvailableNext
@@ -731,18 +731,18 @@ Private Sub Form_Load()
     
     ' only enable if not a replacement and not clintrak samples
     If booReplacement Or Me.SSDBComboSmpType.text = "CLINTRAK" Or mvarIRQsExist = True Then
-        Me.mnuLoadSample.Enabled = False
-        Me.cmdDeleteButton.Enabled = False
+        Me.mnuLoadSample.enabled = False
+        Me.cmdDeleteButton.enabled = False
     End If
     
     If booReplacement Or mvarIRQsExist = True Then
-        Update.Enabled = False
-        txtQtynumber.Enabled = False
-        Me.cmdLoadCoding.Enabled = False
+        Update.enabled = False
+        txtQtynumber.enabled = False
+        Me.cmdLoadCoding.enabled = False
     Else
-        Update.Enabled = True
-        txtQtynumber.Enabled = True
-        If Me.SSDBComboSmpType.text <> "CLINTRAK" Then Me.cmdLoadCoding.Enabled = True
+        Update.enabled = True
+        txtQtynumber.enabled = True
+        If Me.SSDBComboSmpType.text <> "CLINTRAK" Then Me.cmdLoadCoding.enabled = True
     End If
 
     If Determine_If_PDR_HasRun = True Or Planning.CheckIfCombined(ProductionRun.Barcode_Id) = True Then
@@ -787,7 +787,7 @@ Private Sub cmdBackButton_Click()
             If jobShippingId = 0 Then ClearShipFields
         End If
     
-        cmdDeleteButton.Enabled = True
+        cmdDeleteButton.enabled = True
     Else
         Read_File (gCodingFileName)
         Set mData = New CCOLPDRFILES
@@ -803,25 +803,25 @@ Private Sub cmdBackButton_Click()
         Call SetScreenEdit
         Call mData.Add(vdata, 1, _
           SSDBComboSmpType.Columns.Item(2).text)
-        cmdDeleteButton.Enabled = False
+        cmdDeleteButton.enabled = False
     End If
     
     ' Set to dirty if Print @ Packager has changed
-    If gSampleTypeId > 0 And Me.SSDBComboShip.Enabled And Trim(Me.SSDBComboShip.text) = "" Then
+    If gSampleTypeId > 0 And Me.SSDBComboShip.enabled And Trim(Me.SSDBComboShip.text) = "" Then
         dirtyFlag = "Y"
     End If
     
     'greys out back button when first sample type is reached
     If txtSmpTypeNum = 1 Then
-        cmdBackButton.Enabled = False
+        cmdBackButton.enabled = False
     End If
     
     ' only enable if not a replacement and not clintrak samples
     If booReplacement Or Me.SSDBComboSmpType.text = "CLINTRAK" Or mvarIRQsExist = True Then
-        Me.mnuLoadSample.Enabled = False
-        cmdDeleteButton.Enabled = False
+        Me.mnuLoadSample.enabled = False
+        cmdDeleteButton.enabled = False
     Else
-        Me.mnuLoadSample.Enabled = True
+        Me.mnuLoadSample.enabled = True
     End If
     
     Call CheckAvailableNext
@@ -896,7 +896,7 @@ Private Sub cmdDeleteButton_Click()
     'checks to see if the type number goes to zero
     If CInt(txtSmpTypeNum.text) < 1 Then
         txtSmpTypeNum.text = 1
-        cmdBackButton.Enabled = False
+        cmdBackButton.enabled = False
     End If
     
     
@@ -910,7 +910,7 @@ Private Sub cmdDeleteButton_Click()
         dirtyFlag = ""
         Call LoadShippingInfo(jobShippingId, txtShip, txtAttn, txtAdd1, txtAdd2, _
                         txtCity, txtState, txtZip, txtAdd3)
-        cmdDeleteButton.Enabled = True
+        cmdDeleteButton.enabled = True
     Else
         Read_File (gCodingFileName)
         'populates the collection with data from file
@@ -920,7 +920,7 @@ Private Sub cmdDeleteButton_Click()
         Call ClearShipFields
         SSDBComboSmpType.text = ""
         SSDBComboShip.text = ""
-        Me.cmdDeleteButton.Enabled = False
+        Me.cmdDeleteButton.enabled = False
     End If
     
     columnNumber = 0
@@ -928,19 +928,19 @@ Private Sub cmdDeleteButton_Click()
     
     ' only enable if not a replacement and not clintrak samples
     If booReplacement Or Me.SSDBComboSmpType.text = "CLINTRAK" Or mvarIRQsExist = True Then
-        Me.mnuLoadSample.Enabled = False
-        Me.cmdDeleteButton.Enabled = False
+        Me.mnuLoadSample.enabled = False
+        Me.cmdDeleteButton.enabled = False
     Else
-        Me.mnuLoadSample.Enabled = True
+        Me.mnuLoadSample.enabled = True
     End If
     
     If txtSmpTypeNum = 1 Then
-        cmdBackButton.Enabled = False
+        cmdBackButton.enabled = False
     End If
     
     If getExistingSampleTypes(0) < 1 Then
-        mnuLoadSample.Enabled = False
-        cmdDeleteButton.Enabled = False
+        mnuLoadSample.enabled = False
+        cmdDeleteButton.enabled = False
     End If
     
     Call CheckAvailableNext
@@ -1043,7 +1043,7 @@ Private Sub cmdNextButton_Click()
                         txtCity, txtState, txtZip, txtAdd3)
             If jobShippingId = 0 Then ClearShipFields   ' DW 2010-002 added
         End If
-        cmdDeleteButton.Enabled = True
+        cmdDeleteButton.enabled = True
     Else
         Read_File (gCodingFileName)
         Set mData = New CCOLPDRFILES
@@ -1056,7 +1056,7 @@ Private Sub cmdNextButton_Click()
         txtDescription.text = ""
         description = ""
         jobShippingId = 0
-        cmdDeleteButton.Enabled = False
+        cmdDeleteButton.enabled = False
         Call SetScreenEdit
         Call mData.Add(vdata, 1, SSDBComboSmpType.text)
         frmProdPlan.sampleTypes = frmProdPlan.sampleTypes + 1
@@ -1068,24 +1068,24 @@ Private Sub cmdNextButton_Click()
     txtQtynumber = mData.count
     
     ' Set to dirty if Print @ Packager has changed
-    If gSampleTypeId > 0 And Me.SSDBComboShip.Enabled And Trim(Me.SSDBComboShip.text) = "" Then
+    If gSampleTypeId > 0 And Me.SSDBComboShip.enabled And Trim(Me.SSDBComboShip.text) = "" Then
         dirtyFlag = "Y"
     End If
     
     'if sample number is 1 then back button is greyed out
     If txtSmpTypeNum = 1 Then
-        cmdBackButton.Enabled = False
+        cmdBackButton.enabled = False
     Else
-        cmdBackButton.Enabled = True
+        cmdBackButton.enabled = True
     End If
     
     ' only enable if not a replacement and not clintrak samples
     If booReplacement Or Me.SSDBComboSmpType.text = "CLINTRAK" Or mvarIRQsExist = True Then
-        Me.mnuLoadSample.Enabled = False
+        Me.mnuLoadSample.enabled = False
         ' the delete button is enabled/disable above as well, so only disable if certain criteria met
-        cmdDeleteButton.Enabled = False
+        cmdDeleteButton.enabled = False
     Else
-        Me.mnuLoadSample.Enabled = True
+        Me.mnuLoadSample.enabled = True
     End If
 
     
@@ -1141,11 +1141,11 @@ Private Sub cmdSaveButton_Click()
     
     ' only enable if not a replacement and not clintrak samples
     If booReplacement Or Me.SSDBComboSmpType.text = "CLINTRAK" Or mvarIRQsExist = True Then
-        Me.mnuLoadSample.Enabled = False
-        Me.cmdDeleteButton.Enabled = False
+        Me.mnuLoadSample.enabled = False
+        Me.cmdDeleteButton.enabled = False
     Else
-        Me.mnuLoadSample.Enabled = True
-        Me.cmdDeleteButton.Enabled = True
+        Me.mnuLoadSample.enabled = True
+        Me.cmdDeleteButton.enabled = True
     End If
     
     frmProdPlan.booSamplesDirtyFlag = True
@@ -1526,20 +1526,20 @@ Public Sub CollectionToFile(strDestination As String)
 '
 On Error GoTo Error_this_Sub
   
-   Dim strFilename As String
+   Dim strFileName As String
    
             'checks to see if the "smp" directory exists
             If Not FileExists(strDestination) Then
-                strFilename = GetFilePath(ProductionRun.File_Name)
-                strFilename = GetFilePath(strFilename) & "\smp\"
-                If Not DirExists(strFilename) Then
+                strFileName = GetFilePath(ProductionRun.File_Name)
+                strFileName = GetFilePath(strFileName) & "\smp\"
+                If Not DirExists(strFileName) Then
                     'creates the smp directory if it doesn't
-                    MkDir (strFilename)
+                    MkDir (strFileName)
                 End If
-                strFilename = strFilename & Trim(ProductionRun.Barcode_Id) & "_" & CInt(Me.txtSmpTypeNum.text) & ".smp"
-                gSampleFileName = strFilename
+                strFileName = strFileName & Trim(ProductionRun.Barcode_Id) & "_" & CInt(Me.txtSmpTypeNum.text) & ".smp"
+                gSampleFileName = strFileName
             Else
-                strFilename = strDestination
+                strFileName = strDestination
                 gSampleFileName = strDestination
             End If
             
@@ -1547,7 +1547,7 @@ On Error GoTo Error_this_Sub
             'md added code to write to file with 3 char abbrev.
             Call WriteFile(mData, _
                 SSDBComboSmpType.Columns.Item(2).text, _
-               Trim(strFilename))
+               Trim(strFileName))
                
             dirtyFlag = ""
             
@@ -1981,8 +1981,8 @@ On Error GoTo Error_this_Sub
         dirtyFlag = ""
         Call LoadShippingInfo(jobShippingId, txtShip, txtAttn, txtAdd1, txtAdd2, _
                             txtCity, txtState, txtZip, txtAdd3)
-        cmdDeleteButton.Enabled = True
-        cmdBackButton.Enabled = True
+        cmdDeleteButton.enabled = True
+        cmdBackButton.enabled = True
     'checks to see if the current sample type exists
     ElseIf SampleDataExists(Me.txtSmpTypeNum) Then
         ' this code is executed if the current sample exsists in the DB and the file exists
@@ -2003,8 +2003,8 @@ On Error GoTo Error_this_Sub
         description = ""
         jobShippingId = 0
         txtQtynumber = mData.count
-        cmdDeleteButton.Enabled = False
-        cmdBackButton.Enabled = True
+        cmdDeleteButton.enabled = False
+        cmdBackButton.enabled = True
     Else
         ' this code is exeuted if the next sample type and the current sample set both
         ' don't exists.  It loads leaves the current sample set loaded, but refreshes
@@ -2023,7 +2023,7 @@ On Error GoTo Error_this_Sub
         Call ClearShipFields
         description = ""
         jobShippingId = 0
-        cmdDeleteButton.Enabled = False
+        cmdDeleteButton.enabled = False
     End If
 
     txtcolumn.text = ""
@@ -2031,16 +2031,16 @@ On Error GoTo Error_this_Sub
     
     ' only enable if not a replacement and not clintrak samples
     If booReplacement Or Me.SSDBComboSmpType.text = "CLINTRAK" Or mvarIRQsExist = True Then
-        Me.mnuLoadSample.Enabled = False
-        Me.cmdDeleteButton.Enabled = False
+        Me.mnuLoadSample.enabled = False
+        Me.cmdDeleteButton.enabled = False
     Else
-        Me.mnuLoadSample.Enabled = True
+        Me.mnuLoadSample.enabled = True
     End If
     
     If txtSmpTypeNum = 1 Then
-        cmdBackButton.Enabled = False
+        cmdBackButton.enabled = False
     Else
-        cmdBackButton.Enabled = True
+        cmdBackButton.enabled = True
     End If
     
     Call CheckAvailableNext
@@ -2193,16 +2193,16 @@ Private Sub CheckAvailableNext()
     
 
     If Me.txtSmpTypeNum = frmProdPlan.sampleTypes Then
-        cmdNextButton.Enabled = False
+        cmdNextButton.enabled = False
         If mvarIRQsExist = True Or booReplacement = True Then
-            cmdAdd.Enabled = False
+            cmdAdd.enabled = False
         Else
-            cmdAdd.Enabled = True
+            cmdAdd.enabled = True
         End If
         
     Else
-        cmdNextButton.Enabled = True
-        cmdAdd.Enabled = False
+        cmdNextButton.enabled = True
+        cmdAdd.enabled = False
     End If
 ''     If CLng(Me.txtSmpTypeNum.Text) >= CLng(frmProdPlan.txtSampleGroups.Text) Then
 ''        cmdNextButton.Caption = "Add New Type"
@@ -2221,35 +2221,35 @@ Private Sub SetScreenEdit()
     booEditable = (SSDBComboSmpType.text <> "CLINTRAK")
     If Not booEditable Then ClearShipFields
     
-    Me.lblSelectedColumn.Enabled = booEditable
-    Me.txtcolumn.Enabled = booEditable
-    Me.cmdConfigure.Enabled = booEditable
-    Me.cmdLoadCoding.Enabled = booEditable
+    Me.lblSelectedColumn.enabled = booEditable
+    Me.txtcolumn.enabled = booEditable
+    Me.cmdConfigure.enabled = booEditable
+    Me.cmdLoadCoding.enabled = booEditable
     
-    Me.SSDBComboShip.Enabled = (booEditable And Not CBool(frmProdPlan.chkPrintAtPackager.value))
-    Me.lblShipToCbo.Enabled = SSDBComboShip.Enabled
-    Me.lblShipTo.Enabled = SSDBComboShip.Enabled
-    Me.lblAttn.Enabled = SSDBComboShip.Enabled
-    Me.lblAddr1.Enabled = SSDBComboShip.Enabled
-    Me.lblAddr2.Enabled = SSDBComboShip.Enabled
-    Me.lblAddr3.Enabled = SSDBComboShip.Enabled
-    Me.lblCity.Enabled = SSDBComboShip.Enabled
-    Me.lblState.Enabled = SSDBComboShip.Enabled
-    Me.lblZip.Enabled = SSDBComboShip.Enabled
-    Me.txtShip.Enabled = SSDBComboShip.Enabled
-    Me.txtAttn.Enabled = SSDBComboShip.Enabled
-    Me.txtAdd1.Enabled = SSDBComboShip.Enabled
-    Me.txtAdd2.Enabled = SSDBComboShip.Enabled
-    Me.txtAdd3.Enabled = SSDBComboShip.Enabled
-    Me.txtCity.Enabled = SSDBComboShip.Enabled
-    Me.txtState.Enabled = SSDBComboShip.Enabled
-    Me.txtZip.Enabled = SSDBComboShip.Enabled
+    Me.SSDBComboShip.enabled = (booEditable And Not CBool(frmProdPlan.chkPrintAtPackager.value))
+    Me.lblShipToCbo.enabled = SSDBComboShip.enabled
+    Me.lblShipTo.enabled = SSDBComboShip.enabled
+    Me.lblAttn.enabled = SSDBComboShip.enabled
+    Me.lblAddr1.enabled = SSDBComboShip.enabled
+    Me.lblAddr2.enabled = SSDBComboShip.enabled
+    Me.lblAddr3.enabled = SSDBComboShip.enabled
+    Me.lblCity.enabled = SSDBComboShip.enabled
+    Me.lblState.enabled = SSDBComboShip.enabled
+    Me.lblZip.enabled = SSDBComboShip.enabled
+    Me.txtShip.enabled = SSDBComboShip.enabled
+    Me.txtAttn.enabled = SSDBComboShip.enabled
+    Me.txtAdd1.enabled = SSDBComboShip.enabled
+    Me.txtAdd2.enabled = SSDBComboShip.enabled
+    Me.txtAdd3.enabled = SSDBComboShip.enabled
+    Me.txtCity.enabled = SSDBComboShip.enabled
+    Me.txtState.enabled = SSDBComboShip.enabled
+    Me.txtZip.enabled = SSDBComboShip.enabled
     
-    SSDBComboSmpType.Enabled = booEditable
+    SSDBComboSmpType.enabled = booEditable
     ' Do not allow the user to edit Type column
     Me.jgrdData.Columns(1).Selectable = False
     For i = 2 To 20
-        Me.jgrdData.Columns(i).Selectable = SSDBComboSmpType.Enabled
+        Me.jgrdData.Columns(i).Selectable = SSDBComboSmpType.enabled
         ' so barcode columns are not selectable
         If i > intCodingColCount Then
             Me.jgrdData.Columns(i).Selectable = False
@@ -2290,7 +2290,7 @@ Private Sub Process_Rename_Files(TmpSmpFile As String, TmpTypeNum As Integer)
 
 Dim StringCnt As String
 Dim stringfl As String
-Dim strFilename As String
+Dim strFileName As String
 
     
     StringCnt = GetDelimitedFirstLine(TmpSmpFile, 1, ".", False)
@@ -2304,10 +2304,10 @@ Dim strFilename As String
     End If
 
     'create a temporary sample file
-    strFilename = ""
-    strFilename = GetFilePath(TmpSmpFile)
-    strFilename = strFilename & "\temporary.smp"
-    Call FileCopy(TmpSmpFile, strFilename)
+    strFileName = ""
+    strFileName = GetFilePath(TmpSmpFile)
+    strFileName = strFileName & "\temporary.smp"
+    Call FileCopy(TmpSmpFile, strFileName)
     'deletes the old sample file from the directory
     Kill (TmpSmpFile)
     
@@ -2316,10 +2316,10 @@ Dim strFilename As String
     stringfl = GetFilePath(TmpSmpFile)
     stringfl = stringfl & "\" & ProductionRun.Barcode_Id & "_" & TmpTypeNum & ".smp"
     'create the new file
-    Call FileCopy(strFilename, stringfl)
+    Call FileCopy(strFileName, stringfl)
     
     'remove the temporary sample
-    Kill (strFilename)
+    Kill (strFileName)
     
     'call to upate the sample table
     Call UpdateSmplFile_On_DB(TmpTypeNum, stringfl)
@@ -2447,12 +2447,12 @@ On Error GoTo Handle_Error
         colArray(UBound(colArray)) = tempHolder
     End If
     
-Exit_Sub:
+exit_sub:
     Exit Sub
 
 Handle_Error:
     Err.Raise Err.Number, Err.Source, Err.description, , "Extract_MergeBarcode_Columns"
-    Resume Exit_Sub
+    Resume exit_sub
 
 End Sub
 
@@ -2528,14 +2528,14 @@ Private Sub LockOutForm()
 
     If mvarCombinedOrRun = True Then
         Me.jgrdData.AllowEdit = False
-        Me.SSDBComboSmpType.Enabled = False
-        Me.txtQtynumber.Enabled = False
-        Me.Update.Enabled = False
-        Me.cmdLoadCoding.Enabled = False
-        Me.cmdConfigure.Enabled = False
-        Me.mnuLoadSample.Enabled = False
-        Me.cmdDeleteButton.Enabled = False
-        Me.cmdAdd.Enabled = False
+        Me.SSDBComboSmpType.enabled = False
+        Me.txtQtynumber.enabled = False
+        Me.Update.enabled = False
+        Me.cmdLoadCoding.enabled = False
+        Me.cmdConfigure.enabled = False
+        Me.mnuLoadSample.enabled = False
+        Me.cmdDeleteButton.enabled = False
+        Me.cmdAdd.enabled = False
     End If
         
 Cleanup_Exit:
@@ -2550,7 +2550,7 @@ Private Sub cmdAdd_Click()
     On Error GoTo Handle_Error
 
     Call cmdNextButton_Click
-    cmdAdd.Enabled = False
+    cmdAdd.enabled = False
                 
 
 Cleanup_Exit:

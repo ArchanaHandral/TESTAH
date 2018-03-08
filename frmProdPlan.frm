@@ -1002,7 +1002,6 @@ Begin VB.Form frmProdPlan
       _ExtentX        =   2355
       _ExtentY        =   635
       _Version        =   393217
-      Enabled         =   -1  'True
       TextRTF         =   $"frmProdPlan.frx":1286
    End
    Begin RichTextLib.RichTextBox rtbPDRInstructions 
@@ -1016,7 +1015,6 @@ Begin VB.Form frmProdPlan
       _ExtentX        =   2355
       _ExtentY        =   635
       _Version        =   393217
-      Enabled         =   -1  'True
       TextRTF         =   $"frmProdPlan.frx":1301
    End
    Begin MSComctlLib.StatusBar StatusBar1 
@@ -1265,6 +1263,8 @@ Private Sub Form_Load()
     Dim booPdrHasRun As Boolean
     Dim booPdrIsCombined As Boolean
     Dim xmls As New ClintrakCommon.XmlSettings
+    Dim strFileNameSamples As String
+    Dim strTempFileName As String
     
     booSamplesDirtyFlag = False
     Call Me.txtReplacement.Move(Me.StatusBar1.Panels(2).Left + 50, Me.StatusBar1.Top + 50)
@@ -1282,7 +1282,14 @@ Private Sub Form_Load()
     Call BlindLamApplyCol.Add(LABEL_AND_SAMPLES_TEXT, "1")
     Call BlindLamApplyCol.Add(LABELS_ONLY_TEXT, "2")
     Call BlindLamApplyCol.Add(NA_TEXT, "3")
-       
+           
+    'Load debug info from apps.xml
+    gDebugMode = xmls.GetSetting("DebugMode")
+    xmls.AppName = "ProductionRuns"
+    gRnrBaseFilePath = xmls.GetAppSetting("RnrBasePath")
+    gRnrDebugFilePath = gRnrBaseFilePath & "DEBUG\"
+
+    
     ' came from ProdRunMain ------------------
     Call getFileLinksInfo
     Call GetJobInformation
@@ -1326,7 +1333,32 @@ Private Sub Form_Load()
     HoldScratchStockProofId = 0
     
     If ProductionRun.Production_Run_Id <> 0 Then
-        ProductionRun.LookupRecord
+        
+        If gDebugMode = True Then
+            
+            ProductionRun.LookupRecord
+            'if coding path doesn't have debug, lets copy coding files
+            
+            If InStr(1, ProductionRun.File_Name, gRnrDebugFilePath, vbTextCompare) <> 1 Then
+
+                strTempFileName = Replace$(ProductionRun.File_Name, gRnrBaseFilePath, gRnrDebugFilePath, 1, -1, vbTextCompare)
+                'coding doesn't have debug in the path must copy files and update coding db path
+                Call CopyFiles(ProductionRun.File_Name, strTempFileName)
+                Call UpdateCodingFilePath(gCodingFileId, ProductionRun.Production_Run_Id, strTempFileName, 0)
+                
+                'create sample path from coding path and check if it's debug
+                strFileNameSamples = Replace$(ProductionRun.File_Name, "\cod\", "\smp\", 1, -1, vbTextCompare)  'it's already doing this in the code
+                strFileNameSamples = GetFilePath(strFileNameSamples) 'drop the file in the path
+                strTempFileName = Replace$(strFileNameSamples, gRnrBaseFilePath, gRnrDebugFilePath, 1, -1, vbTextCompare)
+                ProductionRun.LookupRecord
+                
+                Call CopySampleFiles(strFileNameSamples, strTempFileName, ProductionRun.Barcode_Id)
+            End If
+
+        Else
+            ProductionRun.LookupRecord
+        End If
+    
     
         'if the production run is not found then initialize the screen and populate some
         'of the values from the labels/files screen
@@ -1411,6 +1443,7 @@ Private Sub Form_Load()
         ProductionRun.Proof_Id = lngProofId
         ProductionRun.Campaign_No = strGroupNum
         ProductionRun.File_Name = gCodingFileName
+        
         Me.txtStockNo.text = gStockLabelId
         ProductionRun.stock = gStockLabelId
         ProductionRun.Stock_Proof_Id = gStockProofId
@@ -2076,6 +2109,8 @@ End Sub
 
 Private Sub duplicateConfig_Click()
     Dim i As Long
+    Dim lngLink As Long
+    Dim strTempFileName As String
     
     On Error GoTo Handle_Error
 
@@ -2126,9 +2161,23 @@ Private Sub duplicateConfig_Click()
                 GoTo Cleanup_Exit
             End If
             Call DuplicateUpdateSmpTable(smpSameCodingData)
-
+            
             For i = 1 To dupSameCodingData.count
-                DuplicateUpdateProdTable (dupSameCodingData.Item(i).productionId)
+               
+               Call DuplicateUpdateProdTable(dupSameCodingData.Item(i).productionId)
+               
+               If gDebugMode = True Then
+                
+                    If InStr(1, dupSameCodingData.Item(i).fileName, gRnrDebugFilePath, vbTextCompare) <> 1 Then
+                        lngLink = GetDuplicateFileLinksInfo(dupSameCodingData.Item(i).productionId)
+                        strTempFileName = Replace$(dupSameCodingData.Item(i).fileName, gRnrBaseFilePath, gRnrDebugFilePath, 1, -1, vbTextCompare)
+                        'coding doesn't have debug in the path must copy files and update coding db path
+                        Call CopyFiles(dupSameCodingData.Item(i).fileName, strTempFileName)
+                        Call UpdateCodingFilePath(lngLink, dupSameCodingData.Item(i).productionId, strTempFileName, 0)
+                    End If
+                
+               End If
+               
             Next i
             
             '***********************************************************************
@@ -2144,7 +2193,16 @@ Private Sub duplicateConfig_Click()
             Call DuplicateUpdateSmpTable(smpData)
 
             For i = 1 To dupData.count
-                DuplicateUpdateProdTable (dupData.Item(i).productionId)
+                Call DuplicateUpdateProdTable(dupData.Item(i).productionId)
+                    If gDebugMode = True Then
+                        If InStr(1, dupData.Item(i).fileName, gRnrDebugFilePath, vbTextCompare) <> 1 Then
+                            strTempFileName = Replace$(dupData.Item(i).fileName, gRnrBaseFilePath, gRnrDebugFilePath, 1, -1, vbTextCompare)
+                            'coding doesn't have debug in the path must copy files and update coding db path
+                            Call CopyFiles(dupData.Item(i).fileName, strTempFileName)
+                            lngLink = GetDuplicateFileLinksInfo(dupData.Item(i).productionId)
+                            Call UpdateCodingFilePath(lngLink, dupData.Item(i).productionId, strTempFileName, 0)
+                        End If
+                    End If
             Next i
                 
             MsgBox _
@@ -2469,6 +2527,8 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
     Dim strMessageCC As String
     Dim booChange As Boolean
     Dim strReason As String
+    Dim strTempFileName As String
+    Dim strFileNameSamples As String
     
     On Error GoTo Error_this_Sub
     
@@ -2517,6 +2577,27 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
         txtPDRStatus.text = "PDR HAS BEEN PROCESSED"
     
         ProductionRun.LookupRecord
+        
+        'handle replacements created in prod when in debug mode that never loaded in debug before
+         If gDebugMode = True Then
+            'if coding path doesn't have debug, lets copy coding files
+            
+            If InStr(1, ProductionRun.File_Name, gRnrDebugFilePath, vbTextCompare) <> 1 Then
+
+                strTempFileName = Replace$(ProductionRun.File_Name, gRnrBaseFilePath, gRnrDebugFilePath, 1, -1, vbTextCompare)
+                'coding doesn't have debug in the path must copy files and update coding db path
+                Call CopyFiles(ProductionRun.File_Name, strTempFileName)
+                Call UpdateCodingFilePath(gCodingFileId, ProductionRun.Production_Run_Id, strTempFileName, 1)
+                
+                'create sample path from coding path and check if it's debug
+                strFileNameSamples = Replace$(ProductionRun.File_Name, "\reprints\", "\smp\", 1, -1, vbTextCompare)  'it's already doing this in the code
+                strFileNameSamples = GetFilePath(strFileNameSamples) 'drop the file in the path
+                strTempFileName = Replace$(strFileNameSamples, gRnrBaseFilePath, gRnrDebugFilePath, 1, -1, vbTextCompare)
+                ProductionRun.LookupRecord
+                
+                Call CopySampleFiles(strFileNameSamples, strTempFileName, ProductionRun.Barcode_Id)
+            End If
+        End If
         
         ProductionRun.Coding_File_Header = strCodingFileHeader
         
@@ -2900,7 +2981,8 @@ End Sub
 Private Sub cmdSave_Click()
     Dim booInitialSave As Boolean
     Dim strCodingFileHeader As String
-    
+    Dim strTempFileName As String
+        
     On Error GoTo Error_this_Sub
 
     ' DW 2010-002 added
@@ -2991,8 +3073,19 @@ Private Sub cmdSave_Click()
         ' non billable reason is updated as the combo box is changed (so that the UI can be made read-only as necessary)
     End With
     
-    ProductionRun.SaveProdRun
+    'if we're in debug mode for a new production run and coding isn't updated we need to update coding for a new run
+    'then update the coding link
+    If (gDebugMode = True) And (booNewProdRun = True) And (InStr(1, ProductionRun.File_Name, gRnrDebugFilePath, vbTextCompare) <> 1) Then
+        strTempFileName = Replace$(ProductionRun.File_Name, gRnrBaseFilePath, gRnrDebugFilePath, 1, -1, vbTextCompare)
+        Call CopyFiles(ProductionRun.File_Name, strTempFileName)
+        ProductionRun.File_Name = strTempFileName
+        ProductionRun.SaveProdRun
+        Call UpdateCodingFilePath(gCodingFileId, ProductionRun.Production_Run_Id, strTempFileName, 0)
+    Else
+       ProductionRun.SaveProdRun
+    End If
     
+       
     If ProductionRun.Prod_Run_Updated Then
         If (Not (Determine_If_PDR_HasRun And (Not booNewProdRun))) Or booReplacement Then
             Call DupLinksSpecInstructions
@@ -3203,7 +3296,7 @@ Private Function ValidScreen() As Boolean
 Cleanup_Exit:
     Exit Function
 Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Cleanup_Exit
 End Function
 
@@ -3261,7 +3354,7 @@ Private Function CheckExistingSample(Optional ByRef intClientSamplesNotShipping 
 Cleanup_Exit:
     Exit Function
 Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Cleanup_Exit
 End Function
 
@@ -3326,7 +3419,7 @@ Flag_Dirty:
 Cleanup_Exit:
     Exit Sub
 Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Cleanup_Exit
 End Sub
 
@@ -3507,7 +3600,7 @@ Private Function UpdateCompletelyShippedFlag(lngJobLogId As Long) As Boolean
 Cleanup_Exit:
     Exit Function
 Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Cleanup_Exit
 End Function
 
@@ -3573,25 +3666,25 @@ Private Sub CollectionToFileCTK(strDestination As String)
 '
 On Error GoTo Error_this_Sub
   
-   Dim strFilename As String
+   Dim strFileName As String
    
     'checks to see if the "smp" directory exists
     If Not FileExists(strDestination) Then
-         strFilename = GetFilePath(ProductionRun.File_Name)
-         strFilename = GetFilePath(strFilename) & "\smp\"
-         If Not DirExists(strFilename) Then
+         strFileName = GetFilePath(ProductionRun.File_Name)
+         strFileName = GetFilePath(strFileName) & "\smp\"
+         If Not DirExists(strFileName) Then
             'creates the smp directory if it doesn't
-             MkDir (strFilename)
+             MkDir (strFileName)
          End If
-             strFilename = strFilename & Trim$(ProductionRun.Barcode_Id) & "_1.smp"
-             mSampleFileName = strFilename
+             strFileName = strFileName & Trim$(ProductionRun.Barcode_Id) & "_1.smp"
+             mSampleFileName = strFileName
     Else
-             strFilename = strDestination
+             strFileName = strDestination
              mSampleFileName = strDestination
     End If
             
     'calls the function to write the collection to a file
-    Call WriteFile(mData, "CTK", Trim$(strFilename))
+    Call WriteFile(mData, "CTK", Trim$(strFileName))
                  
 Exit_this_Sub:
     Exit Sub
@@ -3794,18 +3887,18 @@ Private Function Determine_ReplacementSample_Path(typecount As Long) As String
 
 On Error GoTo Error_this_Sub
   
-   Dim strFilename As String
+   Dim strFileName As String
 
    Determine_ReplacementSample_Path = ""
       
-   strFilename = GetFilePath(ProductionRun.File_Name)
-   strFilename = GetFilePath(strFilename) & "\smp\"
-   If Not DirExists(strFilename) Then
+   strFileName = GetFilePath(ProductionRun.File_Name)
+   strFileName = GetFilePath(strFileName) & "\smp\"
+   If Not DirExists(strFileName) Then
        'creates the smp directory if it doesn't
-     MkDir (strFilename)
+     MkDir (strFileName)
    End If
-   strFilename = strFilename & Trim$(ProductionRun.Barcode_Id) & "_" & typecount & ".smp"
-   Determine_ReplacementSample_Path = strFilename
+   strFileName = strFileName & Trim$(ProductionRun.Barcode_Id) & "_" & typecount & ".smp"
+   Determine_ReplacementSample_Path = strFileName
               
 Exit_this_Sub:
     Exit Function
@@ -4078,13 +4171,13 @@ On Error GoTo Handle_Error
     End With
     
    
-exit_function:
+Exit_Function:
     Exit Function
 
 Handle_Error:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "checkForAssociatedDigitalOverageOrder", vbExclamation
-    Resume exit_function
+    Resume Exit_Function
 
 End Function
 
@@ -4124,13 +4217,13 @@ On Error GoTo Handle_Error
     
     Get_SampleQTY = QtyTotal
 
-exit_function:
+Exit_Function:
     Exit Function
 
 Handle_Error:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Get_SampleQTY", vbExclamation
-    Resume exit_function
+    Resume Exit_Function
     
 End Function
 
@@ -4182,7 +4275,7 @@ Private Sub DupLinksSpecInstructions()
 Cleanup_Exit:
     Exit Sub
 Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Cleanup_Exit
 End Sub
 
@@ -4330,7 +4423,7 @@ Exit_Sub:
     Exit Sub
     
 Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Exit_Sub
     
 End Sub

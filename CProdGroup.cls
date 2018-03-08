@@ -18,7 +18,6 @@ Attribute VB_Exposed = True
 
 Option Explicit
 
-'Private madoData As nADOData.CADOData
 Private mvarProduction_Group_Id As Long
 Private mvarJob_Log_Id As Long
 Private mvarRandomization_Id As Long
@@ -45,6 +44,54 @@ Private mvarScratch_Stock_Desc As String
 Private mvarClintrak_Location_Id As Long
 Private mvarOnsertPressDie As String
 Private mvarDigitalLabelParts As String
+Private mvarPRGReorient As Long
+Private mvarPRGShippingSame As Long
+Private mvarOverLaminate As String
+Private mvarOverLaminateDescription As String
+Private mvarPdrShipSeedValue As Long
+Private mvarTotalPDRsCount As Long
+
+Public Property Let TotalPDRsCount(ByVal vdata As Long)
+    mvarTotalPDRsCount = vdata
+End Property
+Public Property Get TotalPDRsCount() As Long
+    TotalPDRsCount = mvarTotalPDRsCount
+End Property
+
+Public Property Let ShipSeedVal(ByVal vdata As Long)
+    mvarPdrShipSeedValue = vdata
+End Property
+Public Property Get ShipSeedVal() As Long
+    ShipSeedVal = mvarPdrShipSeedValue
+End Property
+
+Public Property Let OverLaminate(ByVal vdata As String)
+    mvarOverLaminate = vdata
+End Property
+Public Property Get OverLaminate() As String
+    OverLaminate = mvarOverLaminate
+End Property
+
+Public Property Let OverLaminateDesc(ByVal vdata As String)
+    mvarOverLaminateDescription = vdata
+End Property
+Public Property Get OverLaminateDesc() As String
+    OverLaminateDesc = mvarOverLaminateDescription
+End Property
+
+Public Property Let PrgReorientInd(ByVal vdata As Long)
+    mvarPRGReorient = vdata
+End Property
+Public Property Get PrgReorientInd() As Long
+    PrgReorientInd = mvarPRGReorient
+End Property
+
+Public Property Let PrgShippingInd(ByVal vdata As Long)
+    mvarPRGShippingSame = vdata
+End Property
+Public Property Get PrgShippingInd() As Long
+    PrgShippingInd = mvarPRGShippingSame
+End Property
 
 Public Property Let Scratch_Stock_Desc(ByVal vdata As String)
     mvarScratch_Stock_Desc = vdata
@@ -240,13 +287,17 @@ Public Sub LookupRecord()
                 mvarScratch_Stock = .Recordset!Scratch_Stock
                 mvarClintrak_Location_Id = .Recordset!Clintrak_Location_Id
                 mvarOnsertPressDie = .Recordset!Onsert_Press_Die
+                mvarOverLaminate = IIf(IsNull(.Recordset!OverLaminate), "N/A", .Recordset!OverLaminate)
+                mvarOverLaminateDescription = IIf(IsNull(.Recordset!OverLaminateDescription), "", .Recordset!OverLaminateDescription)
+                mvarPdrShipSeedValue = .Recordset!ShipToId
+                mvarTotalPDRsCount = IIf(IsNull(.Recordset!TotalPDRsCount), 0, .Recordset!TotalPDRsCount)
                 mvarDigitalLabelParts = _
                     .Recordset!BK1_Identification & _
                     IIf(.Recordset!BK2_Identification <> "", ", ", "") & .Recordset!BK2_Identification & _
                     IIf(.Recordset!BP_Identification <> "", ", ", "") & .Recordset!BP_Identification
                 .Recordset.MoveNext
             Loop
-            '
+            
             .Recordset.Close
 
             If Trim$(mvarScratch_Stock) <> "N/A" Then
@@ -443,11 +494,12 @@ Error_this_Sub:
 End Sub
 
 Public Function CheckIfPRGOfReplacements(Prgbarcode As String) As Boolean
+    On Error GoTo Error_this_Sub
+    
     Dim lngPRGId As Long
     Dim lngOrigPDRId As Long
     Dim objData As nADOData.CADOData
     
-    On Error GoTo Error_this_Sub
     
     CheckIfPRGOfReplacements = False
     lngPRGId = 0
@@ -463,7 +515,7 @@ Public Function CheckIfPRGOfReplacements(Prgbarcode As String) As Boolean
 
         .ResetParameters
     
-        .AddParameter "label Id", Prgbarcode, adVarChar, adParamInput
+        .AddParameter "PRG Barcode", Prgbarcode, adVarChar, adParamInput
             ' Call the SP to create the recordset
         .OpenRecordSetFromSP "get_ProductionGroup_by_PRGBarcode"
             
@@ -545,6 +597,71 @@ Exit_this_Sub:
 Error_this_Sub:
     MsgBox "Error: " & Err.Number & " " & Err.description, vbCritical, _
     "Error Occurred Finding PRG Scratch Stock Desc."
+    Resume Exit_this_Sub
+
+End Sub
+
+Public Sub GetPRGReorient()
+    Dim objData As nADOData.CADOData
+    On Error GoTo Error_this_Sub
+            
+    Set objData = New CADOData
+    With objData
+        Set .Connection = GetDBConnection
+        .CursorType = adOpenForwardOnly
+        .CommandType = adCmdStoredProc
+        .LockType = adLockReadOnly
+
+        .ResetParameters
+    
+        .AddParameter "productionGroupId", mvarProduction_Group_Id, adInteger, adParamInput
+        .OpenRecordSetFromSP "get_PRG_Reorient_Value"
+            
+        If Not .Recordset.EOF Then
+            mvarPRGReorient = .Recordset!ReorientInd
+
+            .Recordset.Close
+        End If
+    End With
+
+Exit_this_Sub:
+    Exit Sub
+    
+Error_this_Sub:
+    MsgBox "Error: " & Err.Number & " " & Err.description, vbCritical, _
+    "Error Occurred in GetPrgReorient()"
+    Resume Exit_this_Sub
+
+End Sub
+
+Public Sub GetPRGSameShipping()
+    Dim objData As nADOData.CADOData
+    On Error GoTo Error_this_Sub
+            
+    Set objData = New CADOData
+    With objData
+        Set .Connection = GetDBConnection
+        .CursorType = adOpenForwardOnly
+        .CommandType = adCmdStoredProc
+        .LockType = adLockReadOnly
+        .ResetParameters
+        
+        .AddParameter "productionGroupId", mvarProduction_Group_Id, adInteger, adParamInput
+        .OpenRecordSetFromSP "get_PRG_Has_Same_Shipping_Addresses"
+            
+        If Not .Recordset.EOF Then
+            mvarPRGShippingSame = .Recordset!ShippingDifferences
+            .Recordset.Close
+        End If
+    
+    End With
+
+Exit_this_Sub:
+    Exit Sub
+    
+Error_this_Sub:
+    MsgBox "Error: " & Err.Number & " " & Err.description, vbCritical, _
+    "Error Occurred in GetPrgSameShipping()"
     Resume Exit_this_Sub
 
 End Sub

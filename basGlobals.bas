@@ -48,6 +48,11 @@ Public gSampleTypeId As Long
 Public writeData As String
 Public gSampleFlag As Boolean
 Public gLinksSpecInstr As String
+Public gDebugMode As String
+Public gRnrDebugFilePath As String
+Public gRnrBaseFilePath As String
+Public gCodingFileId As Long
+Public gIsPRGRun As Boolean
 
 'declare global objects
 Public ProductionRun As CProdrun
@@ -158,6 +163,7 @@ Public Sub getFileLinksInfo()
                 gGroupName = .Recordset!Group_Name
                 gClientGroupName = .Recordset!Client_Group_Name
                 gCodingRepeatCnt = .Recordset!Repeat_Count
+                gCodingFileId = .Recordset!Coding_File_Id
                 .Recordset.MoveNext
             Loop
         End If
@@ -208,6 +214,7 @@ Public Sub getReplacementFileLinksInfo()
                 gGroupNumber = .Recordset!Group_Number
                 gGroupName = .Recordset!Group_Name
                 gClientGroupName = .Recordset!Client_Group_Name
+                gCodingFileId = .Recordset!Coding_File_Id
                 .Recordset.MoveNext
             Loop
         End If
@@ -1276,7 +1283,7 @@ Dim i As Long
 Dim j As Long
 Dim k As Long
 Dim deleteCount As Long
-Dim strFilename As String
+Dim strFileName As String
 Dim dupcount As Long
 Dim smpCount As Long
 
@@ -1312,14 +1319,14 @@ deleteCount = sdata.count
                     Call mData.Add(vdata, k, sdata.Item(j).sampleType)
                 Next k
             End If
-            strFilename = GetFilePath(sdata.Item(j).smpfileName)
-            strFilename = strFilename & "\" & createFileName(dData.Item(i).productionId) & "_" & sdata.Item(j).typeNumber & ".smp"
+            strFileName = GetFilePath(sdata.Item(j).smpfileName)
+            strFileName = strFileName & "\" & createFileName(dData.Item(i).productionId) & "_" & sdata.Item(j).typeNumber & ".smp"
             'writes the data to file
             'md change pass parms on call to file
             'get the description from lookup table to be used in the creation of the file
-             Call WriteFile(mData, GetLookupDesc(sdata.Item(j).sampleType), strFilename)
+             Call WriteFile(mData, GetLookupDesc(sdata.Item(j).sampleType), strFileName)
              sdata.Add dData.Item(i).productionId, sdata.Item(j).typeNumber, sdata.Item(j).sampleType, _
-             sdata.Item(j).shipTo, sdata.Item(j).quantity, sdata.Item(j).smpDescription, strFilename, sdata.Item(j).notes, sdata.Item(j).sample_type_id
+             sdata.Item(j).shipTo, sdata.Item(j).quantity, sdata.Item(j).smpDescription, strFileName, sdata.Item(j).notes, sdata.Item(j).sample_type_id
         Next j
     Next i
 
@@ -1439,9 +1446,10 @@ Dim nreturn As Long
                 .Connection.RollbackTrans
                 Exit Sub
             End If
+        
         End With
     Next i
-
+ 
 Exit_this_Sub:
     Exit Sub
 
@@ -1733,7 +1741,7 @@ Private Function CheckDupSmplRecCounts(sdata As CCOLsmpFiles, dData As CCOLdupFi
     'check for the existance of any CLINTRAK samples. if clintrak samples move on
     'to compare the counts otherwise, exit
     If Not CheckForClintrakSmpl(sdata) Then
-        GoTo exit_function
+        GoTo Exit_Function
     End If
 
     'call to get the record counts for comparison since there are Clintrak samples
@@ -1741,13 +1749,13 @@ Private Function CheckDupSmplRecCounts(sdata As CCOLsmpFiles, dData As CCOLdupFi
         CheckDupSmplRecCounts = True
     End If
 
-exit_function:
+Exit_Function:
     Exit Function
         
 error_function:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Error Checking for Duplicate Sample Counts"
-    Resume exit_function
+    Resume Exit_Function
 
 End Function
 
@@ -1771,13 +1779,13 @@ Private Function CheckForClintrakSmpl(sdata As CCOLsmpFiles) As Boolean
         End If
     Next i
     
-exit_function:
+Exit_Function:
     Exit Function
         
 error_function:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Error Checking for Clintrak Samples"
-    Resume exit_function
+    Resume Exit_Function
 
 End Function
 
@@ -1913,7 +1921,7 @@ Error_this_Sub:
 
 End Function
 
-Public Sub LoadClientLabelFields(ClientID As Long, ProductionRunId As Long)
+Public Sub LoadClientLabelFields(ClientID As Long, productionRunId As Long)
     Dim oValue As CClientReqdField
     
     On Error GoTo Error_this_Sub
@@ -1939,7 +1947,7 @@ Public Sub LoadClientLabelFields(ClientID As Long, ProductionRunId As Long)
         .ResetParameters
             
         .AddParameter "Client Id", ClientID, adInteger, adParamInput
-        .AddParameter "Production Run Id", ProductionRunId, adInteger, adParamInput
+        .AddParameter "Production Run Id", productionRunId, adInteger, adParamInput
         .OpenRecordSetFromSP "get_PDR_ClientRequired_FieldsValues"
         
         If Not .Recordset.EOF Then
@@ -1961,7 +1969,7 @@ Exit_this_Sub:
     Exit Sub
     
 Error_this_Sub:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Exit_this_Sub
     
 End Sub
@@ -2016,7 +2024,7 @@ Dim i As Long
 Dim j As Long
 Dim k As Long
 Dim deleteCount As Long
-Dim strFilename As String
+Dim strFileName As String
 Dim dupcount As Long
 Dim smpCount As Long
 Dim strCodingData As String
@@ -2084,14 +2092,14 @@ deleteCount = sdata.count
 '
 
             End If
-            strFilename = GetFilePath(sdata.Item(j).smpfileName)
-            strFilename = strFilename & "\" & createFileName(dData.Item(i).productionId) & "_" & sdata.Item(j).typeNumber & ".smp"
+            strFileName = GetFilePath(sdata.Item(j).smpfileName)
+            strFileName = strFileName & "\" & createFileName(dData.Item(i).productionId) & "_" & sdata.Item(j).typeNumber & ".smp"
             'writes the data to file
             'md change pass parms on call to file
             'get the description from lookup table to be used in the creation of the file
-             Call WriteFile(mData, GetLookupDesc(sdata.Item(j).sampleType), strFilename)
+             Call WriteFile(mData, GetLookupDesc(sdata.Item(j).sampleType), strFileName)
              sdata.Add dData.Item(i).productionId, sdata.Item(j).typeNumber, sdata.Item(j).sampleType, _
-             sdata.Item(j).shipTo, sdata.Item(j).quantity, sdata.Item(j).smpDescription, strFilename, sdata.Item(j).notes, sdata.Item(j).sample_type_id
+             sdata.Item(j).shipTo, sdata.Item(j).quantity, sdata.Item(j).smpDescription, strFileName, sdata.Item(j).notes, sdata.Item(j).sample_type_id
         Next j
     Next i
 
@@ -2213,7 +2221,7 @@ Error_this_Sub:
 
 End Function
 
-Public Sub LoadBarcodeInfo(ProductionRunId As Long)
+Public Sub LoadBarcodeInfo(productionRunId As Long)
     Dim oValue As CBarcodeInfo
     
     On Error GoTo Error_this_Sub
@@ -2238,7 +2246,7 @@ Public Sub LoadBarcodeInfo(ProductionRunId As Long)
 
         .ResetParameters
             
-        .AddParameter "Production Run Id", ProductionRunId, adInteger, adParamInput
+        .AddParameter "Production Run Id", productionRunId, adInteger, adParamInput
         .OpenRecordSetFromSP "get_Rand_Coding_Data_Barcodes_By_ProdRunId"
         
         If Not .Recordset.EOF Then
@@ -2260,7 +2268,7 @@ Exit_this_Sub:
     Exit Sub
     
 Error_this_Sub:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Exit_this_Sub
     
 End Sub
@@ -2395,7 +2403,7 @@ Connection_Test_Failed:
     gadoConnection.Connection.Open
     Resume Cleanup_Exit
 Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Cleanup_Exit
 End Function
 
@@ -2437,7 +2445,7 @@ Cleanup_Exit:
     Set objData = Nothing
     Exit Sub
 Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Cleanup_Exit
 End Sub
 
@@ -2465,7 +2473,7 @@ Public Function GetNumberLinesInFile(fileName As String) As Long
 Cleanup_Exit:
     Exit Function
 Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Cleanup_Exit
 
 End Function
@@ -2557,7 +2565,7 @@ Cleanup_Exit:
     Exit Sub
     
 Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description
+    Err.Raise Err.Number, Err.source, Err.description
     Resume Cleanup_Exit
 End Sub
 
@@ -2661,3 +2669,259 @@ Public Sub EnsureNonBillableReasonsLoaded()
         Set nonBillableReasonList = GetNonBillableReasonsHelper
     End If
 End Sub
+
+
+Public Function DirectoryExistsWithFiles(ByVal source As String) As Boolean
+    On Error GoTo errHandler
+    
+    Dim objfso, objFolder
+    Set objfso = CreateObject("Scripting.FileSystemObject")
+    Set objFolder = objfso.GetFolder(source)
+    
+    If objFolder.Files.count > 0 Then
+        DirectoryExistsWithFiles = True
+    Else
+    
+        DirectoryExistsWithFiles = False
+    
+    End If
+Exit_Function:
+    
+    Set objfso = Nothing
+    Set objFolder = Nothing
+    
+    Exit Function
+
+errHandler:
+    MsgBox "Error in DirectoryExistsWithFiles()" & vbCrLf & Err.description, vbCritical
+    GoTo Exit_Function
+End Function
+
+
+Public Sub CopyFiles(ByVal source As String, ByVal destination As String)
+    On Error GoTo errHandler
+    
+    Dim objfso, objFile
+    Dim strPath As String
+    Set objfso = CreateObject("Scripting.FileSystemObject")
+    strPath = destination
+    
+    If Right$(strPath, 1) <> "\" Then
+         strPath = GetFilePath(strPath)
+    End If
+    
+    
+    With objfso
+        If Not .FolderExists(strPath) Then
+            MakeDirectoryStructure (strPath)
+        End If
+    End With
+ 
+    With objfso
+    
+    If .FileExists(destination) Then
+        
+        Set objFile = objfso.GetFile(destination)
+        
+        If (objFile.Attributes And 1) = 1 Then
+            objFile.Attributes = objFile.Attributes - 1
+        End If
+        
+    End If
+        .CopyFile source, destination
+    End With
+ 
+Exit_Sub:
+    Set objfso = Nothing
+    Set objFile = Nothing
+    Exit Sub
+errHandler:
+    MsgBox "Error in CopyFiles()" & vbCrLf & Err.description, vbCritical
+    GoTo Exit_Sub
+End Sub
+
+Public Sub MakeDirectoryStructure(ByVal dirPath As String)
+    On Error GoTo errHandler
+    
+    Dim strTemp As String
+
+    If Right$(dirPath, 1) = "/" Then
+        strTemp = Left$(dirPath, Len(dirPath) - 1)
+    Else
+        strTemp = dirPath
+    End If
+    If Dir(dirPath, vbDirectory) <> "" Then
+        ' Already exists.'
+    Else
+        'We have to create it'
+        On Error Resume Next
+        MkDir dirPath
+        If Err > 0 Then
+        ' Create parent subdirectory first.'
+            Err.Clear
+            'New path'
+            strTemp = GetFilePath(dirPath)
+            'Recurse'
+            MakeDirectoryStructure strTemp
+        End If
+        MkDir dirPath
+    End If
+Exit_Sub:
+    Exit Sub
+errHandler:
+    MsgBox "Error in MakeDirectoryStructure()" & vbCrLf & Err.description, vbCritical
+    GoTo Exit_Sub
+End Sub
+
+Public Sub UpdateCodingFilePath(ByVal fileIdentifier As Long, ByVal productionRunId As Long, ByVal newFilePath As String, ByVal isReplacement As Integer)
+On Error GoTo errHandler
+
+    If Not madoData Is Nothing Then
+        Set madoData = Nothing
+    End If
+
+    Set madoData = New CADOData
+
+    With madoData
+        Set .Connection = GetDBConnection
+    End With
+
+    With madoData
+        .CursorType = adOpenForwardOnly
+        .CommandType = adCmdStoredProc
+        .LockType = adLockReadOnly
+
+        .ResetParameters
+
+        .AddParameter "fileId", fileIdentifier, adInteger, adParamInput
+        .AddParameter "productionRunId", productionRunId, adInteger, adParamInput
+        .AddParameter "codingFilePath", newFilePath, adVarChar, adParamInput
+        .AddParameter "replacement", isReplacement, adInteger, adParamInput '1 = replacement 0 = not a replacement
+        
+        .ExecuteSP "update_Rand_CodingFile_Links", True
+
+    End With
+
+Exit_Sub:
+
+    Set madoData = Nothing
+    Exit Sub
+errHandler:
+    MsgBox "Error in UpdateCodingFilePath()" & vbCrLf & Err.description, vbCritical
+    Resume Exit_Sub
+End Sub
+
+Public Sub UpdateSampleFilePath(ByVal productionRunId As Long, ByVal oldFilePath As String, ByVal newFilePath As String)
+On Error GoTo errHandler
+
+    If Not madoData Is Nothing Then
+        Set madoData = Nothing
+    End If
+
+    Set madoData = New CADOData
+
+    With madoData
+        Set .Connection = GetDBConnection
+    End With
+
+    With madoData
+        .CursorType = adOpenForwardOnly
+        .CommandType = adCmdStoredProc
+        .LockType = adLockReadOnly
+
+        .ResetParameters
+
+        .AddParameter "productionRunId", productionRunId, adInteger, adParamInput
+        .AddParameter "sampleFilePath", oldFilePath, adVarChar, adParamInput
+        .AddParameter "newSampleFilePath", newFilePath, adVarChar, adParamInput
+        .ExecuteSP "update_Rand_SampleFile_Links", True
+
+    End With
+
+Exit_Sub:
+
+    Set madoData = Nothing
+    Exit Sub
+errHandler:
+    MsgBox "Error in UpdateSampleFilePath()" & vbCrLf & Err.description, vbCritical
+    Resume Exit_Sub
+End Sub
+
+
+Public Sub CopySampleFiles(ByVal source As String, ByVal destination As String, ByVal barCode As String)
+        On Error GoTo errHandler
+        
+        Dim objfso
+        Set objfso = CreateObject("Scripting.FileSystemObject")
+        Dim strFile As String
+        
+        If Right$(destination, 1) <> "\" Then destination = destination & "\"
+        If Right$(source, 1) <> "\" Then source = source & "\"
+        
+        strFile = Dir(source & "*.*")
+        
+        Do While Len(strFile)
+            With objfso
+        
+             If InStr(1, strFile, barCode, vbTextCompare) > 0 Then
+                
+                If Not .FolderExists(destination) Then
+                    .CreateFolder (destination)
+                End If
+                
+                .CopyFile source & strFile, destination & strFile
+                Call UpdateSampleFilePath(ProductionRun.Production_Run_Id, source & strFile, destination & strFile)
+             End If
+                
+            End With
+            
+            strFile = Dir
+            
+        Loop
+        
+Exit_Sub:
+        Set objfso = Nothing
+        Exit Sub
+errHandler:
+        MsgBox "Error in CopySampleFiles() " & vbCrLf & Err.description, vbCritical
+        Resume Exit_Sub
+End Sub
+
+Public Function GetDuplicateFileLinksInfo(ByVal pdrId As Long) As Long
+On Error GoTo errHandler
+
+    If Not madoData Is Nothing Then
+        Set madoData = Nothing
+    End If
+
+    Set madoData = New CADOData
+
+    With madoData
+        Set .Connection = GetDBConnection
+    End With
+
+    With madoData
+        .CursorType = adOpenForwardOnly
+        .CommandType = adCmdStoredProc
+        .LockType = adLockReadOnly
+
+        .ResetParameters
+
+        .AddParameter "productionRunId", pdrId, adInteger, adParamInput
+        .OpenRecordSetFromSP "get_RandCodingLinkId_By_Pdr"
+        
+        If Not .Recordset.EOF Then
+            GetDuplicateFileLinksInfo = .Recordset!Coding_File_Id
+            .Recordset.Close
+        End If
+    End With
+
+Exit_Function:
+
+    Set madoData = Nothing
+    Exit Function
+errHandler:
+    MsgBox "Error in GetDuplicateFileLinksInfo()" & vbCrLf & Err.description, vbCritical
+    Resume Exit_Function
+    
+End Function

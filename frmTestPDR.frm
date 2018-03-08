@@ -31,7 +31,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   1080
          TabIndex        =   13
-         Text            =   "PDR247289"
+         Text            =   "PDR278149"
          Top             =   240
          Width           =   1455
       End
@@ -193,9 +193,9 @@ Private Sub cmdOpenRepReport_Click()
         End If
         reprpt.PrintAll_ProdPlanning_Forms Me.txtRunBarcode.Text, True
         On Error Resume Next
-        Shell "del C:\Users\LombarR\Documents\yo.pdf"
+        Shell "del C:\yo.pdf"
         On Error GoTo 0
-        reprpt.SaveToFile "C:\Users\LombarR\Documents\yo.pdf"
+        reprpt.SaveToFile "C:\yo.pdf"
         Set reprpt = Nothing
     Else
         Set reprpt = Nothing
@@ -206,16 +206,7 @@ Private Sub Form_Load()
     Me.txtToken.Text = Command$
 End Sub
 
-Private Function Authenticate(ByVal Username As String, ByVal Password As String, ByVal Domain As String) As Boolean
-    Set mvarUser = New ApplicationUser
-    With mvarUser
-        If .Authenticate(Username, Password, Domain, AuthenticationPurpose.Login, Me.txtServer.Text, Me.txtDatabase.Text, "LabelProof") Then 'Application.ProductName
-            Authenticate = True
-        Else
-            Authenticate = False
-        End If
-    End With
-End Function
+
 
 Private Sub cmdOpenPDRWindow_Click()
     Dim pdr As ProductionRuns.ProdRunMain

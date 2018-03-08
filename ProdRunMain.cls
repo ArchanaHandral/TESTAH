@@ -49,6 +49,7 @@ Public Function Initialize(Username As String, Token As String, Server As String
     
 End Function
 
+
 Public Sub Load_Prod_Run(FileLinksId As Long, _
                             CodingNumber As Long, _
                             JobId As Long)
@@ -96,7 +97,7 @@ exit_function:
 
 Handle_Error:
     'Log errors and pass back to calling procedure
-    Err.Raise Err.Number, Err.Source & "->SaveToFile()", Err.description
+    Err.Raise Err.Number, Err.source & "->SaveToFile()", Err.description
     SaveToFile = False
     GoTo exit_function
     
@@ -153,6 +154,7 @@ Public Sub PrintAll_ProdPlanning_Forms(barCode As String, booPDF As Boolean)
         If PlanningList.count > 0 Then
             For i = 1 To PlanningList.count
                  Set rptProdPlan = New ARProdPlan
+                 gIsPRGRun = False
                  gFileLinksId = PlanningList.Item(i).File_Links_ID
                  gCodingNumber = PlanningList.Item(i).Coding_Number
                  gJob_Id = PlanningList.Item(i).Job_Log_Id
@@ -300,7 +302,7 @@ End Sub
 Public Sub Print_PRGPlanning_Form(barCode As String, booPDF As Boolean)
     On Error GoTo Handle_Error
 
-    Dim rptPRGProdPlan As New ARPRGProdPlan
+    Dim rptPrgProdPlan As New ARProdPlan
     Dim n As Long
 
     Set ProductionRun = New CProdrun
@@ -308,20 +310,21 @@ Public Sub Print_PRGPlanning_Form(barCode As String, booPDF As Boolean)
     Set Planning = New CPlanningMethods
     Set PlanningList = New CColPlanningInfo
     
+    gIsPRGRun = True
+    
     If ProductionGroup.CheckIfPRGOfReplacements(barCode) = True Then
         booReplacement = True
         gReprintFile_Type = "REPLACEMENT"
     Else
         booReplacement = False
     End If
-    
-    'md 2006-020
+  
     Planning.CountPDR_Reorient_Ind (barCode)
     
     If booReplacement = False Then
         Planning.Gather_PDR_Requirements (barCode)
         If PlanningList.count > 0 Then
-            Set rptPRGProdPlan = New ARPRGProdPlan
+            Set rptPrgProdPlan = New ARProdPlan
             gJob_Id = PlanningList.Item(1).Job_Log_Id
              'loads the job info for the report
             Call GetJobInformation
@@ -335,22 +338,25 @@ Public Sub Print_PRGPlanning_Form(barCode As String, booPDF As Boolean)
             ProductionGroup.GetPRGLabelDesc
             ProductionGroup.GetPRGStockInfo
             ProductionGroup.GetPRGStockDesc
+            ProductionGroup.GetPRGSameShipping
+            ProductionGroup.GetPRGReorient
             
             gRandomizationId = ProductionGroup.Randomization_Id
             Call GetRandIDNumber
         
             If booPDF = True Then
-                rptPRGProdPlan.Printer.Orientation = ddOLandscape
-                rptPRGProdPlan.Run                                 'Activates the Active Reports
-                For n = 0 To rptPRGProdPlan.Pages.count - 1
-                    rpt.Pages.Insert Counter, rptPRGProdPlan.Pages(n)
+                rptPrgProdPlan.Printer.Orientation = ddOLandscape
+                rptPrgProdPlan.Run                                 'Activates the Active Reports
+                For n = 0 To rptPrgProdPlan.Pages.count - 1
+                    rpt.Pages.Insert Counter, rptPrgProdPlan.Pages(n)
                     Counter = Counter + 1
                 Next n
             Else
-                rptPRGProdPlan.Printer.Orientation = ddOLandscape
-                Call rptPRGProdPlan.PrintReport(False)
-                Set rptPRGProdPlan = Nothing
+                rptPrgProdPlan.Printer.Orientation = ddOLandscape
+                Call rptPrgProdPlan.PrintReport(False)
+                Set rptPrgProdPlan = Nothing
             End If
+
             
         Else
             MsgBox "Error Processing this Production Record! Contact IT!", vbCritical, _
@@ -361,7 +367,7 @@ Public Sub Print_PRGPlanning_Form(barCode As String, booPDF As Boolean)
     Else
         Planning.GatherPRGReplacementPDRRequirements (barCode)
         If PlanningList.count > 0 Then
-            Set rptPRGProdPlan = New ARPRGProdPlan
+            Set rptPrgProdPlan = New ARProdPlan
             gJob_Id = PlanningList.Item(1).Job_Log_Id
              'loads the job info for the report
             Call GetJobInformation
@@ -375,21 +381,23 @@ Public Sub Print_PRGPlanning_Form(barCode As String, booPDF As Boolean)
             ProductionGroup.GetPRGLabelDesc
             ProductionGroup.GetPRGStockInfo
             ProductionGroup.GetPRGStockDesc
-            
+            ProductionGroup.GetPRGSameShipping
+            ProductionGroup.GetPRGReorient
+
             gRandomizationId = ProductionGroup.Randomization_Id
             Call GetRandIDNumber
 
             If booPDF = True Then
-                rptPRGProdPlan.Printer.Orientation = ddOLandscape
-                rptPRGProdPlan.Run                                 'Activates the Active Reports
-                For n = 0 To rptPRGProdPlan.Pages.count - 1
-                    rpt.Pages.Insert Counter, rptPRGProdPlan.Pages(n)
+                rptPrgProdPlan.Printer.Orientation = ddOLandscape
+                rptPrgProdPlan.Run                                 'Activates the Active Reports
+                For n = 0 To rptPrgProdPlan.Pages.count - 1
+                    rpt.Pages.Insert Counter, rptPrgProdPlan.Pages(n)
                     Counter = Counter + 1
                 Next n
             Else
-                rptPRGProdPlan.Printer.Orientation = ddOLandscape
-                Call rptPRGProdPlan.PrintReport(False)
-                Set rptPRGProdPlan = Nothing
+                rptPrgProdPlan.Printer.Orientation = ddOLandscape
+                Call rptPrgProdPlan.PrintReport(False)
+                Set rptPrgProdPlan = Nothing
             End If
             
         Else
@@ -412,5 +420,6 @@ End Sub
 
 Public Sub CreateMultiReport()
     Set rpt = New ARProdPlan
+    gIsPRGRun = False
 End Sub
 
