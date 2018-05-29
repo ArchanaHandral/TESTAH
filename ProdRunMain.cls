@@ -92,14 +92,14 @@ Public Function SaveToFile(Path As String) As Boolean
     Report.Pages.Commit
     
 
-exit_function:
+Exit_Function:
     Exit Function
 
 Handle_Error:
     'Log errors and pass back to calling procedure
     Err.Raise Err.Number, Err.source & "->SaveToFile()", Err.description
     SaveToFile = False
-    GoTo exit_function
+    GoTo Exit_Function
     
 End Function
 
@@ -240,6 +240,7 @@ Public Sub PrintAll_ProdPlanning_Forms(barCode As String, booPDF As Boolean)
     ElseIf Mid$(UCase$(barCode), 1, 3) = "PRG" Then
         Call Planning.GatherPRGReplacementPDRRequirements(barCode)
         If PlanningList.count > 0 Then
+            gIsPRGRun = False
             For i = 1 To PlanningList.count
                 If Planning.CheckIfReplacement(PlanningList.Item(i).Form_Idectification) = True Then
                     booReplacement = True
