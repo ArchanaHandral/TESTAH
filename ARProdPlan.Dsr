@@ -132,6 +132,11 @@ Private Sub Detail_Format()
             IIf(ProductionRun.PDR_Print_Date = "1/1/1900", NOT_APPLICABLE, ProductionRun.PDR_Print_Date & " " & _
                 gClintrakLocations(CStr(ProductionRun.Clintrak_Location_Id)).Time_Zone_Display)
     
+        If ProductionRun.PDR_Print_Date <> "1/1/1900" And ProductionRun.PaperworkPrintedBy <> "" Then
+            Me.lblPrintDate = Me.lblPrintDate & " by " & ProductionRun.PaperworkPrintedBy
+        End If
+        
+    
         Me.otxtOverLaminate = ProductionRun.OverLaminate
         If Me.otxtOverLaminate = NOT_APPLICABLE Or Me.otxtOverLaminate = TBD Then
             Me.otxtOverLaminateDesc = ""
@@ -155,8 +160,8 @@ Private Sub Detail_Format()
                 End If
         End Select
         
-        If ProductionRun.Prgbarcode <> NOT_APPLICABLE Then
-            Me.otxtFormID = Me.otxtFormID & " (" & ProductionRun.Prgbarcode & ") " & ProductionRun.PRGCount & " of " & ProductionRun.TotalPDRs
+        If ProductionRun.PRGBarcode <> NOT_APPLICABLE Then
+            Me.otxtFormID = Me.otxtFormID & " (" & ProductionRun.PRGBarcode & ") " & ProductionRun.PRGCount & " of " & ProductionRun.TotalPDRs
         End If
     End If
 

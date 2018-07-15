@@ -74,7 +74,7 @@ Private mvarOverLaminateDescription As String
 Private mvarPRGBarCode As String
 Private mvarPRGCount As Long
 Private mvarTotalPDRs As Long
-
+Private mvarFormPrintedBy As String
 
 Public Function IsOnRushRequest() As Boolean
     Dim objData As nADOData.CADOData
@@ -92,6 +92,10 @@ Public Function IsOnRushRequest() As Boolean
         End If
     End With
 End Function
+
+Public Property Get PaperworkPrintedBy() As String
+    PaperworkPrintedBy = mvarFormPrintedBy
+End Property
 
 Public Property Let PRGBarcode(ByVal vdata As String)
     mvarPRGBarCode = vdata
@@ -462,6 +466,7 @@ Public Function HasUseClientInventoryAccess() As Boolean
 End Function
 
 
+
 Public Sub LookupRecord()
     Dim objData As nADOData.CADOData
     On Error GoTo Error_this_Sub
@@ -526,6 +531,7 @@ Public Sub LookupRecord()
                 mvarPRGBarCode = .Recordset!PRGBarcode
                 mvarPRGCount = IIf(IsNull(.Recordset!PRGCount), 0, .Recordset!PRGCount)
                 mvarTotalPDRs = .Recordset!PDRsInPRG
+                mvarFormPrintedBy = IIf(IsNull(.Recordset!PaperworkPrintedBy), "", .Recordset!PaperworkPrintedBy)
                 
                 mvarDigitalLabelParts = _
                     .Recordset!BK1_Identification & _
