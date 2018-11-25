@@ -100,6 +100,7 @@ Public Function Clone() As CCollIRQInfo
                 .IRQ_Details_Qty_Requested = Me.Item(i).IRQ_Details_Qty_Requested
                 .IRQ_Status = Me.Item(i).IRQ_Status
                 .IRQ_Main_Proof_Id = Me.Item(i).IRQ_Main_Proof_Id
+                .IRQToolComponentId = Me.Item(i).IRQToolComponentId
             End With
     Next i
     

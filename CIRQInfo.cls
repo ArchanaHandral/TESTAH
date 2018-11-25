@@ -27,4 +27,17 @@ Public IRQ_Details_Id As Long
 Public IRQ_Details_Qty_Requested As Long
 Public IRQ_Status As String
 Public IRQ_Main_Proof_Id As Long
+Public IRQToolComponentId As Long
 
+Public Enum IRQType
+    Label
+    RollStock
+End Enum
+
+Public Property Get IRQType() As IRQType
+    If IRQToolComponentId > 0 Then
+        IRQType = RollStock
+    Else
+        IRQType = Label
+    End If
+End Property

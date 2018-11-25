@@ -75,6 +75,9 @@ Private mvarPRGBarCode As String
 Private mvarPRGCount As Long
 Private mvarTotalPDRs As Long
 Private mvarFormPrintedBy As String
+Private mvarOnsertBaseRollStockMinWidth As Double
+Private mvarOnsertBaseRollStockComponentId As Long
+Private mvarOnsertBaseRollStockPartNumber As String
 
 Public Function IsOnRushRequest() As Boolean
     Dim objData As nADOData.CADOData
@@ -97,11 +100,11 @@ Public Property Get PaperworkPrintedBy() As String
     PaperworkPrintedBy = mvarFormPrintedBy
 End Property
 
-Public Property Let PRGBarcode(ByVal vdata As String)
+Public Property Let Prgbarcode(ByVal vdata As String)
     mvarPRGBarCode = vdata
 End Property
-Public Property Get PRGBarcode() As String
-    PRGBarcode = mvarPRGBarCode
+Public Property Get Prgbarcode() As String
+    Prgbarcode = mvarPRGBarCode
 End Property
 
 Public Property Let PRGCount(ByVal vdata As Long)
@@ -455,6 +458,30 @@ Public Property Get IsProductionRunDeleted() As Boolean
     IsProductionRunDeleted = mvarIsProductionRunDeleted
 End Property
 
+Public Property Get OnsertBaseRollStockMinimumWidth() As Double
+    OnsertBaseRollStockMinimumWidth = mvarOnsertBaseRollStockMinWidth
+End Property
+
+Public Property Let OnsertBaseRollStockMinimumWidth(value As Double)
+    mvarOnsertBaseRollStockMinWidth = value
+End Property
+
+Public Property Get OnsertBaseRollStockComponentId() As Long
+    OnsertBaseRollStockComponentId = mvarOnsertBaseRollStockComponentId
+End Property
+
+Public Property Let OnsertBaseRollStockComponentId(value As Long)
+    mvarOnsertBaseRollStockComponentId = value
+End Property
+
+Public Property Get OnsertBaseRollStockPartNumber() As String
+    OnsertBaseRollStockPartNumber = mvarOnsertBaseRollStockPartNumber
+End Property
+
+Public Property Let OnsertBaseRollStockPartNumber(value As String)
+    mvarOnsertBaseRollStockPartNumber = value
+End Property
+
 Public Sub ResetUseClientInventoryReasonDetails()
     mvarUseClientInventoryModifiedBy = 0
     mvarUseClientInventoryDate = "1/1/1900"
@@ -464,8 +491,6 @@ End Sub
 Public Function HasUseClientInventoryAccess() As Boolean
     HasUseClientInventoryAccess = gApplicationUser.HasAccess(SecurityLevels.UseClientInventoryAuthorize)
 End Function
-
-
 
 Public Sub LookupRecord()
     Dim objData As nADOData.CADOData
@@ -528,10 +553,13 @@ Public Sub LookupRecord()
                 mvarUseClientInventoryModifiedBy = .Recordset!UseClientInventoryModifiedBy
                 mvarOverLaminate = IIf(IsNull(.Recordset!OverLaminate), "N/A", .Recordset!OverLaminate)
                 mvarOverLaminateDescription = IIf(IsNull(.Recordset!OverLaminateDescription), "", .Recordset!OverLaminateDescription)
-                mvarPRGBarCode = .Recordset!PRGBarcode
+                mvarPRGBarCode = .Recordset!Prgbarcode
                 mvarPRGCount = IIf(IsNull(.Recordset!PRGCount), 0, .Recordset!PRGCount)
                 mvarTotalPDRs = .Recordset!PDRsInPRG
                 mvarFormPrintedBy = IIf(IsNull(.Recordset!PaperworkPrintedBy), "", .Recordset!PaperworkPrintedBy)
+                mvarOnsertBaseRollStockMinWidth = .Recordset!OnsertBaseRollStockMinWidth
+                mvarOnsertBaseRollStockComponentId = .Recordset!OnsertBaseRollStockComponentId
+                mvarOnsertBaseRollStockPartNumber = .Recordset!OnsertBaseRollStockPartNumber
                 
                 mvarDigitalLabelParts = _
                     .Recordset!BK1_Identification & _
@@ -620,6 +648,8 @@ Public Sub SaveProdRun()
         .AddParameter "UseClientInventoryReason", IIf(Len(mvarUseClientInventoryReason) > 0, mvarUseClientInventoryReason, "Null"), adVarChar, adParamInput
         .AddParameter "UseClientInventoryDate", mvarUseClientInventoryDate, adDate, adParamInput
         .AddParameter "UseClientInventoryModifiedBy", mvarUseClientInventoryModifiedBy, adInteger, adParamInput
+        .AddParameter "OnsertBaseRollStockComponentId", mvarOnsertBaseRollStockComponentId, adInteger, adParamInput
+        .AddParameter "OnsertBaseRollStockMinWidth", mvarOnsertBaseRollStockMinWidth, adDouble, adParamInput
         
         mvarOriginalUseClientInventoryReason = mvarUseClientInventoryReason
          
@@ -986,7 +1016,7 @@ Cleanup_Exit:
     Set objData = Nothing
     Exit Sub
 Handle_Error:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 End Sub
 
@@ -1001,3 +1031,23 @@ End Sub
 Public Function HasChanges() As Boolean
     HasChanges = (mvarUseClientInventoryReason <> mvarOriginalUseClientInventoryReason)
 End Function
+
+Public Property Get OnsertStock()
+    OnsertStock = FormatOnsertStock(mvarOnsertBaseRollStockPartNumber, mvarOnsertBaseRollStockMinWidth)
+End Property
+
+Public Static Function FormatOnsertStock(partNumber As String, minWidth As Double) As String
+    If minWidth <> 0 And partNumber = "" Then
+        FormatOnsertStock = "N/A (min. width: " & minWidth & """)"
+
+    ElseIf partNumber = "" Then
+        FormatOnsertStock = "N/A"
+
+    ElseIf minWidth = 0 And partNumber <> "" Then
+        FormatOnsertStock = partNumber & " (min. width: N/A)"
+        
+    Else
+        FormatOnsertStock = partNumber & " (min. width: " & minWidth & """)"
+    End If
+End Function
+

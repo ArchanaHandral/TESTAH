@@ -1,13 +1,13 @@
 VERSION 5.00
 Begin {9EB8768B-CDFA-44DF-8F3E-857A8405E1DB} ARProdPlan 
-   Caption         =   "Computerization Order Form"
-   ClientHeight    =   12930
+   Caption         =   "ProductionRuns - ARProdPlan (ActiveReport)"
+   ClientHeight    =   13590
    ClientLeft      =   225
    ClientTop       =   555
-   ClientWidth     =   17505
+   ClientWidth     =   17565
    StartUpPosition =   3  'Windows Default
-   _ExtentX        =   30877
-   _ExtentY        =   22807
+   _ExtentX        =   30983
+   _ExtentY        =   23971
    SectionData     =   "ARProdPlan.dsx":0000
 End
 Attribute VB_Name = "ARProdPlan"
@@ -63,6 +63,7 @@ Private Sub Detail_Format()
         Me.RunBarcode = "[" & ProductionGroup.Barcode_Id & "]"
         Me.otxtOnsertPressDie = ProductionGroup.OnsertPressDie
         Me.otxtDesc = ProductionGroup.description
+        Me.txtBaseRollStock = ProductionGroup.OnsertStock
         Me.otxtStockNo = ProductionGroup.stock
         
         Me.otxtStockDesc = ProductionGroup.Stock_Desc
@@ -104,6 +105,7 @@ Private Sub Detail_Format()
         Me.otxtStockNo = ProductionRun.stock
         Me.otxtDesc = ProductionRun.LabelDescription
         Me.otxtStockDesc = ProductionRun.Stock_Desc
+        Me.txtBaseRollStock = ProductionRun.OnsertStock
         
         If ProductionRun.DigitalLabelParts <> "" Then
             Me.otxtStockNo = Me.otxtStockNo & "  (" & ProductionRun.DigitalLabelParts & ")"
@@ -164,6 +166,10 @@ Private Sub Detail_Format()
             Me.otxtFormID = Me.otxtFormID & " (" & ProductionRun.PRGBarcode & ") " & ProductionRun.PRGCount & " of " & ProductionRun.TotalPDRs
         End If
     End If
+    
+    ' This is only seen when viewing the report from the Rand
+    ' In Job Execution, the report is embedded in the window and no title can be seen
+    Me.Caption = Me.otxtFormID & " (" & Me.otxtIDNumber & ")"
 
     
     With oRichEdit1

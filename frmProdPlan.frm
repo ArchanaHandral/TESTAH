@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{8D650141-6025-11D1-BC40-0000C042AEC0}#3.0#0"; "ssdw3b32.ocx"
 Begin VB.Form frmProdPlan 
@@ -26,7 +26,6 @@ Begin VB.Form frmProdPlan
    ScaleHeight     =   9675
    ScaleWidth      =   10650
    ShowInTaskbar   =   0   'False
-   StartUpPosition =   1  'CenterOwner
    Begin VB.Frame Frame1 
       Height          =   1080
       Left            =   120
@@ -743,6 +742,28 @@ Begin VB.Form frmProdPlan
       TabIndex        =   23
       Top             =   5640
       Width           =   5295
+      Begin VB.TextBox txtOnsertBaseRollStock 
+         BackColor       =   &H8000000F&
+         BorderStyle     =   0  'None
+         BeginProperty Font 
+            Name            =   "Tahoma"
+            Size            =   8.25
+            Charset         =   0
+            Weight          =   700
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         ForeColor       =   &H00000000&
+         Height          =   285
+         Left            =   1080
+         Locked          =   -1  'True
+         TabIndex        =   69
+         TabStop         =   0   'False
+         Text            =   "RLP12345 (min width: 1.0625)"
+         Top             =   1680
+         Width           =   4095
+      End
       Begin VB.TextBox txtOnsertDie 
          BackColor       =   &H8000000F&
          BorderStyle     =   0  'None
@@ -762,7 +783,7 @@ Begin VB.Form frmProdPlan
          TabIndex        =   52
          TabStop         =   0   'False
          Text            =   "XXXX.XXXX.XX.XXX.XXXX.XX"
-         Top             =   1680
+         Top             =   1320
          Width           =   4095
       End
       Begin VB.TextBox txtDesc 
@@ -809,6 +830,17 @@ Begin VB.Form frmProdPlan
          Top             =   240
          Width           =   1575
       End
+      Begin VB.Label lblOnsertBaseRollStock 
+         BackStyle       =   0  'Transparent
+         Caption         =   "Base Roll Stock:"
+         ForeColor       =   &H00000000&
+         Height          =   435
+         Left            =   120
+         TabIndex        =   70
+         Top             =   1560
+         Width           =   780
+         WordWrap        =   -1  'True
+      End
       Begin VB.Label lblOnsertDie 
          AutoSize        =   -1  'True
          BackStyle       =   0  'Transparent
@@ -817,7 +849,7 @@ Begin VB.Form frmProdPlan
          Height          =   270
          Left            =   120
          TabIndex        =   53
-         Top             =   1680
+         Top             =   1320
          Width           =   855
       End
       Begin VB.Label Label4 
@@ -1018,7 +1050,6 @@ Begin VB.Form frmProdPlan
       TextRTF         =   $"frmProdPlan.frx":1301
    End
    Begin MSComctlLib.StatusBar StatusBar1 
-      Align           =   2  'Align Bottom
       Height          =   285
       Left            =   0
       TabIndex        =   28
@@ -1183,6 +1214,10 @@ Private mvarOrigStockId As String
 Private mvarOrigScratchStockId As String
 Private mvarOrigOnsertDieToolId As Long
 Private mvarOrigOnsertDiePartNumber As String
+Private mvarOriginalOnsertBaseRollStockComponentId As Long
+Private mvarOriginalOnsertBaseRollStockPartNumber As String
+Private mvarOriginalOnsertBaseRollStockMinimumWidth As Double
+
 Public booSamplesDirtyFlag As Boolean
 Private mvarDebugText As String
 Private mvarDebugIcoPath As String
@@ -1374,6 +1409,7 @@ Private Sub Form_Load()
             HoldStockProofId = ProductionRun.Stock_Proof_Id
             Me.txtProducedBy = ProductionRun.Produced_By
             Me.txtScratchStockNo.text = ProductionRun.Scratch_Stock
+            Me.txtOnsertBaseRollStock = ProductionRun.OnsertStock
             HoldScratchStockProofId = ProductionRun.Scratch_Proof_Id
 
             Me.lblApplyBlindLam.Caption = BlindLamApplyCol(CStr(ProductionRun.Apply_ScratchOff))
@@ -1410,21 +1446,8 @@ Private Sub Form_Load()
                 End If
             End If
             
-            ' IRQ stuff
-            Call GetIRQInfo
-            If Not oCollIRQInfo Is Nothing Then
-                For Each oIRQInfo In oCollIRQInfo
-                    oIRQInfo.PDR_Count = GetNumberPDRsForIRQ(oIRQInfo.IRQ_Id)
-                    If oIRQInfo.IRQ_Proof_Id = ProductionRun.Stock_Proof_Id Or oIRQInfo.IRQ_Main_Proof_Id = ProductionRun.Stock_Proof_Id Then
-                        Me.txtStockIRQ = IIf(Me.txtStockIRQ = "", oIRQInfo.IRQ_Number, Me.txtStockIRQ & DPIRQDELIMITER & oIRQInfo.IRQ_Number)   ' DW 2012-001 modified
-                    Else
-                        If oIRQInfo.IRQ_Proof_Id = ProductionRun.Scratch_Proof_Id Then
-                            Me.txtScratchIRQ = oIRQInfo.IRQ_Number
-                        End If
-                    End If
-                Next
-            End If
-            '
+            Call UpdateExistingIRQList
+
         Else
             MsgBox _
                 "Production run was not found and one should exist for this Link." & vbCrLf & _
@@ -1443,6 +1466,10 @@ Private Sub Form_Load()
         ProductionRun.Proof_Id = lngProofId
         ProductionRun.Campaign_No = strGroupNum
         ProductionRun.File_Name = gCodingFileName
+        ProductionRun.OnsertBaseRollStockComponentId = gOnsertBaseRollStockComponentId
+        ProductionRun.OnsertBaseRollStockMinimumWidth = gOnsertBaseRollStockMinimumWidth
+        ProductionRun.OnsertBaseRollStockPartNumber = gOnsertBaseRollStockPartNumber
+       
         
         Me.txtStockNo.text = gStockLabelId
         ProductionRun.stock = gStockLabelId
@@ -1451,8 +1478,11 @@ Private Sub Form_Load()
         ProductionRun.Scratch_Stock = gBlindLabelId
         ProductionRun.Scratch_Proof_Id = gBlindProofId
         Me.txtOnsertDie.text = gOnsertDiePartNumber
+        Me.txtOnsertBaseRollStock = ProductionRun.OnsertStock()
+        
         ProductionRun.OnsertDiePartNumber = gOnsertDiePartNumber
         ProductionRun.OnsertDieToolId = gOnsertDieToolId
+        
         txtSamples.text = "0"
         txtSampleGroups.text = "0"
         ProductionRun.NonBillable.SetNew ProductionRun.Job_Log_Id
@@ -1587,6 +1617,9 @@ Private Sub Form_Load()
     mvarOrigBlindLamApply = 0
     mvarOrigOnsertDieToolId = 0
     mvarOrigOnsertDiePartNumber = ""
+    mvarOriginalOnsertBaseRollStockMinimumWidth = 0
+    mvarOriginalOnsertBaseRollStockComponentId = 0
+    mvarOriginalOnsertBaseRollStockPartNumber = ""
     booIRQsExist = False
     
     ' when loading an existing PDR is not on a packing slip, check if the stock/blinding
@@ -1605,8 +1638,8 @@ Private Sub Form_Load()
         ' a) Determine if the stock/blinding lam info be update
         ' b) If the stock/blinding lam can't be updated, it will give the user the reason
         '       it can't be updated to it they can to have it updated, they know where in
-        '       the process the PDR is and they can start from there to get it to a positiong
-        '       where it can be udpated.
+        '       the process the PDR is and they can start from there to get it to a position
+        '       where it can be updated.
         strReason = ""
         
 '        If InStr(txtPDRStatus.Text, "PROCESSED") > 0 And Me.txtPDRStatus.Visible = True Then
@@ -1717,6 +1750,21 @@ Private Sub Form_Load()
                         "Label Specs's Onsert die is currently " & gOnsertDiePartNumber & "." & vbCrLf & vbCrLf & _
                         "The PDR's die CANNOT be updated at this time because it " & strReason, _
                         vbOKOnly + vbInformation, "Die Difference"
+            End If
+        End If
+        
+        If (ProductionRun.OnsertBaseRollStockComponentId <> gOnsertBaseRollStockComponentId) Then
+            If basGlobals.ShowChangePromptForLabel("Onsert base roll stock", FormatEmptyStringNA(ProductionRun.OnsertBaseRollStockPartNumber), FormatEmptyStringNA(gOnsertBaseRollStockPartNumber), strReason) Then
+                ProductionRun.OnsertBaseRollStockPartNumber = gOnsertBaseRollStockPartNumber
+                ProductionRun.OnsertBaseRollStockComponentId = gOnsertBaseRollStockComponentId
+                Me.txtOnsertBaseRollStock = ProductionRun.OnsertStock
+            End If
+        End If
+        
+        If (ProductionRun.OnsertBaseRollStockMinimumWidth <> gOnsertBaseRollStockMinimumWidth) Then
+            If basGlobals.ShowChangePromptForLabel("Onsert base roll stock minimum width", FormatZeroNumberNA(ProductionRun.OnsertBaseRollStockMinimumWidth), FormatZeroNumberNA(gOnsertBaseRollStockMinimumWidth), strReason) Then
+                ProductionRun.OnsertBaseRollStockMinimumWidth = gOnsertBaseRollStockMinimumWidth
+                Me.txtOnsertBaseRollStock = ProductionRun.OnsertStock
             End If
         End If
         
@@ -2086,6 +2134,9 @@ Private Sub Form_Unload(Cancel As Integer)
     mvarOrigBlindLamApply = 0
     mvarOrigOnsertDieToolId = 0
     mvarOrigOnsertDiePartNumber = ""
+    mvarOriginalOnsertBaseRollStockMinimumWidth = 0
+    mvarOriginalOnsertBaseRollStockComponentId = 0
+    mvarOriginalOnsertBaseRollStockPartNumber = ""
     mSampleFileName = ""
     mInputFileName = ""
     booSamplesQTYChanged = False
@@ -2094,7 +2145,7 @@ End Sub
 Private Sub mnuAbout_Click()
     Dim abt As New AboutForm
     
-    abt.Initialize gApplicationUser, Me.Icon, App.Title, App.ProductName, App.Major, App.Minor, App.Revision
+    abt.Initialize gApplicationUser, Me.Icon, App.title, App.ProductName, App.Major, App.Minor, App.Revision
     abt.Show
 
 End Sub
@@ -2292,7 +2343,7 @@ Private Sub mnuReplacements_Click()
       
     Call CheckData
     
-    Dim Message, Title, Default
+    Dim Message, title, Default
     Dim txtInputSeqNum As String
     Dim booFound As Boolean
     Dim strReprintFileName As String
@@ -2301,9 +2352,9 @@ Private Sub mnuReplacements_Click()
     Dim objData As nADOData.CADOData
     
     Message = "Scan the Barcode from the Reprint Report!"
-    Title = "Reprint File"
+    title = "Reprint File"
     Default = "0"
-    txtInputSeqNum = InputBox(Message, Title, Default, 4320, 4320)
+    txtInputSeqNum = InputBox(Message, title, Default, 4320, 4320)
     If Len(txtInputSeqNum) = 0 Then
         Exit Sub
     End If
@@ -2491,7 +2542,7 @@ Private Sub mnuReplacements_Click()
         End If
     End If
     
-    ' Check if Onsert die has changed in Label Specs after the original PDR was creatd.
+    ' Check if Onsert die has changed in Label Specs after the original PDR was created.
     If (ProductionRun.OnsertDieToolId <> gOnsertDieToolId) Then
         If MsgBox( _
             "The original PDR's Onsert die is " & ProductionRun.OnsertDiePartNumber & "." & vbCrLf & _
@@ -2501,6 +2552,21 @@ Private Sub mnuReplacements_Click()
             Me.txtOnsertDie.text = gOnsertDiePartNumber
             ProductionRun.OnsertDiePartNumber = gOnsertDiePartNumber
             ProductionRun.OnsertDieToolId = gOnsertDieToolId
+        End If
+    End If
+    
+    If (ProductionRun.OnsertBaseRollStockComponentId <> gOnsertBaseRollStockComponentId) Then
+        If basGlobals.ShowChangePromptForNewReplacement("Onsert base roll stock", FormatEmptyStringNA(ProductionRun.OnsertBaseRollStockPartNumber), FormatEmptyStringNA(gOnsertBaseRollStockPartNumber), "") Then
+            ProductionRun.OnsertBaseRollStockPartNumber = gOnsertBaseRollStockPartNumber
+            ProductionRun.OnsertBaseRollStockComponentId = gOnsertBaseRollStockComponentId
+            Me.txtOnsertBaseRollStock = ProductionRun.OnsertStock
+        End If
+    End If
+    
+    If (ProductionRun.OnsertBaseRollStockMinimumWidth <> gOnsertBaseRollStockMinimumWidth) Then
+        If basGlobals.ShowChangePromptForNewReplacement("Onsert base roll stock minimum width", FormatZeroNumberNA(ProductionRun.OnsertBaseRollStockMinimumWidth), FormatZeroNumberNA(gOnsertBaseRollStockMinimumWidth), "") Then
+            ProductionRun.OnsertBaseRollStockMinimumWidth = gOnsertBaseRollStockMinimumWidth
+            Me.txtOnsertBaseRollStock = ProductionRun.OnsertStock
         End If
     End If
     
@@ -2564,6 +2630,9 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
             mvarOrigScratchStockId = ProductionRun.Scratch_Stock
             mvarOrigBlindLamApply = ProductionRun.Apply_ScratchOff
             mvarOrigOnsertDieToolId = ProductionRun.OnsertDieToolId
+            mvarOriginalOnsertBaseRollStockMinimumWidth = ProductionRun.OnsertBaseRollStockMinimumWidth
+            mvarOriginalOnsertBaseRollStockComponentId = ProductionRun.OnsertBaseRollStockComponentId
+            mvarOriginalOnsertBaseRollStockPartNumber = ProductionRun.OnsertBaseRollStockPartNumber
             mvarOrigOnsertDiePartNumber = ProductionRun.OnsertDiePartNumber
         End If
         
@@ -2690,30 +2759,13 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
         Me.txtStockNo.text = ProductionRun.stock
         Me.txtOnsertDie.text = ProductionRun.OnsertDiePartNumber
         Me.txtScratchStockNo.text = ProductionRun.Scratch_Stock
+        Me.txtOnsertBaseRollStock = ProductionRun.OnsertStock
         Me.lblApplyBlindLam.Caption = BlindLamApplyCol(CStr(ProductionRun.Apply_ScratchOff))
         If Me.lblApplyBlindLam.Caption = NA_TEXT Or Me.lblApplyBlindLam.Caption = NOT_BLINDED_TEXT Then
             Me.lblApplyBlindLam.Caption = ""
         End If
         
-        ' tj - IRQ stuff 2
-        Me.txtStockIRQ.text = ""
-        Me.txtScratchIRQ.text = ""
-        Call GetIRQInfo
-        If Not oCollIRQInfo Is Nothing Then
-            For Each oIRQInfo In oCollIRQInfo
-                oIRQInfo.PDR_Count = GetNumberPDRsForIRQ(oIRQInfo.IRQ_Id)
-                If oIRQInfo.IRQ_Proof_Id = ProductionRun.Stock_Proof_Id Or oIRQInfo.IRQ_Main_Proof_Id = ProductionRun.Stock_Proof_Id Then   ' DW 2012-001 added or
-                    Me.txtStockIRQ = IIf(Me.txtStockIRQ = "", oIRQInfo.IRQ_Number, Me.txtStockIRQ & DPIRQDELIMITER & oIRQInfo.IRQ_Number)   ' DW 2012-001 modified
-                Else
-                    If oIRQInfo.IRQ_Proof_Id = ProductionRun.Scratch_Proof_Id Then
-                        Me.txtScratchIRQ = oIRQInfo.IRQ_Number
-                    End If
-                End If
-            Next
-        Else
-            Me.txtStockIRQ.text = ""
-            Me.txtScratchIRQ.text = ""
-        End If
+        Call UpdateExistingIRQList
         
         Me.chkPrintAtPackager.value = ProductionRun.PrintAtPackager
     End With
@@ -2944,6 +2996,37 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
             End If
         End If
         
+        If (ProductionRun.OnsertBaseRollStockPartNumber <> mvarOriginalOnsertBaseRollStockPartNumber) Then
+            If basGlobals.ShowChangePromptForExistingReplacement("Onsert base roll stock", FormatEmptyStringNA(ProductionRun.OnsertBaseRollStockPartNumber), FormatEmptyStringNA(mvarOriginalOnsertBaseRollStockPartNumber), strReason) Then
+                ProductionRun.OnsertBaseRollStockPartNumber = mvarOriginalOnsertBaseRollStockPartNumber
+                ProductionRun.OnsertBaseRollStockComponentId = mvarOriginalOnsertBaseRollStockComponentId
+                Me.txtOnsertBaseRollStock = ProductionRun.OnsertStock
+            End If
+            
+        ElseIf (ProductionRun.OnsertBaseRollStockPartNumber <> basGlobals.gOnsertBaseRollStockPartNumber) Then
+            If basGlobals.ShowChangePromptForLabel("Onsert base roll stock", FormatEmptyStringNA(ProductionRun.OnsertBaseRollStockPartNumber), FormatEmptyStringNA(basGlobals.gOnsertBaseRollStockPartNumber), strReason) Then
+                ProductionRun.OnsertBaseRollStockPartNumber = basGlobals.gOnsertBaseRollStockPartNumber
+                ProductionRun.OnsertBaseRollStockComponentId = basGlobals.gOnsertBaseRollStockComponentId
+                Me.txtOnsertBaseRollStock = ProductionRun.OnsertStock
+            End If
+      
+        End If
+        
+        If (ProductionRun.OnsertBaseRollStockMinimumWidth <> mvarOriginalOnsertBaseRollStockMinimumWidth) Then
+            If basGlobals.ShowChangePromptForExistingReplacement("Onsert base roll minimum width", FormatZeroNumberNA(ProductionRun.OnsertBaseRollStockMinimumWidth), FormatZeroNumberNA(mvarOriginalOnsertBaseRollStockMinimumWidth), strReason) Then
+                ProductionRun.OnsertBaseRollStockMinimumWidth = mvarOriginalOnsertBaseRollStockMinimumWidth
+                Me.txtOnsertBaseRollStock = ProductionRun.OnsertStock
+            End If
+        
+        ElseIf (ProductionRun.OnsertBaseRollStockMinimumWidth <> basGlobals.gOnsertBaseRollStockMinimumWidth) Then
+            If basGlobals.ShowChangePromptForLabel("Onsert base roll minimum width", FormatZeroNumberNA(ProductionRun.OnsertBaseRollStockMinimumWidth), FormatZeroNumberNA(basGlobals.gOnsertBaseRollStockMinimumWidth), strReason) Then
+                ProductionRun.OnsertBaseRollStockMinimumWidth = basGlobals.gOnsertBaseRollStockMinimumWidth
+                Me.txtOnsertBaseRollStock = ProductionRun.OnsertStock
+            End If
+       
+        End If
+       
+        
         If booChange = True Then
             txtDirtyFlag = "Y"
             Me.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
@@ -3134,20 +3217,7 @@ Private Sub cmdSave_Click()
         End If
         
 
-        Me.txtStockIRQ = ""
-        Me.txtScratchIRQ = ""
-        Call GetIRQInfo
-        If Not oCollIRQInfo Is Nothing Then
-            For Each oIRQInfo In oCollIRQInfo
-                If oIRQInfo.IRQ_Proof_Id = ProductionRun.Stock_Proof_Id Then
-                    Me.txtStockIRQ = oIRQInfo.IRQ_Number
-                Else
-                    If oIRQInfo.IRQ_Proof_Id = ProductionRun.Scratch_Proof_Id Then
-                        Me.txtScratchIRQ = oIRQInfo.IRQ_Number
-                    End If
-                End If
-            Next
-        End If
+        Call UpdateExistingIRQList
 
         MsgBox "Production Run Record successfully processed.", vbInformation
         
@@ -3296,7 +3366,7 @@ Private Function ValidScreen() As Boolean
 Cleanup_Exit:
     Exit Function
 Handle_Error:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 End Function
 
@@ -3354,7 +3424,7 @@ Private Function CheckExistingSample(Optional ByRef intClientSamplesNotShipping 
 Cleanup_Exit:
     Exit Function
 Handle_Error:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 End Function
 
@@ -3419,7 +3489,7 @@ Flag_Dirty:
 Cleanup_Exit:
     Exit Sub
 Handle_Error:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 End Sub
 
@@ -3600,7 +3670,7 @@ Private Function UpdateCompletelyShippedFlag(lngJobLogId As Long) As Boolean
 Cleanup_Exit:
     Exit Function
 Handle_Error:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 End Function
 
@@ -4074,6 +4144,7 @@ Public Sub GetIRQInfo()
                              oIRQInfo.IRQ_Details_Qty_Requested = .Recordset!Qty_Requested
                              oIRQInfo.IRQ_Status = .Recordset!Status
                              oIRQInfo.IRQ_Main_Proof_Id = .Recordset!Main_Proof_Id
+                             oIRQInfo.IRQToolComponentId = .Recordset!Tool_Component_ID
                 .Recordset.MoveNext
             Loop
             
@@ -4275,7 +4346,7 @@ Private Sub DupLinksSpecInstructions()
 Cleanup_Exit:
     Exit Sub
 Handle_Error:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 End Sub
 
@@ -4423,7 +4494,7 @@ Exit_Sub:
     Exit Sub
     
 Handle_Error:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Exit_Sub
     
 End Sub
@@ -4580,3 +4651,29 @@ Private Function IsThereAnIRQ() As Boolean
     
 End Function
 
+Public Sub FlagChange()
+    Me.txtDirtyFlag = "Y"
+    Me.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
+End Sub
+
+Private Sub UpdateExistingIRQList()
+    txtStockIRQ.text = ""
+    txtScratchIRQ.text = ""
+    Call GetIRQInfo
+    If Not oCollIRQInfo Is Nothing Then
+        For Each oIRQInfo In oCollIRQInfo
+            oIRQInfo.PDR_Count = GetNumberPDRsForIRQ(oIRQInfo.IRQ_Id)
+            
+            If oIRQInfo.IRQType = Label And (oIRQInfo.IRQ_Proof_Id = ProductionRun.Stock_Proof_Id Or oIRQInfo.IRQ_Main_Proof_Id = ProductionRun.Stock_Proof_Id) Then
+                Me.txtStockIRQ = IIf(Me.txtStockIRQ = "", oIRQInfo.IRQ_Number, Me.txtStockIRQ & "," & oIRQInfo.IRQ_Number)
+                
+            ElseIf (oIRQInfo.IRQType = Label) And (oIRQInfo.IRQ_Proof_Id = ProductionRun.Scratch_Proof_Id) Then
+                Me.txtScratchIRQ = oIRQInfo.IRQ_Number
+                
+            ElseIf (oIRQInfo.IRQType = RollStock) And (oIRQInfo.IRQToolComponentId = ProductionRun.OnsertBaseRollStockComponentId) Then
+                Me.txtStockIRQ = IIf(Me.txtStockIRQ = "", oIRQInfo.IRQ_Number, Me.txtStockIRQ & "," & oIRQInfo.IRQ_Number)
+                
+            End If
+        Next
+    End If
+End Sub

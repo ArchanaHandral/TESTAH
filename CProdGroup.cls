@@ -50,6 +50,8 @@ Private mvarOverLaminate As String
 Private mvarOverLaminateDescription As String
 Private mvarPdrShipSeedValue As Long
 Private mvarTotalPDRsCount As Long
+Private mvarOnsertBaseRollStockMinWidth As Double
+Private mvarOnsertBaseRollStockPartNumber As String
 
 Public Property Let TotalPDRsCount(ByVal vdata As Long)
     mvarTotalPDRsCount = vdata
@@ -291,6 +293,8 @@ Public Sub LookupRecord()
                 mvarOverLaminateDescription = IIf(IsNull(.Recordset!OverLaminateDescription), "", .Recordset!OverLaminateDescription)
                 mvarPdrShipSeedValue = .Recordset!ShipToId
                 mvarTotalPDRsCount = IIf(IsNull(.Recordset!TotalPDRsCount), 0, .Recordset!TotalPDRsCount)
+                mvarOnsertBaseRollStockMinWidth = .Recordset!OnsertBaseRollStockMinWidth
+                mvarOnsertBaseRollStockPartNumber = .Recordset!OnsertBaseRollStockPartNumber
                 mvarDigitalLabelParts = _
                     .Recordset!BK1_Identification & _
                     IIf(.Recordset!BK2_Identification <> "", ", ", "") & .Recordset!BK2_Identification & _
@@ -665,3 +669,7 @@ Error_this_Sub:
     Resume Exit_this_Sub
 
 End Sub
+
+Public Property Get OnsertStock() As String
+    OnsertStock = ProductionRun.FormatOnsertStock(mvarOnsertBaseRollStockPartNumber, mvarOnsertBaseRollStockMinWidth)
+End Property

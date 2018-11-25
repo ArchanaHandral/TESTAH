@@ -81,6 +81,9 @@ Public gBlindLabelId As String
 Public gBlindLamApply As Integer
 Public gOnsertDieToolId As Long
 Public gOnsertDiePartNumber As String
+Public gOnsertBaseRollStockMinimumWidth As Double
+Public gOnsertBaseRollStockComponentId As Long
+Public gOnsertBaseRollStockPartNumber As String
 Public gCodingRepeatCnt As Integer
 Public dupSameCodingData As CCOLdupFiles
 Public smpSameCodingData As CCOLsmpFiles
@@ -98,8 +101,6 @@ Public BlindLamApplyCol As Collection
 Public UpdateSchedule As ScheduleUpdate.CScheduleUpdatemain
 ' DW 2008-017 added
 Public gDomainIconPath As String
-' DW 2012-001 added
-Public Const DPIRQDELIMITER As String = ","
 
 Public Enum SecurityLevels
     NonBillableAuthorize = 1
@@ -1969,7 +1970,7 @@ Exit_this_Sub:
     Exit Sub
     
 Error_this_Sub:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Exit_this_Sub
     
 End Sub
@@ -2268,7 +2269,7 @@ Exit_this_Sub:
     Exit Sub
     
 Error_this_Sub:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Exit_this_Sub
     
 End Sub
@@ -2403,7 +2404,7 @@ Connection_Test_Failed:
     gadoConnection.Connection.Open
     Resume Cleanup_Exit
 Handle_Error:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 End Function
 
@@ -2431,6 +2432,9 @@ Public Sub GetLabelCurrentValues()
             gBlindLabelId = .Recordset!Blinding_Label_Id
             gOnsertDieToolId = .Recordset!Onsert_Die_Tool_Id
             gOnsertDiePartNumber = .Recordset!Onsert_Tooling_Die
+            gOnsertBaseRollStockMinimumWidth = .Recordset!OnsertBaseRollStockMinWidth
+            gOnsertBaseRollStockComponentId = .Recordset!OnsertBaseRollStockComponentId
+            gOnsertBaseRollStockPartNumber = .Recordset!OnsertBaseRollStockPartNumber
             
             If gBlindProofId = 0 Then
                 gBlindLamApply = 2
@@ -2445,7 +2449,7 @@ Cleanup_Exit:
     Set objData = Nothing
     Exit Sub
 Handle_Error:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 End Sub
 
@@ -2473,7 +2477,7 @@ Public Function GetNumberLinesInFile(fileName As String) As Long
 Cleanup_Exit:
     Exit Function
 Handle_Error:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 
 End Function
@@ -2565,7 +2569,7 @@ Cleanup_Exit:
     Exit Sub
     
 Handle_Error:
-    Err.Raise Err.Number, Err.source, Err.description
+    Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
 End Sub
 
@@ -2671,12 +2675,12 @@ Public Sub EnsureNonBillableReasonsLoaded()
 End Sub
 
 
-Public Function DirectoryExistsWithFiles(ByVal source As String) As Boolean
+Public Function DirectoryExistsWithFiles(ByVal Source As String) As Boolean
     On Error GoTo errHandler
     
     Dim objfso, objFolder
     Set objfso = CreateObject("Scripting.FileSystemObject")
-    Set objFolder = objfso.GetFolder(source)
+    Set objFolder = objfso.GetFolder(Source)
     
     If objFolder.Files.count > 0 Then
         DirectoryExistsWithFiles = True
@@ -2698,7 +2702,7 @@ errHandler:
 End Function
 
 
-Public Sub CopyFiles(ByVal source As String, ByVal destination As String)
+Public Sub CopyFiles(ByVal Source As String, ByVal destination As String)
     On Error GoTo errHandler
     
     Dim objfso, objFile
@@ -2728,7 +2732,7 @@ Public Sub CopyFiles(ByVal source As String, ByVal destination As String)
         End If
         
     End If
-        .CopyFile source, destination
+        .CopyFile Source, destination
     End With
  
 Exit_Sub:
@@ -2848,7 +2852,7 @@ errHandler:
 End Sub
 
 
-Public Sub CopySampleFiles(ByVal source As String, ByVal destination As String, ByVal barCode As String)
+Public Sub CopySampleFiles(ByVal Source As String, ByVal destination As String, ByVal barCode As String)
         On Error GoTo errHandler
         
         Dim objfso
@@ -2856,9 +2860,9 @@ Public Sub CopySampleFiles(ByVal source As String, ByVal destination As String, 
         Dim strFile As String
         
         If Right$(destination, 1) <> "\" Then destination = destination & "\"
-        If Right$(source, 1) <> "\" Then source = source & "\"
+        If Right$(Source, 1) <> "\" Then Source = Source & "\"
         
-        strFile = Dir(source & "*.*")
+        strFile = Dir(Source & "*.*")
         
         Do While Len(strFile)
             With objfso
@@ -2869,8 +2873,8 @@ Public Sub CopySampleFiles(ByVal source As String, ByVal destination As String, 
                     .CreateFolder (destination)
                 End If
                 
-                .CopyFile source & strFile, destination & strFile
-                Call UpdateSampleFilePath(ProductionRun.Production_Run_Id, source & strFile, destination & strFile)
+                .CopyFile Source & strFile, destination & strFile
+                Call UpdateSampleFilePath(ProductionRun.Production_Run_Id, Source & strFile, destination & strFile)
              End If
                 
             End With
@@ -2924,4 +2928,60 @@ errHandler:
     MsgBox "Error in GetDuplicateFileLinksInfo()" & vbCrLf & Err.description, vbCritical
     Resume Exit_Function
     
+End Function
+
+Public Static Function ShowChangePromptForLabel(valueName As String, currentValue As Variant, expectedValue As Variant, reason As String) As Boolean
+    ShowChangePromptForLabel = ShowChangePrompt("This PDR's", valueName, "Label Specs's", expectedValue, currentValue, reason, True)
+End Function
+
+Public Static Function ShowChangePromptForExistingReplacement(valueName As String, currentValue As Variant, expectedValue As Variant, reason As String) As Boolean
+    ShowChangePromptForExistingReplacement = ShowChangePrompt("This Replacement PDR's", valueName, "The Original PDR's", expectedValue, currentValue, reason, True)
+End Function
+
+Public Static Function ShowChangePromptForNewReplacement(valueName As String, currentValue As Variant, expectedValue As Variant, reason As String) As Boolean
+    ShowChangePromptForNewReplacement = ShowChangePrompt("The Original PDR's", valueName, "Label Specs's", expectedValue, currentValue, reason, False)
+End Function
+
+Private Static Function ShowChangePrompt(currentValueTitle As String, valueName As String, expectedValueTitle As String, expectedValue As Variant, currentValue As Variant, reason As String, showSavePrompt As Boolean) As Boolean
+    Dim ok As Boolean
+    Dim updatePrompt As String
+    updatePrompt = Replace(Replace(expectedValueTitle, "The", "the"), "'s", "")
+    
+    If reason = "" Then
+        ok = (MsgBox(currentValueTitle & " " & valueName & " is currently " & currentValue & "." & vbCrLf & _
+                    expectedValueTitle & " " & valueName & " is currently " & expectedValue & "." & vbCrLf & vbCrLf & _
+                    "Do you want to update this PDR to match " & updatePrompt & "?", _
+                    vbYesNo + vbQuestion, "Update PDR") = vbYes)
+                    
+        If ok And showSavePrompt Then
+            MsgBox "This PDR's " & valueName & " will be updated but you must still save the change to keep it.", vbOKOnly + vbInformation
+            frmProdPlan.FlagChange
+        End If
+        
+    Else
+        MsgBox currentValueTitle & " " & valueName & " is currently " & currentValue & "." & vbCrLf & _
+            expectedValueTitle & " " & valueName & " is currently " & expectedValue & "." & vbCrLf & vbCrLf & _
+            "This PDR cannot be updated because it " & reason, _
+            vbOKOnly + vbInformation, "PDR Difference"
+
+        ok = False
+    End If
+    
+    ShowChangePrompt = ok
+End Function
+
+Public Static Function FormatZeroNumberNA(value As Double) As String
+    If value = 0 Then
+        FormatZeroNumberNA = "N/A"
+    Else
+        FormatZeroNumberNA = CStr(value)
+    End If
+End Function
+
+Public Static Function FormatEmptyStringNA(value As String) As String
+    If value = "" Then
+        FormatEmptyStringNA = "N/A"
+    Else
+        FormatEmptyStringNA = value
+    End If
 End Function
