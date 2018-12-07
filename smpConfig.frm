@@ -1123,10 +1123,11 @@ Private Sub cmdSaveButton_Click()
     'checks if the form is valid
     If Valid_Sample_Form() Then
         If SSDBComboSmpType.text = "CLINTRAK" Then
-            notes = "This is a CLINTRAK SAMPLE - DO NOT SHIP!!!"
+            notes = "This is an INTERNAL SAMPLE - DO NOT SHIP!!!"
             jobShippingId = 0
         Else
-            If notes = "This is a CLINTRAK SAMPLE - DO NOT SHIP!!!" Then
+            If notes = "This is a CLINTRAK SAMPLE - DO NOT SHIP!!!" Or _
+                    notes = "This is an INTERNAL SAMPLE - DO NOT SHIP!!!" Then
                 notes = " "
             End If
         End If

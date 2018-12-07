@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{8D650141-6025-11D1-BC40-0000C042AEC0}#3.0#0"; "ssdw3b32.ocx"
 Begin VB.Form frmProdPlan 
@@ -1034,6 +1034,7 @@ Begin VB.Form frmProdPlan
       _ExtentX        =   2355
       _ExtentY        =   635
       _Version        =   393217
+      Enabled         =   -1  'True
       TextRTF         =   $"frmProdPlan.frx":1286
    End
    Begin RichTextLib.RichTextBox rtbPDRInstructions 
@@ -1047,6 +1048,7 @@ Begin VB.Form frmProdPlan
       _ExtentX        =   2355
       _ExtentY        =   635
       _Version        =   393217
+      Enabled         =   -1  'True
       TextRTF         =   $"frmProdPlan.frx":1301
    End
    Begin MSComctlLib.StatusBar StatusBar1 
@@ -3943,7 +3945,7 @@ Dim tnotes As String
  Me.txtSamples = 2
  Me.txtSampleGroups = 1
 
- tnotes = "This is a CLINTRAK SAMPLE - DO NOT SHIP!!!"
+ tnotes = "This is an INTERNAL SAMPLE - DO NOT SHIP!!!"
  
  Call smpData.Add(ProductionRun.Production_Run_Id, 1, "CLINTRAK", 0, 2, "CLINTRAK", gSampleFileName, tnotes, 0) ' DW 2010-002 added final parameter
     

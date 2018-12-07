@@ -162,8 +162,8 @@ Private Sub Detail_Format()
                 End If
         End Select
         
-        If ProductionRun.PRGBarcode <> NOT_APPLICABLE Then
-            Me.otxtFormID = Me.otxtFormID & " (" & ProductionRun.PRGBarcode & ") " & ProductionRun.PRGCount & " of " & ProductionRun.TotalPDRs
+        If ProductionRun.Prgbarcode <> NOT_APPLICABLE Then
+            Me.otxtFormID = Me.otxtFormID & " (" & ProductionRun.Prgbarcode & ") " & ProductionRun.PRGCount & " of " & ProductionRun.TotalPDRs
         End If
     End If
     
