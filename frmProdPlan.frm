@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "Richtx32.ocx"
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{8D650141-6025-11D1-BC40-0000C042AEC0}#3.0#0"; "ssdw3b32.ocx"
 Begin VB.Form frmProdPlan 
@@ -1034,7 +1034,6 @@ Begin VB.Form frmProdPlan
       _ExtentX        =   2355
       _ExtentY        =   635
       _Version        =   393217
-      Enabled         =   -1  'True
       TextRTF         =   $"frmProdPlan.frx":1286
    End
    Begin RichTextLib.RichTextBox rtbPDRInstructions 
@@ -1048,7 +1047,6 @@ Begin VB.Form frmProdPlan
       _ExtentX        =   2355
       _ExtentY        =   635
       _Version        =   393217
-      Enabled         =   -1  'True
       TextRTF         =   $"frmProdPlan.frx":1301
    End
    Begin MSComctlLib.StatusBar StatusBar1 
@@ -1269,6 +1267,7 @@ End Sub
 Private Function IsUseClientInventorySetToDefault() As Boolean
     IsUseClientInventorySetToDefault = (ProductionRun.UseClientInventory = ProductionRun.NonBillable.IsBillable)
 End Function
+
 
 Private Sub cmdReason_Click()
     Dim frmReason As New frmReason
@@ -1801,7 +1800,25 @@ Private Sub Form_Load()
     End If
     
     ManageClientInventoryCheckBox
-
+' If not print at packager check for samples . Allow correction if file length is 0
+    If Not CBool(Me.chkPrintAtPackager.value) Then
+        If Me.txtSamples > 0 Then
+            If FileLen(gSampleFileName) = 0 Then
+               If vbYes = MsgBox("The Internal Sample Files were not found. Do you want the system to re-create the Internal Samples based on today’s data?", vbYesNo) Then
+                    If Fix_Samples_FromPDR_Screen Then
+'change PDR sample counts for new samples just configured
+                        ProductionRun.Samples_Requested = CLng(Me.txtSamples)
+                        ProductionRun.Sample_Number = CInt(Me.txtSampleGroups)
+                        MsgBox "Internal Samples Fixed", vbOKOnly
+                    Else
+                        MsgBox _
+                            "Unable to Fix Internal Samples" & vbCrLf & _
+                            "Please contact IT.", vbExclamation
+                    End If
+                End If
+            End If
+        End If
+    End If
 Exit_this_Sub:
     Screen.MousePointer = vbDefault
     Exit Sub
@@ -3035,7 +3052,28 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
         End If
            
         ManageClientInventoryCheckBox
-        
+' If not print at packager check for samples . Allow correction if file length is 0
+        If Not CBool(Me.chkPrintAtPackager.value) Then
+            If Me.txtSamples > 0 Then
+' need to set gSampleFilename to reprint PDR. Currently set to original PDR
+                Call GetSampleFileName
+                If FileLen(gSampleFileName) = 0 Then
+                    If vbYes = MsgBox("The Internal Sample Files were not found. Do you want the system to re-create the Internal Samples based on today’s data?", vbYesNo) Then
+                        If Fix_Samples_FromPDR_Screen Then
+'change PDR sample counts for new samples just configured
+                            ProductionRun.Samples_Requested = CLng(Me.txtSamples)
+                            ProductionRun.Sample_Number = CInt(Me.txtSampleGroups)
+                            MsgBox "Internal Samples Fixed", vbOKOnly
+                        Else
+                            MsgBox _
+                                "Unable to Fix Internal Samples" & vbCrLf & _
+                                "Please contact IT.", vbExclamation
+                        End If
+                    End If
+                End If
+            End If
+        End If
+    
     End If
     
 Exit_this_Sub:
@@ -3613,6 +3651,36 @@ Dim i As Long
     End With
         
 End Sub
+Private Sub GetSampleFileName()
+'
+'comments: Get sample file name for check
+'parameters:  none
+
+Dim objData As nADOData.CADOData
+'check to see if samples exist
+    If Trim$(txtSampleGroups.text) = "" Or txtSampleGroups.text = "0" Then
+        Exit Sub
+    End If
+
+    Set objData = New CADOData
+    With objData
+        Set .Connection = GetDBConnection
+            .CursorType = adOpenForwardOnly
+            .CommandType = adCmdStoredProc
+            .LockType = adLockReadOnly
+
+            .ResetParameters
+            .AddParameter "Production Run Id", ProductionRun.Production_Run_Id, adInteger, adParamInput
+            .AddParameter "Type Number", 0, adInteger, adParamInput
+            .OpenRecordSetFromSP "get_SampleTypeInfo"
+                        
+            If Not .Recordset.EOF Then
+                gSampleFileName = .Recordset!Sample_File_Name
+            End If
+            .Recordset.Close
+    End With
+       
+End Sub
 
 Public Sub ActivateEditOption(on_off As Boolean)
     cmdSamples.enabled = on_off
@@ -3726,7 +3794,47 @@ PROC_ERR:
     Resume Proc_EXIT
 
 End Function
+Private Function Fix_Samples_FromPDR_Screen() As Boolean
+'sample fix code
+'fix for 0 length sample file
+'md added for clintrak sampels called from from prodplan to automatically configure
+'2 clintrak samples on save of PDR with any replacement samples as well
 
+On Error GoTo PROC_ERR
+    
+      
+    Fix_Samples_FromPDR_Screen = False
+    mSampleFileName = ""
+    
+    'check to ensure that we can use the coding file to retrieve the live data for the Clintrak samples
+    'if there are only samples for this PDR then we must force the creation of dummy Clintrak samples
+    If Me.txtQty = 0 Then
+        Call Get_SampleFile_Layout
+    Else
+        ' load 2 clintrak samples to collection for use in creation of file with live data
+        ' If Print at Packager is true do not add the "Clintrak" Samples
+        If Not CBool(Me.chkPrintAtPackager.value) Then
+            Call ReadProcess_File_CTK(ProductionRun.File_Name, 2, "CLINTRAK")
+        End If
+    End If
+    
+    ' If Print at Packager is true do not add the "Clintrak" Samples
+    If Not CBool(Me.chkPrintAtPackager.value) Then
+        'create clintrak sample file
+        Call CollectionToFileCTK(mSampleFileName)
+        gSampleFileName = mSampleFileName
+        If FileLen(gSampleFileName) <> 0 Then
+            Fix_Samples_FromPDR_Screen = True
+        End If
+    End If
+Proc_EXIT:
+    Exit Function
+  
+PROC_ERR:
+    MsgBox "Error: " & Err.Number & ". " & Err.description, , _
+        "Error Saving Samples from PDR screen", vbExclamation
+    Resume Proc_EXIT
+End Function
 Private Sub CollectionToFileCTK(strDestination As String)
 
 'md new for clintrak samples
