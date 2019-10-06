@@ -592,9 +592,12 @@ End Sub
 Public Sub SaveProdRun()
     Dim objData As nADOData.CADOData
     Dim nreturn As Long
+    Dim booHasError As Boolean
+    Dim booInTransaction As Boolean
                     
     On Error GoTo Error_this_Sub
-                                                        
+    
+    booInTransaction = False
     mbooProdRunUpdated = False
     
     Set objData = New CADOData
@@ -605,6 +608,7 @@ Public Sub SaveProdRun()
         .CommandType = adCmdStoredProc
         .LockType = adLockReadOnly
         .Connection.BeginTrans
+        booInTransaction = True
         
         .ResetParameters
         
@@ -670,10 +674,7 @@ Public Sub SaveProdRun()
             mbooProdRunUpdated = True
             'don't update the links if this is a replacement production run
             If Not booReplacement Then
-                If Not update_FileLinks_ProdRunId Then
-                    MsgBox "Error: " & Err.Number & " " & Err.description, vbCritical, _
-                    "Error Occurred Updating File Links with the Prod Run Id"
-                End If
+                booHasError = Not update_FileLinks_ProdRunId
             End If
             Call GetStockDesc
             If Trim$(mvarScratch_Stock) > "" Then
@@ -684,15 +685,29 @@ Public Sub SaveProdRun()
         
         If mbooProdRunUpdated Then
             .Connection.CommitTrans
+            booInTransaction = False
         Else
             .Connection.RollbackTrans
+            booInTransaction = False
         End If
+        
+        If (booHasError) Then
+            MsgBox "Error: " & Err.Number & " " & Err.description, vbCritical, _
+                    "Error Occurred Updating File Links with the Prod Run Id"
+        End If
+        
+        
     End With
    
 Exit_this_Sub:
     Exit Sub
     
 Error_this_Sub:
+    
+    If (booInTransaction) Then
+        objData.Connection.RollbackTrans
+    End If
+    
     MsgBox "Error: " & Err.Number & " " & Err.description, vbCritical, _
     "Error Occurred Saving Production Run Record"
     Resume Exit_this_Sub
