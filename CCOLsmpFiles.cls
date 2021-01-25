@@ -22,7 +22,7 @@ Private mcol As Collection
 ' DW ECR12-008 update ship as Integer to ship as Long
 Public Function Add(prodId As Long, typenum As Integer, _
                     smptype As String, ship As Long, qty As Long, _
-                    description As String, file As String, notes As String, sample_type_id As Long) As CsmpFiles
+                    description As String, file As String, sample_type_id As Long) As CsmpFiles
 
 Dim objNewMember As CsmpFiles
 Set objNewMember = New CsmpFiles
@@ -34,7 +34,6 @@ objNewMember.shipTo = ship
 objNewMember.quantity = qty
 objNewMember.smpDescription = description
 objNewMember.smpfileName = file
-objNewMember.notes = notes
 objNewMember.sample_type_id = sample_type_id
 
 mcol.Add objNewMember

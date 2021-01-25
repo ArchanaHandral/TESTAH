@@ -2,7 +2,7 @@ VERSION 5.00
 Begin VB.Form frmTestPDR 
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Production Runs Stub"
-   ClientHeight    =   2295
+   ClientHeight    =   2655
    ClientLeft      =   13200
    ClientTop       =   4305
    ClientWidth     =   9735
@@ -18,11 +18,11 @@ Begin VB.Form frmTestPDR
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   2295
+   ScaleHeight     =   2655
    ScaleWidth      =   9735
    Begin VB.Frame fraRepReport 
       Caption         =   "Replacement Report"
-      Height          =   1335
+      Height          =   1695
       Left            =   4800
       TabIndex        =   11
       Top             =   840
@@ -40,7 +40,7 @@ Begin VB.Form frmTestPDR
          Height          =   375
          Left            =   3240
          TabIndex        =   12
-         Top             =   840
+         Top             =   240
          Width           =   1455
       End
       Begin VB.Label Label2 
@@ -102,16 +102,24 @@ Begin VB.Form frmTestPDR
          Strikethrough   =   0   'False
       EndProperty
       ForeColor       =   &H8000000D&
-      Height          =   1335
+      Height          =   1695
       Left            =   120
       TabIndex        =   0
       Top             =   840
       Width           =   4455
+      Begin VB.TextBox txtLockVersion 
+         Height          =   285
+         Left            =   1080
+         TabIndex        =   16
+         Text            =   "2020-10-19 16:09:12.477"
+         Top             =   1320
+         Width           =   2175
+      End
       Begin VB.TextBox txtJobLogId 
          Height          =   285
          Left            =   1080
          TabIndex        =   9
-         Text            =   "58828"
+         Text            =   "86584"
          Top             =   960
          Width           =   1455
       End
@@ -119,7 +127,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   1080
          TabIndex        =   7
-         Text            =   "376483"
+         Text            =   "480686"
          Top             =   600
          Width           =   1455
       End
@@ -127,7 +135,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   1080
          TabIndex        =   2
-         Text            =   "723635"
+         Text            =   "783444"
          Top             =   240
          Width           =   1455
       End
@@ -136,8 +144,18 @@ Begin VB.Form frmTestPDR
          Height          =   375
          Left            =   2880
          TabIndex        =   1
-         Top             =   840
+         Top             =   240
          Width           =   1455
+      End
+      Begin VB.Label lblLockVersion 
+         AutoSize        =   -1  'True
+         BackStyle       =   0  'Transparent
+         Caption         =   "Lock Version"
+         Height          =   195
+         Left            =   120
+         TabIndex        =   15
+         Top             =   1320
+         Width           =   885
       End
       Begin VB.Label lblJobLog 
          AutoSize        =   -1  'True
@@ -216,7 +234,7 @@ Private Sub cmdOpenPDRWindow_Click()
         Dim loginString() As String
         loginString = Split(Me.txtToken.Text, " ")
         If .Initialize(loginString(0), loginString(1), loginString(2), loginString(3), "\\ClkAlData\Clintrak_Data\ICONS\") Then
-            Call .Load_Prod_Run(CLng(txtFileLinksId.Text), CLng(Me.txtCodingNum.Text), CLng(Me.txtJobLogId.Text))
+            Call .Load_Prod_Run(CLng(txtFileLinksId.Text), CLng(Me.txtCodingNum.Text), CLng(Me.txtJobLogId.Text), txtLockVersion.Text)
         End If
       
     End With

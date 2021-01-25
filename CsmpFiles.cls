@@ -25,5 +25,4 @@ Public shipTo As Long           ' DW ECR12-008 update integer to long
 Public quantity As Long
 Public smpDescription As String
 Public smpfileName As String
-Public notes As String
 Public sample_type_id As Long

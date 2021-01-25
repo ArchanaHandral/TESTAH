@@ -1,14 +1,14 @@
 Type=Exe
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{52E0A6AD-BDAA-408B-A4AA-F222DB8A286D}#3.1#0#..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\VB98\ClintrakCommon.dll#ClintrakCommon
-Reference=*\G{9D028723-DF1B-40F3-983B-78332057D89D}#1.4#0#ProductionRuns.dll#
+Reference=*\G{9D028723-DF1B-40F3-983B-78332057D89D}#3.0#0#ProductionRuns.dll#
 Form=frmTestPDR.frm
 IconForm="frmTestPDR"
 Startup="frmTestPDR"
 HelpFile=""
 Title="TestProductionRuns"
 ExeName32="TestProductionRuns.exe"
-Command32="frank.li d25ae3c3-f4db-4738-9d1f-3214a6426a3f USBOH-SQLDEV01\USBOHSQLDEV01 Z2017011Testing"
+Command32="ross.lombardi faf5ef61-48cb-4cf1-b06e-1d5b49b89594 USBOH-SQLdev03\USBOHSQLdev03 KGLinksDemo"
 Name="TestProductionRuns"
 HelpContextID="0"
 CompatibleMode="0"

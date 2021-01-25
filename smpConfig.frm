@@ -23,7 +23,6 @@ Begin VB.Form frmSmpConfig
    MinButton       =   0   'False
    ScaleHeight     =   6675
    ScaleWidth      =   8415
-   StartUpPosition =   1  'CenterOwner
    Begin VB.CommandButton cmdAdd 
       Caption         =   "Add New Type"
       BeginProperty Font 
@@ -37,7 +36,7 @@ Begin VB.Form frmSmpConfig
       EndProperty
       Height          =   375
       Left            =   1320
-      TabIndex        =   41
+      TabIndex        =   40
       Top             =   6120
       Width           =   1335
    End
@@ -46,7 +45,7 @@ Begin VB.Form frmSmpConfig
       BorderStyle     =   0  'None
       Height          =   615
       Left            =   0
-      TabIndex        =   36
+      TabIndex        =   35
       Top             =   0
       Width           =   8415
       Begin VB.TextBox txtSmpTypeNum 
@@ -64,7 +63,7 @@ Begin VB.Form frmSmpConfig
          Height          =   345
          Left            =   6000
          Locked          =   -1  'True
-         TabIndex        =   37
+         TabIndex        =   36
          Text            =   "1"
          Top             =   120
          Width           =   495
@@ -87,7 +86,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00C00000&
          Height          =   345
          Left            =   120
-         TabIndex        =   38
+         TabIndex        =   37
          Top             =   120
          Width           =   7785
       End
@@ -104,7 +103,7 @@ Begin VB.Form frmSmpConfig
       EndProperty
       Height          =   2625
       Left            =   120
-      TabIndex        =   24
+      TabIndex        =   23
       Top             =   680
       Width           =   8175
       Begin VB.TextBox txtAdd3 
@@ -112,7 +111,7 @@ Begin VB.Form frmSmpConfig
          Height          =   285
          Left            =   4920
          Locked          =   -1  'True
-         TabIndex        =   39
+         TabIndex        =   38
          TabStop         =   0   'False
          Top             =   1360
          Width           =   3135
@@ -178,7 +177,7 @@ Begin VB.Form frmSmpConfig
          Height          =   285
          Left            =   4920
          Locked          =   -1  'True
-         TabIndex        =   14
+         TabIndex        =   13
          TabStop         =   0   'False
          Top             =   160
          Width           =   3135
@@ -188,7 +187,7 @@ Begin VB.Form frmSmpConfig
          Height          =   285
          Left            =   4920
          Locked          =   -1  'True
-         TabIndex        =   15
+         TabIndex        =   14
          TabStop         =   0   'False
          Top             =   460
          Width           =   3135
@@ -198,7 +197,7 @@ Begin VB.Form frmSmpConfig
          Height          =   285
          Left            =   4920
          Locked          =   -1  'True
-         TabIndex        =   16
+         TabIndex        =   15
          TabStop         =   0   'False
          Top             =   760
          Width           =   3135
@@ -208,7 +207,7 @@ Begin VB.Form frmSmpConfig
          Height          =   285
          Left            =   4920
          Locked          =   -1  'True
-         TabIndex        =   17
+         TabIndex        =   16
          TabStop         =   0   'False
          Top             =   1060
          Width           =   3135
@@ -218,7 +217,7 @@ Begin VB.Form frmSmpConfig
          Height          =   285
          Left            =   4920
          Locked          =   -1  'True
-         TabIndex        =   18
+         TabIndex        =   17
          TabStop         =   0   'False
          Top             =   1660
          Width           =   3135
@@ -228,7 +227,7 @@ Begin VB.Form frmSmpConfig
          Height          =   285
          Left            =   4920
          Locked          =   -1  'True
-         TabIndex        =   19
+         TabIndex        =   18
          TabStop         =   0   'False
          Top             =   1960
          Width           =   3135
@@ -238,7 +237,7 @@ Begin VB.Form frmSmpConfig
          Height          =   285
          Left            =   4920
          Locked          =   -1  'True
-         TabIndex        =   20
+         TabIndex        =   19
          TabStop         =   0   'False
          Top             =   2260
          Width           =   3135
@@ -315,7 +314,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00000000&
          Height          =   255
          Left            =   3960
-         TabIndex        =   40
+         TabIndex        =   39
          Top             =   1440
          Width           =   975
       End
@@ -324,7 +323,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00000000&
          Height          =   255
          Left            =   120
-         TabIndex        =   35
+         TabIndex        =   34
          Top             =   240
          Width           =   975
       End
@@ -333,7 +332,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00000000&
          Height          =   255
          Left            =   120
-         TabIndex        =   34
+         TabIndex        =   33
          Top             =   720
          Width           =   615
       End
@@ -342,7 +341,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00000000&
          Height          =   255
          Left            =   120
-         TabIndex        =   33
+         TabIndex        =   32
          Top             =   1185
          Width           =   855
       End
@@ -351,7 +350,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00000000&
          Height          =   255
          Left            =   120
-         TabIndex        =   32
+         TabIndex        =   31
          Top             =   2040
          Width           =   855
       End
@@ -360,7 +359,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00000000&
          Height          =   255
          Left            =   3960
-         TabIndex        =   31
+         TabIndex        =   30
          Top             =   255
          Width           =   735
       End
@@ -369,7 +368,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00000000&
          Height          =   255
          Left            =   3960
-         TabIndex        =   30
+         TabIndex        =   29
          Top             =   555
          Width           =   735
       End
@@ -378,7 +377,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00000000&
          Height          =   255
          Left            =   3960
-         TabIndex        =   29
+         TabIndex        =   28
          Top             =   855
          Width           =   975
       End
@@ -387,7 +386,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00000000&
          Height          =   255
          Left            =   3960
-         TabIndex        =   28
+         TabIndex        =   27
          Top             =   1155
          Width           =   975
       End
@@ -396,7 +395,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00000000&
          Height          =   255
          Left            =   3960
-         TabIndex        =   27
+         TabIndex        =   26
          Top             =   1695
          Width           =   495
       End
@@ -405,7 +404,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00000000&
          Height          =   255
          Left            =   3960
-         TabIndex        =   26
+         TabIndex        =   25
          Top             =   1995
          Width           =   615
       End
@@ -414,7 +413,7 @@ Begin VB.Form frmSmpConfig
          ForeColor       =   &H00000000&
          Height          =   255
          Left            =   3960
-         TabIndex        =   25
+         TabIndex        =   24
          Top             =   2295
          Width           =   375
       End
@@ -431,17 +430,9 @@ Begin VB.Form frmSmpConfig
       EndProperty
       Height          =   2655
       Left            =   120
-      TabIndex        =   21
+      TabIndex        =   20
       Top             =   3240
       Width           =   8175
-      Begin VB.CommandButton cmdNotes 
-         Caption         =   "Notes"
-         Height          =   255
-         Left            =   7080
-         TabIndex        =   13
-         Top             =   2280
-         Width           =   975
-      End
       Begin VB.CommandButton cmdConfigure 
          Caption         =   "Configure"
          Height          =   255
@@ -461,7 +452,7 @@ Begin VB.Form frmSmpConfig
       Begin GridEX20.GridEX jgrdData 
          Height          =   1935
          Left            =   120
-         TabIndex        =   22
+         TabIndex        =   21
          TabStop         =   0   'False
          Top             =   240
          Width           =   7935
@@ -497,7 +488,7 @@ Begin VB.Form frmSmpConfig
          Caption         =   "Selected Column:"
          Height          =   255
          Left            =   120
-         TabIndex        =   23
+         TabIndex        =   22
          Top             =   2280
          Width           =   1455
       End
@@ -607,7 +598,6 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Public dirtyFlag As String             'flag to signal dirty form
-Public notes As String
 Public oIRQInfo As CIRQInfo
 
 Dim jobShippingId As Long
@@ -880,6 +870,11 @@ End Sub
 
 Private Sub cmdDeleteButton_Click()
     On Error GoTo Handle_Error
+    
+    If gLinkLock.IsLockStillValid = False Then
+        MsgBox "You cannot delete a sample because your lock on the Links has been deleted." & vbCrLf & vbCrLf & "Please reload before continuing.", vbInformation + vbOKOnly, "Invalid Lock"
+        Exit Sub
+    End If
         
     If MsgBox("Are you sure you want to delete this sample?", _
         vbQuestion + vbYesNo) = vbYes Then
@@ -957,6 +952,12 @@ Private Sub cmdDeleteButton_Click()
     jgrdData.ItemCount = mData.count
     jgrdData.Update
     jgrdData.Refresh
+    
+    If booReplacement = False Then
+        basGlobals.UpdateLinkLockVersionAndUpdatedBy
+    Else
+        basGlobals.UpdateLinkLockVersion
+    End If
     
 Cleanup_Exit:
      Exit Sub
@@ -1107,12 +1108,9 @@ Private Sub cmdNextButton_Click()
     
 End Sub
 
-Private Sub cmdNotes_Click()
-    Load frmNotes
-    frmNotes.Show vbModal
-End Sub
 
 Private Sub cmdSaveButton_Click()
+On Error GoTo errorHandler
     Dim colCount As Long
     Dim j As Long
     
@@ -1123,13 +1121,7 @@ Private Sub cmdSaveButton_Click()
     'checks if the form is valid
     If Valid_Sample_Form() Then
         If SSDBComboSmpType.text = "CLINTRAK" Then
-            notes = "This is an INTERNAL SAMPLE - DO NOT SHIP!!!"
             jobShippingId = 0
-        Else
-            If notes = "This is a CLINTRAK SAMPLE - DO NOT SHIP!!!" Or _
-                    notes = "This is an INTERNAL SAMPLE - DO NOT SHIP!!!" Then
-                notes = " "
-            End If
         End If
                 
         Call CollectionToFile(gSampleFileName)
@@ -1166,6 +1158,19 @@ Private Sub cmdSaveButton_Click()
         jgrdData.Columns.Item(j).Visible = False
     Next j
     
+    If booReplacement = False Then
+        basGlobals.UpdateLinkLockVersionAndUpdatedBy
+    Else
+        basGlobals.UpdateLinkLockVersion
+    End If
+    
+cleanupExit:
+     Exit Sub
+     
+errorHandler:
+     MsgBox Err.description & vbCrLf & _
+         "in frmSmpConfig.cmdSaveButton_Click"
+     Resume cleanupExit
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
@@ -1174,8 +1179,6 @@ Private Sub Form_Unload(Cancel As Integer)
     
     ProductionRun.Sample_Number = frmProdPlan.txtSampleGroups
     ProductionRun.Samples_Requested = frmProdPlan.txtSamples
-    
-'    ProductionRun.UpdateSampleQuantities
 End Sub
 
 Private Sub jgrdData_ColumnHeaderClick(ByVal column As GridEX20.JSColumn)
@@ -1427,7 +1430,7 @@ Private Sub SSDBComboSmpType_Click()
         
         Call UpdateFirstColumn
         
-        comboSmp = Me.SSDBComboSmpType.Columns(0).text 'comboSmpType.List(comboSmpType.ListIndex)
+        comboSmp = Me.SSDBComboSmpType.Columns(0).text
     End If
     
     Call SetScreenEdit
@@ -1588,8 +1591,7 @@ On Error GoTo Error_this_Sub
         .AddParameter "Quantity", mData.count, adInteger, adParamInput
         .AddParameter "Sample File Name", gSampleFileName, adVarChar, adParamInput
         .AddParameter "Sample Description", CheckNulls(txtDescription), adChar, adParamInput
-        .AddParameter "Notes", CheckNulls(notes), adVarChar, adParamInput
-
+        
         .AddParameter "return", "   ", adInteger, adParamOutput ' the "   " is for a length value
         .AddParameter "identity", "   ", adInteger, adParamOutput ' the "   " is for a length value
 
@@ -1648,13 +1650,11 @@ On Error GoTo Error_this_Function
             jobShippingId = .Recordset!Job_Shipping_Id
             comboSmp = SSDBComboSmpType.text
             description = txtDescription.text
-            notes = .Recordset!notes
         Else
             txtQtynumber = "1"
             gSampleFileName = ""
             txtDescription = SSDBComboSmpType.text
             gSampleTypeId = 0
-            notes = ""
         End If
         
         'checks to see if the a sample file exists for this particular production run
@@ -1744,6 +1744,12 @@ Public Function Valid_Sample_Form() As Boolean
                 Exit Function
             End If
         End If
+    End If
+
+    If gLinkLock.IsLockStillValid = False Then
+        MsgBox "You cannot save because your lock on the Links has been deleted." & vbCrLf & vbCrLf & "Please reload before continuing.", vbInformation + vbOKOnly, "Invalid Lock"
+        Valid_Sample_Form = False
+        Exit Function
     End If
     
     columnSqueezeCapacity = 32
@@ -2448,12 +2454,12 @@ On Error GoTo Handle_Error
         colArray(UBound(colArray)) = tempHolder
     End If
     
-exit_sub:
+Exit_Sub:
     Exit Sub
 
 Handle_Error:
     Err.Raise Err.Number, Err.Source, Err.description, , "Extract_MergeBarcode_Columns"
-    Resume exit_sub
+    Resume Exit_Sub
 
 End Sub
 

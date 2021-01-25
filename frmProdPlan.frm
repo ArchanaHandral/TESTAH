@@ -1,6 +1,5 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "Richtx32.ocx"
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "mscomctl.OCX"
 Object = "{8D650141-6025-11D1-BC40-0000C042AEC0}#3.0#0"; "ssdw3b32.ocx"
 Begin VB.Form frmProdPlan 
    BorderStyle     =   0  'None
@@ -26,10 +25,26 @@ Begin VB.Form frmProdPlan
    ScaleHeight     =   9675
    ScaleWidth      =   10650
    ShowInTaskbar   =   0   'False
+   Begin VB.TextBox txtPdrSpecialInstructions 
+      Height          =   285
+      Left            =   1320
+      TabIndex        =   68
+      Top             =   9000
+      Visible         =   0   'False
+      Width           =   255
+   End
+   Begin VB.TextBox txtLinksSpecialInstructions 
+      Height          =   285
+      Left            =   1680
+      TabIndex        =   67
+      Top             =   9000
+      Visible         =   0   'False
+      Width           =   255
+   End
    Begin VB.Frame Frame1 
       Height          =   1080
       Left            =   120
-      TabIndex        =   62
+      TabIndex        =   58
       Top             =   1080
       Width           =   5295
       Begin VB.TextBox txtClientName 
@@ -48,7 +63,7 @@ Begin VB.Form frmProdPlan
          Height          =   285
          Left            =   1080
          Locked          =   -1  'True
-         TabIndex        =   65
+         TabIndex        =   61
          TabStop         =   0   'False
          Text            =   "XXXXXXXXXXXXXXXXX"
          Top             =   120
@@ -70,7 +85,7 @@ Begin VB.Form frmProdPlan
          Height          =   285
          Left            =   1080
          Locked          =   -1  'True
-         TabIndex        =   64
+         TabIndex        =   60
          TabStop         =   0   'False
          Text            =   "0000-000-00 RL#00"
          Top             =   360
@@ -93,7 +108,7 @@ Begin VB.Form frmProdPlan
          Left            =   1080
          Locked          =   -1  'True
          MultiLine       =   -1  'True
-         TabIndex        =   63
+         TabIndex        =   59
          TabStop         =   0   'False
          Top             =   600
          Width           =   3945
@@ -105,7 +120,7 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00000000&
          Height          =   285
          Left            =   120
-         TabIndex        =   68
+         TabIndex        =   64
          Top             =   360
          Width           =   615
       End
@@ -116,7 +131,7 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00000000&
          Height          =   285
          Left            =   120
-         TabIndex        =   67
+         TabIndex        =   63
          Top             =   120
          Width           =   540
       End
@@ -127,7 +142,7 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00000000&
          Height          =   285
          Left            =   120
-         TabIndex        =   66
+         TabIndex        =   62
          Top             =   600
          Width           =   690
       End
@@ -135,8 +150,8 @@ Begin VB.Form frmProdPlan
    Begin VB.Frame FrameClientInventory 
       Height          =   1335
       Left            =   120
-      TabIndex        =   57
-      Top             =   4320
+      TabIndex        =   53
+      Top             =   3720
       Width           =   5295
       Begin VB.CommandButton cmdReason 
          Caption         =   "Reason"
@@ -170,7 +185,7 @@ Begin VB.Form frmProdPlan
          Height          =   285
          Left            =   1080
          Locked          =   -1  'True
-         TabIndex        =   61
+         TabIndex        =   57
          TabStop         =   0   'False
          Text            =   "000000"
          Top             =   600
@@ -192,7 +207,7 @@ Begin VB.Form frmProdPlan
          Height          =   285
          Left            =   1080
          Locked          =   -1  'True
-         TabIndex        =   59
+         TabIndex        =   55
          TabStop         =   0   'False
          Text            =   "XXXXXXXXXXXX"
          Top             =   240
@@ -205,7 +220,7 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00C00000&
          Height          =   195
          Left            =   120
-         TabIndex        =   60
+         TabIndex        =   56
          Top             =   600
          Width           =   795
          WordWrap        =   -1  'True
@@ -217,7 +232,7 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00000000&
          Height          =   270
          Left            =   120
-         TabIndex        =   58
+         TabIndex        =   54
          Top             =   240
          Width           =   855
       End
@@ -237,7 +252,7 @@ Begin VB.Form frmProdPlan
       ForeColor       =   &H000000FF&
       Height          =   285
       Left            =   6600
-      TabIndex        =   56
+      TabIndex        =   52
       Text            =   "NON-BILLABLE"
       Top             =   9350
       Width           =   1215
@@ -245,7 +260,7 @@ Begin VB.Form frmProdPlan
    Begin VB.Frame fraDescription 
       Height          =   4215
       Left            =   5520
-      TabIndex        =   43
+      TabIndex        =   39
       Top             =   3000
       Width           =   5055
       Begin VB.CommandButton cmdSpecInst 
@@ -299,7 +314,7 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00000000&
          Height          =   195
          Left            =   120
-         TabIndex        =   45
+         TabIndex        =   41
          Top             =   3000
          Width           =   1110
       End
@@ -309,7 +324,7 @@ Begin VB.Form frmProdPlan
          Caption         =   "Description:"
          Height          =   195
          Left            =   120
-         TabIndex        =   44
+         TabIndex        =   40
          Top             =   240
          Width           =   855
       End
@@ -329,7 +344,7 @@ Begin VB.Form frmProdPlan
       ForeColor       =   &H000000FF&
       Height          =   285
       Left            =   3240
-      TabIndex        =   51
+      TabIndex        =   47
       Text            =   "COMBINED/ PDR HAS BEEN PROCESSED"
       Top             =   9350
       Width           =   3255
@@ -349,7 +364,7 @@ Begin VB.Form frmProdPlan
       ForeColor       =   &H000000FF&
       Height          =   285
       Left            =   1920
-      TabIndex        =   50
+      TabIndex        =   46
       Text            =   "REPLACEMENT"
       Top             =   9350
       Width           =   1215
@@ -359,7 +374,7 @@ Begin VB.Form frmProdPlan
       BorderStyle     =   0  'None
       Height          =   1085
       Left            =   0
-      TabIndex        =   46
+      TabIndex        =   42
       Top             =   0
       Width           =   10605
       Begin VB.TextBox txtBarcodeId 
@@ -379,7 +394,7 @@ Begin VB.Form frmProdPlan
          Height          =   345
          Left            =   225
          Locked          =   -1  'True
-         TabIndex        =   48
+         TabIndex        =   44
          TabStop         =   0   'False
          Text            =   "PDR______"
          Top             =   80
@@ -401,7 +416,7 @@ Begin VB.Form frmProdPlan
          Height          =   195
          Left            =   240
          Locked          =   -1  'True
-         TabIndex        =   47
+         TabIndex        =   43
          TabStop         =   0   'False
          Text            =   "XXXXX XXXXXXXXXX"
          Top             =   600
@@ -414,7 +429,7 @@ Begin VB.Form frmProdPlan
          Caption         =   "Created By:"
          Height          =   195
          Left            =   210
-         TabIndex        =   49
+         TabIndex        =   45
          Top             =   405
          Width           =   10245
       End
@@ -422,7 +437,7 @@ Begin VB.Form frmProdPlan
    Begin VB.Frame Frame5 
       Height          =   1935
       Left            =   5520
-      TabIndex        =   41
+      TabIndex        =   37
       Top             =   1080
       Width           =   5055
       Begin VB.CheckBox chkPrintAtPackager 
@@ -483,7 +498,7 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00000000&
          Height          =   300
          Left            =   120
-         TabIndex        =   42
+         TabIndex        =   38
          Top             =   600
          Width           =   585
       End
@@ -491,7 +506,7 @@ Begin VB.Form frmProdPlan
    Begin VB.Frame Frame4 
       Height          =   1095
       Left            =   120
-      TabIndex        =   30
+      TabIndex        =   28
       Top             =   7680
       Width           =   5295
       Begin VB.CheckBox chkReOrientation 
@@ -508,7 +523,7 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00C00000&
          Height          =   255
          Left            =   120
-         TabIndex        =   34
+         TabIndex        =   32
          Top             =   720
          Width           =   2655
       End
@@ -528,7 +543,7 @@ Begin VB.Form frmProdPlan
          Height          =   285
          Left            =   1080
          Locked          =   -1  'True
-         TabIndex        =   31
+         TabIndex        =   29
          TabStop         =   0   'False
          Text            =   "XXXXXXXX"
          Top             =   360
@@ -541,7 +556,7 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00000000&
          Height          =   390
          Left            =   120
-         TabIndex        =   33
+         TabIndex        =   31
          Top             =   240
          Width           =   810
          WordWrap        =   -1  'True
@@ -554,7 +569,7 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00008000&
          Height          =   390
          Left            =   2760
-         TabIndex        =   32
+         TabIndex        =   30
          Top             =   240
          Width           =   2295
          WordWrap        =   -1  'True
@@ -570,9 +585,9 @@ Begin VB.Form frmProdPlan
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   2175
+      Height          =   1575
       Left            =   120
-      TabIndex        =   29
+      TabIndex        =   27
       Top             =   2160
       Width           =   5295
       Begin VB.TextBox txtClientTGId 
@@ -589,12 +604,12 @@ Begin VB.Form frmProdPlan
          EndProperty
          ForeColor       =   &H00000000&
          Height          =   285
-         Left            =   1080
+         Left            =   1200
          Locked          =   -1  'True
-         TabIndex        =   54
+         TabIndex        =   50
          TabStop         =   0   'False
          Text            =   "XXXXXXXXXXXXXXXXXXX"
-         Top             =   1800
+         Top             =   1200
          Width           =   4020
       End
       Begin VB.TextBox txtGroupName 
@@ -611,36 +626,13 @@ Begin VB.Form frmProdPlan
          EndProperty
          ForeColor       =   &H00000000&
          Height          =   525
-         Left            =   1080
-         Locked          =   -1  'True
-         MultiLine       =   -1  'True
-         TabIndex        =   40
-         TabStop         =   0   'False
-         Top             =   1200
-         Width           =   4020
-      End
-      Begin VB.TextBox txtCoding 
-         BackColor       =   &H8000000F&
-         BorderStyle     =   0  'None
-         BeginProperty Font 
-            Name            =   "Tahoma"
-            Size            =   8.25
-            Charset         =   0
-            Weight          =   700
-            Underline       =   0   'False
-            Italic          =   0   'False
-            Strikethrough   =   0   'False
-         EndProperty
-         ForeColor       =   &H00000000&
-         Height          =   645
-         Left            =   1080
+         Left            =   1200
          Locked          =   -1  'True
          MultiLine       =   -1  'True
          TabIndex        =   36
          TabStop         =   0   'False
-         Text            =   "frmProdPlan.frx":1272
-         Top             =   240
-         Width           =   4035
+         Top             =   600
+         Width           =   4020
       End
       Begin VB.TextBox txtFileName 
          BackColor       =   &H8000000F&
@@ -656,12 +648,12 @@ Begin VB.Form frmProdPlan
          EndProperty
          ForeColor       =   &H00000000&
          Height          =   285
-         Left            =   1080
+         Left            =   1200
          Locked          =   -1  'True
-         TabIndex        =   35
+         TabIndex        =   33
          TabStop         =   0   'False
          Text            =   "XXXXXXXXXXXXXXXXXXX"
-         Top             =   840
+         Top             =   240
          Width           =   4020
       End
       Begin VB.Label lblClientTGId 
@@ -670,9 +662,9 @@ Begin VB.Form frmProdPlan
          Caption         =   "Client TG ID:"
          ForeColor       =   &H00000000&
          Height          =   195
-         Left            =   120
-         TabIndex        =   55
-         Top             =   1800
+         Left            =   240
+         TabIndex        =   51
+         Top             =   1200
          Width           =   915
       End
       Begin VB.Label Label3 
@@ -681,22 +673,11 @@ Begin VB.Form frmProdPlan
          Caption         =   "Treatment Group:"
          ForeColor       =   &H00000000&
          Height          =   390
-         Left            =   120
-         TabIndex        =   39
-         Top             =   1200
+         Left            =   240
+         TabIndex        =   35
+         Top             =   600
          Width           =   885
          WordWrap        =   -1  'True
-      End
-      Begin VB.Label Label10 
-         AutoSize        =   -1  'True
-         BackStyle       =   0  'Transparent
-         Caption         =   "Coding:"
-         ForeColor       =   &H00000000&
-         Height          =   285
-         Left            =   120
-         TabIndex        =   38
-         Top             =   240
-         Width           =   555
       End
       Begin VB.Label Label1 
          AutoSize        =   -1  'True
@@ -704,9 +685,9 @@ Begin VB.Form frmProdPlan
          Caption         =   "File Name:"
          ForeColor       =   &H00000000&
          Height          =   285
-         Left            =   120
-         TabIndex        =   37
-         Top             =   840
+         Left            =   240
+         TabIndex        =   34
+         Top             =   240
          Width           =   750
       End
    End
@@ -737,10 +718,10 @@ Begin VB.Form frmProdPlan
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   2055
+      Height          =   2535
       Left            =   120
-      TabIndex        =   23
-      Top             =   5640
+      TabIndex        =   21
+      Top             =   5160
       Width           =   5295
       Begin VB.TextBox txtOnsertBaseRollStock 
          BackColor       =   &H8000000F&
@@ -758,10 +739,10 @@ Begin VB.Form frmProdPlan
          Height          =   285
          Left            =   1080
          Locked          =   -1  'True
-         TabIndex        =   69
+         TabIndex        =   65
          TabStop         =   0   'False
          Text            =   "RLP12345 (min width: 1.0625)"
-         Top             =   1680
+         Top             =   2040
          Width           =   4095
       End
       Begin VB.TextBox txtOnsertDie 
@@ -780,10 +761,10 @@ Begin VB.Form frmProdPlan
          Height          =   285
          Left            =   1080
          Locked          =   -1  'True
-         TabIndex        =   52
+         TabIndex        =   48
          TabStop         =   0   'False
          Text            =   "XXXX.XXXX.XX.XXX.XXXX.XX"
-         Top             =   1320
+         Top             =   1680
          Width           =   4095
       End
       Begin VB.TextBox txtDesc 
@@ -799,11 +780,11 @@ Begin VB.Form frmProdPlan
             Strikethrough   =   0   'False
          EndProperty
          ForeColor       =   &H00000000&
-         Height          =   645
+         Height          =   1005
          Left            =   1080
          Locked          =   -1  'True
          MultiLine       =   -1  'True
-         TabIndex        =   25
+         TabIndex        =   23
          TabStop         =   0   'False
          Top             =   600
          Width           =   4065
@@ -824,7 +805,7 @@ Begin VB.Form frmProdPlan
          Height          =   285
          Left            =   1080
          Locked          =   -1  'True
-         TabIndex        =   24
+         TabIndex        =   22
          TabStop         =   0   'False
          Text            =   "XXXXXXXXXXXX"
          Top             =   240
@@ -836,8 +817,8 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00000000&
          Height          =   435
          Left            =   120
-         TabIndex        =   70
-         Top             =   1560
+         TabIndex        =   66
+         Top             =   1920
          Width           =   780
          WordWrap        =   -1  'True
       End
@@ -848,8 +829,8 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00000000&
          Height          =   270
          Left            =   120
-         TabIndex        =   53
-         Top             =   1320
+         TabIndex        =   49
+         Top             =   1680
          Width           =   855
       End
       Begin VB.Label Label4 
@@ -857,7 +838,7 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00000000&
          Height          =   285
          Left            =   120
-         TabIndex        =   27
+         TabIndex        =   25
          Top             =   600
          Width           =   975
       End
@@ -866,7 +847,7 @@ Begin VB.Form frmProdPlan
          ForeColor       =   &H00000000&
          Height          =   225
          Left            =   120
-         TabIndex        =   26
+         TabIndex        =   24
          Top             =   240
          Width           =   780
       End
@@ -1023,36 +1004,10 @@ Begin VB.Form frmProdPlan
       Visible         =   0   'False
       Width           =   180
    End
-   Begin RichTextLib.RichTextBox rtbLinkInstructions 
-      Height          =   360
-      Left            =   2760
-      TabIndex        =   21
-      TabStop         =   0   'False
-      Top             =   8910
-      Visible         =   0   'False
-      Width           =   1335
-      _ExtentX        =   2355
-      _ExtentY        =   635
-      _Version        =   393217
-      TextRTF         =   $"frmProdPlan.frx":1286
-   End
-   Begin RichTextLib.RichTextBox rtbPDRInstructions 
-      Height          =   360
-      Left            =   1320
-      TabIndex        =   22
-      TabStop         =   0   'False
-      Top             =   8910
-      Visible         =   0   'False
-      Width           =   1335
-      _ExtentX        =   2355
-      _ExtentY        =   635
-      _Version        =   393217
-      TextRTF         =   $"frmProdPlan.frx":1301
-   End
    Begin MSComctlLib.StatusBar StatusBar1 
       Height          =   285
       Left            =   0
-      TabIndex        =   28
+      TabIndex        =   26
       Top             =   9390
       Width           =   10650
       _ExtentX        =   18785
@@ -1222,6 +1177,7 @@ Public booSamplesDirtyFlag As Boolean
 Private mvarDebugText As String
 Private mvarDebugIcoPath As String
 Public mvarBillingDirty As Boolean
+Public mvarLinksReportDirty As Boolean
 
 
 Private Function CheckOverrides() As Boolean
@@ -1232,6 +1188,18 @@ Private Function CheckOverrides() As Boolean
     End If
 End Function
 
+Private Sub CheckSave()
+    If HasDataChanged Then
+        Select Case MsgBox("Do you want to save changes?", vbYesNo + vbQuestion)
+            Case vbNo
+                Me.txtDirtyFlag = ""
+            Case vbYes
+                cmdSave_Click
+        End Select
+    Else
+        Me.txtDirtyFlag = ""
+    End If
+End Sub
 Private Sub chkUseClientInventory_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
     Dim response As Integer
     If Button = vbLeftButton Then
@@ -1324,7 +1292,6 @@ Private Sub Form_Load()
     xmls.AppName = "ProductionRuns"
     gRnrBaseFilePath = xmls.GetAppSetting("RnrBasePath")
     gRnrDebugFilePath = gRnrBaseFilePath & "DEBUG\"
-
     
     ' came from ProdRunMain ------------------
     Call getFileLinksInfo
@@ -1333,7 +1300,7 @@ Private Sub Form_Load()
     Call GetRandIDNumber
     Call GetRandDelimiter
     Call GetLabelCurrentValues
-   
+
     'set this flag each time this screen is entered
     booReplacement = False
     Me.txtReplacement.Visible = False
@@ -1360,7 +1327,6 @@ Private Sub Form_Load()
     Me.txtFileName = GetFileNameFromFilePath(gCodingFileName)
     Me.txtGroupName = gGroupName
     Me.txtClientTGId = gClientGroupName
-    Me.txtCoding = gCodingName
     strGroupNum = gGroupNumber
     'loads the ship to combobox with all associated shipping addresses
     Call LoadShipToCombo2Column(Me.SSDBComboShip)
@@ -1443,6 +1409,7 @@ Private Sub Form_Load()
                
                     ProductionRun.Qty_Requested = lngQtyReq
                     Me.txtDirtyFlag = "Y"
+                    mvarLinksReportDirty = True
                     Me.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
                 End If
             End If
@@ -1458,6 +1425,7 @@ Private Sub Form_Load()
     Else
         booNewProdRun = True
         Me.txtDirtyFlag = "Y"
+        Me.mvarLinksReportDirty = True
         Me.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
         Me.cmdSpecInst.enabled = False
         ProductionRun.Job_Log_Id = gJob_Id
@@ -1669,6 +1637,7 @@ Private Sub Form_Load()
                                 "You must SAVE the PDR in order to save this change.", vbInformation, "Stock Updated"
             
                     booChange = True
+                    mvarLinksReportDirty = True
                 End If
             Else
                 MsgBox "The PDR's stock is currently " & ProductionRun.stock & "." & vbCrLf & _
@@ -1717,7 +1686,7 @@ Private Sub Form_Load()
                                 "You must SAVE the PDR in order to save this change.", vbInformation, "Blinding Laminate Updated"
                     
                     booChange = True
-                    
+                    mvarLinksReportDirty = True
                 End If
             
             Else
@@ -1769,11 +1738,10 @@ Private Sub Form_Load()
             End If
         End If
         
-        If booChange = True Then
+        If booChange = True Or (mvarLinksReportDirty And booReplacement = False) Then
             Me.txtDirtyFlag.text = "Y"
             Me.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
         End If
-
     End If
         
     ' DW 2012-001 added
@@ -1879,7 +1847,7 @@ End Sub
 Private Sub cmdSpecInst_Click()
 
     Load frmSpecInst
-    frmSpecInst.rtbInstructions = ProductionRun.Special_Inst
+    frmSpecInst.txtInstructions = ProductionRun.Special_Inst
     ' Do not allow users to save changes if the PDR has run
     frmSpecInst.OKButton.enabled = Not Me.txtPDRStatus.Visible
     frmSpecInst.Show vbModal
@@ -1897,7 +1865,7 @@ Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
 '   3 - The Microsoft Windows Task Manager is closing the application.
 '   4 - An MDI child form is closing because the MDI form is closing.
     If ProductionRun.IsProductionRunDeleted Then Exit Sub
-    Call CheckData
+    CheckSave
     
     ' DW 2010-002 added
     Select Case UnloadMode
@@ -1974,6 +1942,13 @@ Private Sub cmdDeleteProdRun_Click()
         GoTo Exit_this_Sub
     End If
     
+    If ProductionRun.ApprovalDate <> "1/1/1900" Then
+        MsgBox _
+            "This PDR cannot be deleted because it is already approved." & vbCrLf & _
+            "If possible, unapprove the PDR/Links and then try again.", vbExclamation
+        Exit Sub
+    End If
+    
     ' to not allow delete if an IRQ exists
     If Me.txtStockIRQ <> "" And Me.txtScratchIRQ <> "" Then
         MsgBox _
@@ -2020,6 +1995,11 @@ Private Sub cmdDeleteProdRun_Click()
         "It is associated to a rush request.", vbExclamation
         Exit Sub
     End If
+    
+    If gLinkLock.IsLockStillValid = False Then
+        MsgBox "You cannot delete this PDR because your lock on the Links has been deleted." & vbCrLf & vbCrLf & "Please reload before continuing.", vbInformation + vbOKOnly, "Invalid Lock"
+        Exit Sub
+    End If
 
     If MsgBox("Are you sure you want to Delete this Production Run?", _
         vbQuestion + vbYesNo) = vbNo Then
@@ -2048,6 +2028,7 @@ Private Sub cmdDeleteProdRun_Click()
         MsgBox "Production Run Record was Successfully Deleted.", vbInformation
         Call UpdateCompletelyShippedFlag(ProductionRun.Job_Log_Id)
         txtDirtyFlag = ""
+        mvarLinksReportDirty = False
     Else
         MsgBox "Production Run Record was NOT Deleted." & Chr$(13) & "Check data and retry.", vbCritical
     End If
@@ -2107,7 +2088,6 @@ Private Sub Form_Unload(Cancel As Integer)
     gCodingFileName = ""
     gRandDelimiter = ""
     gOriginalPDRBarcode = ""
-    gCodingName = ""
     gCodingNumber = 0
     gGroupNumber = 0
     gGroupName = ""
@@ -2194,6 +2174,11 @@ Private Sub duplicateConfig_Click()
                 vbInformation + vbOKOnly, "Warning - Error Duplicating"
         Exit Sub
     End If
+    
+    If gLinkLock.IsLockStillValid = False Then
+        MsgBox "You cannot duplicate samples because your lock on the Links has been deleted." & vbCrLf & vbCrLf & "Please reload before continuing.", vbInformation + vbOKOnly, "Invalid Lock"
+        Exit Sub
+    End If
 
     Set dupData = New CCOLdupFiles
     Set dupSameCodingData = New CCOLdupFiles
@@ -2274,6 +2259,11 @@ Private Sub duplicateConfig_Click()
                         End If
                     End If
             Next i
+            If booReplacement = False Then
+                basGlobals.UpdateLinkLockVersionAndUpdatedBy
+            Else
+                basGlobals.UpdateLinkLockVersion
+            End If
                 
             MsgBox _
                 "Samples have been duplicated for Production Runs.", vbInformation
@@ -2360,7 +2350,7 @@ Private Sub mnuReplacements_Click()
     
     On Error GoTo Error_this_Sub
       
-    Call CheckData
+    CheckSave
     
     Dim Message, title, Default
     Dim txtInputSeqNum As String
@@ -2617,7 +2607,7 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
     
     On Error GoTo Error_this_Sub
     
-    Call CheckData
+    Call CheckSave
 
     Dim intLastSlashPos As Integer
     Dim RPFound As Boolean
@@ -2814,6 +2804,7 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
     ' Clear dirty flag here because if the flag was tripped as
     ' part of the data load process it doesn't count.
     Me.txtDirtyFlag.text = ""
+    mvarLinksReportDirty = False
     
     If DeterminePDROnPKS = False Then
         strReason = ""
@@ -3161,10 +3152,26 @@ Private Sub cmdSave_Click()
             End If
         Next
     End If
+    
+    If gLinkLock.IsLockStillValid = False Then
+        MsgBox "You cannot save because your lock on the Links has been deleted." & vbCrLf & vbCrLf & "Please reload before continuing.", vbInformation + vbOKOnly, "Invalid Lock"
+        GoTo Exit_this_Sub
+    End If
 
     Call AppendRefNumber
     Call AppendClientReqdFields
+    
+    HasDataChanged
+    
+    If (Not (Determine_If_PDR_HasRun And (Not booNewProdRun))) Or booReplacement Then
+            Call DupLinksSpecInstructions
+    End If
+    
+    If booReplacement Then
+        Call AppendOrigRunToSpecInstructions
+    End If
 
+    
     Set smpData = New CCOLsmpFiles
     booInitialSave = (ProductionRun.Production_Run_Id = 0)
     
@@ -3208,15 +3215,7 @@ Private Sub cmdSave_Click()
        ProductionRun.SaveProdRun
     End If
     
-       
     If ProductionRun.Prod_Run_Updated Then
-        If (Not (Determine_If_PDR_HasRun And (Not booNewProdRun))) Or booReplacement Then
-            Call DupLinksSpecInstructions
-        End If
-        
-        If booReplacement Then
-            Call AppendOrigRunToSpecInstructions
-        End If
         gProductionRun_Id = ProductionRun.Production_Run_Id     'assigns the global to the new production run id
         If Not CheckExistingSample Then
             If Save_Samples_FromPDR_Screen Then
@@ -3264,6 +3263,7 @@ Private Sub cmdSave_Click()
         Call UpdateCompletelyShippedFlag(ProductionRun.Job_Log_Id)
         
         txtDirtyFlag = ""
+        mvarLinksReportDirty = False
         Me.cmdSpecInst.enabled = True
         Me.mvarBillingDirty = False
         
@@ -3474,15 +3474,18 @@ End Function
 '       Checks to see whether there was any data changed to the form, if there are
 '       changes it prompts the user to save.</summary>
 '</comment>
-Private Sub CheckData()
+Private Function HasDataChanged() As Boolean
     On Error GoTo Handle_Error
 
     Dim i As Long
     
-    If ProductionRun.Production_Run_Id = 0 Then GoTo Flag_Dirty
-    If Trim$(Me.txtProdDesc) <> Trim$(ProductionRun.Prod_Description) Then GoTo Flag_Dirty
+    HasDataChanged = False
+    
+    If ProductionRun.Production_Run_Id = 0 Then GoTo Flag_Dirty_Links
+    If Trim$(Me.txtProdDesc) <> Trim$(ProductionRun.Prod_Description) Then GoTo Flag_Dirty_Links
     If Trim$(Me.txtReferanceNo) <> Trim$(ProductionRun.Reference_No) Then GoTo Flag_Dirty
-    If Me.chkReOrientation.value <> ProductionRun.Reorient_Ind Then GoTo Flag_Dirty
+    If Me.chkReOrientation.value <> ProductionRun.Reorient_Ind Then GoTo Flag_Dirty_Links
+    If ProductionRun.Special_Inst <> ProductionRun.SpecialInstructions Then GoTo Flag_Dirty_Links ' Special_Inst = current, SpecialInstructions = original
     If ProductionRun.NonBillable.HasChange() Then GoTo Flag_Dirty
     If ProductionRun.HasChanges Then GoTo Flag_Dirty
         
@@ -3501,37 +3504,35 @@ Private Sub CheckData()
     If Not CBool(Me.chkPrintAtPackager.value) Then
         If (ProductionRun.Ship_To_Id <> SSDBComboShip.Columns.Item(1).text) Or _
                 ProductionRun.Ship_Description <> SSDBComboShip.Columns(0).text Then
-            GoTo Flag_Dirty
+            GoTo Flag_Dirty_Links
         End If
     End If
     
-Data_Changed:
-    
-
-    If Me.txtDirtyFlag = "Y" Then
-
-        Select Case MsgBox("Do you want to save changes?", vbYesNo + vbQuestion)
-            Case vbNo
-                Me.txtDirtyFlag = ""
-            Case vbYes
-                Call cmdSave_Click
-        End Select
-    Else
-        Me.txtDirtyFlag = ""
+    If txtDirtyFlag.text = "Y" Then
+        ' if we found no changes above, still go through the process if the flag was manually set
+        GoTo Flag_Dirty
     End If
-    GoTo Cleanup_Exit
+    
+    HasDataChanged = False
+    
+Cleanup_Exit:
+    Exit Function
+    
+Flag_Dirty_Links:
+    If booReplacement = False Then
+        Me.mvarLinksReportDirty = True
+    End If
 
 Flag_Dirty:
     Me.txtDirtyFlag = "Y"
     Me.txtProducedBy.text = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
-    GoTo Data_Changed
-
-Cleanup_Exit:
-    Exit Sub
+    HasDataChanged = True
+    GoTo Cleanup_Exit
+    
 Handle_Error:
     Err.Raise Err.Number, Err.Source, Err.description
     Resume Cleanup_Exit
-End Sub
+End Function
 
 Private Sub CheckColumnNumbers()
 '
@@ -3610,6 +3611,11 @@ Dim i As Long
                     ' if different, display a message and exit the loop bc there's no need to continue checking.
                     If CodeString <> SmplString Then
                         ChgCodingFile = True
+                        If booReplacement = False Then
+                            basGlobals.UpdateLinkLockVersionAndUpdatedBy  ' deleted samples, so immediately update the links version
+                        Else
+                            basGlobals.UpdateLinkLockVersion
+                        End If
                         If codingColumns <> SampleColumns Then
                             MsgBox _
                                 "The number of coded fields from the original coding file has changed." & vbCrLf & _
@@ -3619,7 +3625,6 @@ Dim i As Long
                                 "The Coding File is different than the Sample Files" & vbCrLf & _
                                 "The sample files will be deleted!  You MUST reconfigure ALL samples again!!!", vbExclamation
                         End If
-                        
                         Exit For
                     End If
                 Next i
@@ -3913,8 +3918,7 @@ On Error GoTo Error_this_Sub
         .AddParameter "Quantity", smpData.Item(i).quantity, adInteger, adParamInput
         .AddParameter "Sample File Name", smpData.Item(i).smpfileName, adVarChar, adParamInput
         .AddParameter "Sample Description", CheckNulls(smpData.Item(i).smpDescription), adChar, adParamInput
-        .AddParameter "Notes", CheckNulls(smpData.Item(i).notes), adVarChar, adParamInput
-        
+
         .AddParameter "return", "   ", adInteger, adParamOutput ' the "   " is for a length value
         .AddParameter "identity", "   ", adInteger, adParamOutput ' the "   " is for a length value
         
@@ -4024,7 +4028,7 @@ Private Sub Get_ReprintSamples_ID_For_Replacements()
             
             'load the collection
               Call smpData.Add(ProductionRun.Production_Run_Id, Me.txtSampleGroups, .Recordset!Sample_Type, ProductionRun.Ship_To_Id, _
-                .Recordset!File_Record_Count, .Recordset!Sample_Type, Determine_ReplacementSample_Path(index), "", .Recordset!sample_type_id)
+                .Recordset!File_Record_Count, .Recordset!Sample_Type, Determine_ReplacementSample_Path(index), .Recordset!sample_type_id)
                 
             'create the file from the reprint sample file
             Call FileCopy(.Recordset!Reprint_Sample_File_Name, smpData.Item(index).smpfileName)
@@ -4053,9 +4057,7 @@ Dim tnotes As String
  Me.txtSamples = 2
  Me.txtSampleGroups = 1
 
- tnotes = "This is an INTERNAL SAMPLE - DO NOT SHIP!!!"
- 
- Call smpData.Add(ProductionRun.Production_Run_Id, 1, "CLINTRAK", 0, 2, "CLINTRAK", gSampleFileName, tnotes, 0) ' DW 2010-002 added final parameter
+ Call smpData.Add(ProductionRun.Production_Run_Id, 1, "CLINTRAK", 0, 2, "CLINTRAK", gSampleFileName, 0) ' DW 2010-002 added final parameter
     
 End Sub
 
@@ -4352,13 +4354,13 @@ On Error GoTo Handle_Error
     End With
     
    
-Exit_Function:
+exit_function:
     Exit Function
 
 Handle_Error:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "checkForAssociatedDigitalOverageOrder", vbExclamation
-    Resume Exit_Function
+    Resume exit_function
 
 End Function
 
@@ -4398,13 +4400,13 @@ On Error GoTo Handle_Error
     
     Get_SampleQTY = QtyTotal
 
-Exit_Function:
+exit_function:
     Exit Function
 
 Handle_Error:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Get_SampleQTY", vbExclamation
-    Resume Exit_Function
+    Resume exit_function
     
 End Function
 
@@ -4418,39 +4420,41 @@ End Function
 Private Sub DupLinksSpecInstructions()
     On Error GoTo Handle_Error
 
-    If Trim$(Me.rtbLinkInstructions.text) <> "" Then
-        Me.rtbPDRInstructions.TextRTF = ProductionRun.Special_Inst
-        If InStr(Me.rtbPDRInstructions.text, Trim$(Me.rtbLinkInstructions.text)) = 0 Then
+    If Trim$(Me.txtLinksSpecialInstructions.text) <> "" Then
+        Me.txtPdrSpecialInstructions.text = ProductionRun.Special_Inst
+        If InStr(Me.txtPdrSpecialInstructions.text, Trim$(Me.txtLinksSpecialInstructions.text)) = 0 Then
         
             If MsgBox( _
                 "Would you like to append the Links Special Instructions " & vbCrLf & _
                 "to the PDR's Special Instructions?", vbQuestion + vbYesNo) = vbYes Then
                 
-                If Trim$(Me.rtbPDRInstructions.text) <> "" Then
-                    Me.rtbPDRInstructions.text = _
-                        Me.rtbPDRInstructions.text & vbCrLf & vbCrLf & _
-                        Me.rtbLinkInstructions.text & " - " & _
+                If Trim$(Me.txtPdrSpecialInstructions.text) <> "" Then
+                    Me.txtPdrSpecialInstructions.text = _
+                        Me.txtPdrSpecialInstructions.text & vbCrLf & vbCrLf & _
+                        Me.txtLinksSpecialInstructions.text & " - " & _
                         Now & " " & gClintrakLocations(gApplicationUser.ClintrakLocationId).Time_Zone_Display
                 Else
-                    Me.rtbPDRInstructions.text = _
-                        Me.rtbLinkInstructions.text & " - " & _
+                    Me.txtPdrSpecialInstructions.text = _
+                        Me.txtLinksSpecialInstructions.text & " - " & _
                         Now & " " & gClintrakLocations(gApplicationUser.ClintrakLocationId).Time_Zone_Display
                 End If
                 
-                Call writetext
                 
-                If Len(Me.rtbPDRInstructions.text) > _
-                    Len(Me.rtbLinkInstructions.text & " - " & _
+                If Len(Me.txtPdrSpecialInstructions.text) > _
+                    Len(Me.txtLinksSpecialInstructions.text & " - " & _
                         Now & " " & gClintrakLocations(gApplicationUser.ClintrakLocationId).Time_Zone_Display) Then
                     Load frmSpecInst
-                    frmSpecInst.rtbInstructions = ProductionRun.Special_Inst
-                    ' Do not allow users to cancel b/c it has already been saved
+                    frmSpecInst.txtInstructions = Me.txtPdrSpecialInstructions.text
+                    ' Do not allow users to cancel
                     frmSpecInst.OKButton.enabled = True
                     frmSpecInst.CancelButton.enabled = False
                     frmSpecInst.Show vbModal
                 End If
             End If
         End If
+        
+        ProductionRun.Special_Inst = Me.txtPdrSpecialInstructions.text
+        
     End If
     
 Cleanup_Exit:
@@ -4460,28 +4464,6 @@ Handle_Error:
     Resume Cleanup_Exit
 End Sub
 
-Private Sub writetext()
-    Dim objData As nADOData.CADOData
-    Dim strSQL As String
-        
-    Set objData = New CADOData
-    With objData
-        ' DW 2010-002 added
-        Set .Connection = GetDBConnection
-        .ResetParameters
-        .CommandType = adCmdText
-    End With
-
-        strSQL = "declare @textpointer varbinary(16) " & _
-                "select @textpointer = textptr(Production_Runs.Special_Inst) from Production_Runs where Production_Runs.Production_Run_Id = " & ProductionRun.Production_Run_Id & _
-                "writetext Production_Runs.Special_Inst @textpointer " & " '" & CheckQuotes(Me.rtbPDRInstructions.TextRTF) & "'"
-                    
-        objData.SQL = strSQL
-        objData.Execute True
-               
-        ProductionRun.Special_Inst = Me.rtbPDRInstructions
-
-End Sub
 
 Private Sub AppendRefNumber()
 
@@ -4612,7 +4594,7 @@ End Sub
 Private Sub AppendOrigRunToSpecInstructions()
 '
 'comments:  this sub appends the replacement run's original PRG or PDR to
-'           the special instrutions in the database
+'           the special instrutions
 'parameters: none
 'returns:    nothing
 
@@ -4620,19 +4602,13 @@ Private Sub AppendOrigRunToSpecInstructions()
     
     strOrigRun = "Original Run: " & GetOriginalRunBarcode
 
-        Me.rtbPDRInstructions.TextRTF = ProductionRun.Special_Inst
-        If InStr(Me.rtbPDRInstructions.text, strOrigRun) = 0 Then
-
-            If Me.rtbPDRInstructions.text = "" Then
-                Me.rtbPDRInstructions.text = strOrigRun
-            Else
-                Me.rtbPDRInstructions.text = Me.rtbPDRInstructions.text & vbCrLf & strOrigRun
-            End If
-            
-                    
-            Call writetext
-                                                           
+        Me.txtPdrSpecialInstructions.text = ProductionRun.Special_Inst
+        
+        If InStr(Me.txtPdrSpecialInstructions.text, strOrigRun) = 0 Then
+            Me.txtPdrSpecialInstructions.text = Me.txtPdrSpecialInstructions.text & vbCrLf & strOrigRun
         End If
+        
+    ProductionRun.Special_Inst = Me.txtPdrSpecialInstructions.text
     
 End Sub
 
@@ -4655,7 +4631,7 @@ Private Function GetOriginalRunBarcode() As String
 
         .ResetParameters
     
-        .AddParameter "Production Run Id", ProductionRun.Production_Run_Id, adInteger, adParamInput
+        .AddParameter "Production Run Id", ProductionRun.Orig_Prod_Run_Id, adInteger, adParamInput
         ' Call the SP to create the recordset
         .OpenRecordSetFromSP "get_OriginalRunGroup_by_ProdRunId"
             

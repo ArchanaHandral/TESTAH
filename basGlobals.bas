@@ -13,6 +13,7 @@ Private nonBillableReasonList As Recordset
 Public gClintrakLocations As ClintrakCommon.LocationCollection
 Public gLocationHandler As ClintrakCommon.location
 Public gUserLocation As ClintrakCommon.LocationClass
+Public gLinkLock As ClintrakCommon.ItemLock
 
 'declare global variables
 Public booReplacement As Boolean
@@ -35,7 +36,6 @@ Public gQuantity As Long
 Public gCodingFileName As String
 Public gRandDelimiter As String
 Public gOriginalPDRBarcode As String
-Public gCodingName As String
 Public gCodingNumber As Long
 Public gGroupNumber As Long
 Public gGroupName As String
@@ -158,7 +158,6 @@ Public Sub getFileLinksInfo()
                 gLabelId = .Recordset!label_identification
                 gCodingFileName = .Recordset!Coding_File_Name
                 gQuantity = .Recordset!Rec_Cnt
-                gCodingName = .Recordset!Coding_Name
                 gCodingNumber = .Recordset!Coding_Number
                 gGroupNumber = .Recordset!Group_Number
                 gGroupName = .Recordset!Group_Name
@@ -210,7 +209,6 @@ Public Sub getReplacementFileLinksInfo()
                 gRandomizationId = .Recordset!rand_id
                 gProofId = .Recordset!Proof_Id
                 gCodingFileName = .Recordset!Coding_File_Name
-                gCodingName = .Recordset!Coding_Name
                 gCodingNumber = .Recordset!Coding_Number
                 gGroupNumber = .Recordset!Group_Number
                 gGroupName = .Recordset!Group_Name
@@ -475,7 +473,7 @@ Public Sub GetRandDelimiter()
         .Recordset.Close
     End With
     
-    frmProdPlan.rtbLinkInstructions.text = gLinksSpecInstr
+    frmProdPlan.txtLinksSpecialInstructions.text = gLinksSpecInstr
     
 Exit_this_Sub:
     Exit Sub
@@ -1252,7 +1250,7 @@ On Error GoTo Error_this_Sub
             Do Until .Recordset.EOF
                 sdata.Add .Recordset!Production_Run_Id, .Recordset!Type_Number, _
                             .Recordset!Sample_Type, .Recordset!Job_Shipping_Id, .Recordset!quantity, _
-                            .Recordset!Sample_Description, .Recordset!Sample_File_Name, .Recordset!notes, .Recordset!sample_type_id
+                            .Recordset!Sample_Description, .Recordset!Sample_File_Name, .Recordset!sample_type_id
                 .Recordset.MoveNext
             Loop
         End If
@@ -1327,7 +1325,7 @@ deleteCount = sdata.count
             'get the description from lookup table to be used in the creation of the file
              Call WriteFile(mData, GetLookupDesc(sdata.Item(j).sampleType), strFileName)
              sdata.Add dData.Item(i).productionId, sdata.Item(j).typeNumber, sdata.Item(j).sampleType, _
-             sdata.Item(j).shipTo, sdata.Item(j).quantity, sdata.Item(j).smpDescription, strFileName, sdata.Item(j).notes, sdata.Item(j).sample_type_id
+             sdata.Item(j).shipTo, sdata.Item(j).quantity, sdata.Item(j).smpDescription, strFileName, sdata.Item(j).sample_type_id
         Next j
     Next i
 
@@ -1434,7 +1432,6 @@ Dim nreturn As Long
             .AddParameter "Quantity", sdata.Item(i).quantity, adInteger, adParamInput
             .AddParameter "Sample File Name", sdata.Item(i).smpfileName, adVarChar, adParamInput
             .AddParameter "Sample Description", CheckNulls(sdata.Item(i).smpDescription), adChar, adParamInput
-            .AddParameter "Notes", CheckNulls(sdata.Item(i).notes), adVarChar, adParamInput
     
             .AddParameter "return", "   ", adInteger, adParamOutput ' the "   " is for a length value
             .AddParameter "identity", "   ", adInteger, adParamOutput ' the "   " is for a length value
@@ -1742,7 +1739,7 @@ Private Function CheckDupSmplRecCounts(sdata As CCOLsmpFiles, dData As CCOLdupFi
     'check for the existance of any CLINTRAK samples. if clintrak samples move on
     'to compare the counts otherwise, exit
     If Not CheckForClintrakSmpl(sdata) Then
-        GoTo Exit_Function
+        GoTo exit_function
     End If
 
     'call to get the record counts for comparison since there are Clintrak samples
@@ -1750,13 +1747,13 @@ Private Function CheckDupSmplRecCounts(sdata As CCOLsmpFiles, dData As CCOLdupFi
         CheckDupSmplRecCounts = True
     End If
 
-Exit_Function:
+exit_function:
     Exit Function
         
 error_function:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Error Checking for Duplicate Sample Counts"
-    Resume Exit_Function
+    Resume exit_function
 
 End Function
 
@@ -1780,13 +1777,13 @@ Private Function CheckForClintrakSmpl(sdata As CCOLsmpFiles) As Boolean
         End If
     Next i
     
-Exit_Function:
+exit_function:
     Exit Function
         
 error_function:
     MsgBox "Error: " & Err.Number & ". " & Err.description, , _
         "Error Checking for Clintrak Samples"
-    Resume Exit_Function
+    Resume exit_function
 
 End Function
 
@@ -2073,7 +2070,7 @@ deleteCount = sdata.count
                 strExistSampleData = vdata
                 arrExistSampleData = Split(strExistSampleData, gRandDelimiter)
                 vdata = strCodingData
-'
+
                 If UBound(arrCodingData) = UBound(arrExistSampleData) Then
                     ' DW 2008-017 aka Karen
                     Call ReadProcessFileKeepMod(sdata.Item(j).smpfileName, sdata.Item(j).quantity, sdata.Item(j).sampleType, strCodingData)
@@ -2100,7 +2097,7 @@ deleteCount = sdata.count
             'get the description from lookup table to be used in the creation of the file
              Call WriteFile(mData, GetLookupDesc(sdata.Item(j).sampleType), strFileName)
              sdata.Add dData.Item(i).productionId, sdata.Item(j).typeNumber, sdata.Item(j).sampleType, _
-             sdata.Item(j).shipTo, sdata.Item(j).quantity, sdata.Item(j).smpDescription, strFileName, sdata.Item(j).notes, sdata.Item(j).sample_type_id
+             sdata.Item(j).shipTo, sdata.Item(j).quantity, sdata.Item(j).smpDescription, strFileName, sdata.Item(j).sample_type_id
         Next j
     Next i
 
@@ -2689,7 +2686,7 @@ Public Function DirectoryExistsWithFiles(ByVal Source As String) As Boolean
         DirectoryExistsWithFiles = False
     
     End If
-Exit_Function:
+exit_function:
     
     Set objfso = Nothing
     Set objFolder = Nothing
@@ -2698,7 +2695,7 @@ Exit_Function:
 
 errHandler:
     MsgBox "Error in DirectoryExistsWithFiles()" & vbCrLf & Err.description, vbCritical
-    GoTo Exit_Function
+    GoTo exit_function
 End Function
 
 
@@ -2920,13 +2917,13 @@ On Error GoTo errHandler
         End If
     End With
 
-Exit_Function:
+exit_function:
 
     Set madoData = Nothing
     Exit Function
 errHandler:
     MsgBox "Error in GetDuplicateFileLinksInfo()" & vbCrLf & Err.description, vbCritical
-    Resume Exit_Function
+    Resume exit_function
     
 End Function
 
@@ -2985,3 +2982,141 @@ Public Static Function FormatEmptyStringNA(value As String) As String
         FormatEmptyStringNA = value
     End If
 End Function
+
+Public Static Function GetRandIdFromLinksId(linksId As Long) As Long
+On Error GoTo errHandler
+
+    If Not madoData Is Nothing Then
+        Set madoData = Nothing
+    End If
+
+    Set madoData = New CADOData
+
+    With madoData
+        Set .Connection = GetDBConnection
+    End With
+
+    With madoData
+        .CursorType = adOpenForwardOnly
+        .CommandType = adCmdStoredProc
+        .LockType = adLockReadOnly
+
+        .ResetParameters
+
+        ' checks CD1+
+        .AddParameter "@in_link_Id", linksId, adInteger, adParamInput
+        .OpenRecordSetFromSP "get_RandCodingLinkbyLink_Id"
+
+        If .Recordset.EOF Then
+            ' checks CD0
+            .OpenRecordSetFromSP "get_RandCodingLinkCD0byLink_Id"
+        End If
+
+        If Not .Recordset.EOF Then
+            GetRandIdFromLinksId = .Recordset!rand_id
+            .Recordset.Close
+        Else
+            GetRandIdFromLinksId = 0
+        End If
+    End With
+
+exit_function:
+
+    Set madoData = Nothing
+    Exit Function
+errHandler:
+    MsgBox "Error in GetDuplicateFileLinksInfo()" & vbCrLf & Err.description, vbCritical
+    Resume exit_function
+End Function
+
+Public Static Function GetLinkLock(lockVersion As String, randId As Long) As Boolean
+    On Error GoTo errorHandler
+    Dim lockRes As ClintrakCommon.LockResult
+    Set gLinkLock = New ClintrakCommon.ItemLock
+    lockRes = gLinkLock.InitializeWithDate("Randomizations", randId, "Randomization_Id", "LinksIdNumber", "LockVersion", lockVersion, gApplicationUser)
+    
+     Select Case lockRes
+        Case ClintrakCommon.LockResult.LockOk
+            ' nothing to do!
+    
+        Case ClintrakCommon.LockResult.ItemMissing
+            MsgBox "This PDR's Links could not be found. Please attempt to reload the Links and verify it still exists.", vbOKOnly + vbExclamation
+        
+        Case ClintrakCommon.LockResult.LockExists
+            MsgBox "This PDR's Links is locked by " + gLinkLock.LockedBy + " and cannot be opened.", vbOKOnly + vbInformation
+        
+        Case ClintrakCommon.LockResult.OutOfDate
+            MsgBox "The PDR cannot be opened because its Links has been changed by another user. Please reload the Links and try again.", vbOKOnly + vbInformation
+    End Select
+    
+    GetLinkLock = (lockRes = LockOk)
+    If lockRes <> LockOk Then
+        Set gLinkLock = Nothing
+    End If
+    
+exitFunction:
+    Exit Function
+    
+errorHandler:
+    MsgBox "Error in GetLinkLock()" & vbCrLf & Err.description, vbCritical
+    Resume exitFunction
+End Function
+
+Public Sub ReleaseLinkLock()
+    If Not gLinkLock Is Nothing Then
+        gLinkLock.Dispose
+        Set gLinkLock = Nothing
+    End If
+End Sub
+
+Public Sub UpdateLinkLockVersion()
+    UpdateLinkLock False
+End Sub
+
+Public Sub UpdateLinkLockVersionAndUpdatedBy()
+    UpdateLinkLock True
+End Sub
+
+Private Sub UpdateLinkLock(saveUpdatedBy As Boolean)
+' every save of a PDR should update lock version
+' if we're also updating a links report field, we need to save who made the change
+
+On Error GoTo errorHandler
+
+   
+    If Not madoData Is Nothing Then
+        Set madoData = Nothing
+    End If
+
+    Set madoData = New CADOData
+
+    With madoData
+        Set .Connection = GetDBConnection
+    End With
+
+    With madoData
+        .CursorType = adOpenForwardOnly
+        .CommandType = adCmdStoredProc
+        .LockType = adLockReadOnly
+
+        .ResetParameters
+
+        .AddParameter "@randomizationId", basGlobals.gRandomizationId, adInteger, adParamInput
+        
+        If saveUpdatedBy Then
+            .AddParameter "@updatedBy", basGlobals.gApplicationUser.employeeId, adInteger, adParamInput
+            .AddParameter "@updatedLocation", basGlobals.gApplicationUser.ClintrakLocationId, adInteger, adParamInput
+        Else
+            .AddParameter "@updatedBy", 0, adInteger, adParamInput
+            .AddParameter "@updatedLocation", 0, adInteger, adParamInput
+        End If
+        .OpenRecordSetFromSP "update_Link_Lock_Version"
+    End With
+    Exit Sub
+    
+errorHandler:
+    ' don't show a msg since this could take place in a transaction
+    ' but at least indicate an error happened here
+    ' this error will get pushed to the caller
+    Error.Raise 1, Err.Source, "->UpdateLinkLock(): " & Err.description
+End Sub

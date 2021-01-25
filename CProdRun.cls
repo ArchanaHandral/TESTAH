@@ -78,6 +78,7 @@ Private mvarFormPrintedBy As String
 Private mvarOnsertBaseRollStockMinWidth As Double
 Private mvarOnsertBaseRollStockComponentId As Long
 Private mvarOnsertBaseRollStockPartNumber As String
+Private mvarSpecialInstructionsInitial As String
 
 Public Function IsOnRushRequest() As Boolean
     Dim objData As nADOData.CADOData
@@ -95,6 +96,14 @@ Public Function IsOnRushRequest() As Boolean
         End If
     End With
 End Function
+
+Public Property Get SpecialInstructions() As String
+    SpecialInstructions = mvarSpecialInstructionsInitial
+End Property
+
+Public Property Let SpecialInstructions(ByVal vdata As String)
+    mvarSpecialInstructionsInitial = vdata
+End Property
 
 Public Property Get PaperworkPrintedBy() As String
     PaperworkPrintedBy = mvarFormPrintedBy
@@ -560,6 +569,7 @@ Public Sub LookupRecord()
                 mvarOnsertBaseRollStockMinWidth = .Recordset!OnsertBaseRollStockMinWidth
                 mvarOnsertBaseRollStockComponentId = .Recordset!OnsertBaseRollStockComponentId
                 mvarOnsertBaseRollStockPartNumber = .Recordset!OnsertBaseRollStockPartNumber
+                mvarSpecialInstructionsInitial = mvarSpecial_Inst
                 
                 mvarDigitalLabelParts = _
                     .Recordset!BK1_Identification & _
@@ -615,7 +625,7 @@ Public Sub SaveProdRun()
         NonBillable.Save mvarJob_Log_Id, objData
 
         .ResetParameters
-
+        
         .AddParameter "Prod Run ID", mvarProduction_Run_Id, adInteger, adParamInput
         .AddParameter "Job Log ID", mvarJob_Log_Id, adInteger, adParamInput
         .AddParameter "Randomization ID", mvarRandomization_Id, adInteger, adParamInput
@@ -654,6 +664,7 @@ Public Sub SaveProdRun()
         .AddParameter "UseClientInventoryModifiedBy", mvarUseClientInventoryModifiedBy, adInteger, adParamInput
         .AddParameter "OnsertBaseRollStockComponentId", mvarOnsertBaseRollStockComponentId, adInteger, adParamInput
         .AddParameter "OnsertBaseRollStockMinWidth", mvarOnsertBaseRollStockMinWidth, adDouble, adParamInput
+        .AddParameter "Special Instructions", CheckNulls(mvarSpecial_Inst), adVarChar, adParamInput
         
         mvarOriginalUseClientInventoryReason = mvarUseClientInventoryReason
          
@@ -671,10 +682,16 @@ Public Sub SaveProdRun()
         Else
             mvarProduction_Run_Id = .GetParameterValue("identity")
             mvarBarcodeId = .GetParameterValue("barcodeId")
+            mvarSpecialInstructionsInitial = mvarSpecial_Inst
             mbooProdRunUpdated = True
             'don't update the links if this is a replacement production run
             If Not booReplacement Then
                 booHasError = Not update_FileLinks_ProdRunId
+                If frmProdPlan.mvarLinksReportDirty And booReplacement = False Then
+                    basGlobals.UpdateLinkLockVersionAndUpdatedBy
+                Else
+                    basGlobals.UpdateLinkLockVersion
+                End If
             End If
             Call GetStockDesc
             If Trim$(mvarScratch_Stock) > "" Then
@@ -944,6 +961,12 @@ Public Sub DeleteRecord()
             ProductionRun.NonBillable.Delete objData
         End If
         
+        If booReplacement = False Then
+            basGlobals.UpdateLinkLockVersionAndUpdatedBy
+        Else
+            basGlobals.UpdateLinkLockVersion
+        End If
+        basGlobals.ReleaseLinkLock
         mvarIsProductionRunDeleted = mbooProdRunUpdated
         .Connection.CommitTrans
         

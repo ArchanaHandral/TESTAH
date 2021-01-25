@@ -172,28 +172,16 @@ Private Sub Detail_Format()
     Me.Caption = Me.otxtFormID & " (" & Me.otxtIDNumber & ")"
 
     
-    With oRichEdit1
-        ' Get the plain text portion of the RichText and set the RTB back to empty.
-        If gIsPRGRun Then
-            strPlainText = SEE_INDIVIDUAL_PDR
-        Else
-            .TextRTF = ProductionRun.Special_Inst
-            strPlainText = .text
-        End If
-        If Trim$(strPlainText) = "" Then
-            strPlainText = "N/A   " & IIf(ProductionRun.PDR_Print_Date = "1/1/1900", "", ProductionRun.PDR_Print_Date & " " & _
-                gClintrakLocations(CStr(ProductionRun.Clintrak_Location_Id)).Time_Zone_Display)
-        End If
-        .text = ""
-        ' Set the style for the RTB and re-enter the plain text
-        .SelStart = 0
-        .SelFontName = "Arial"
-        .SelFontSize = 220
-        .SelBold = True
-        .SelItalic = False
-        .SelUnderline = False
-        .SelColor = vbRed
-        .SelText = strPlainText
-    End With
+    If gIsPRGRun Then
+        strPlainText = SEE_INDIVIDUAL_PDR
+    Else
+        strPlainText = ProductionRun.Special_Inst
+    End If
+    If Trim$(strPlainText) = "" Then
+        strPlainText = "N/A   " & IIf(ProductionRun.PDR_Print_Date = "1/1/1900", "", ProductionRun.PDR_Print_Date & " " & _
+        gClintrakLocations(CStr(ProductionRun.Clintrak_Location_Id)).Time_Zone_Display)
+    End If
+    
+    Me.otxtSpecialInstructions = strPlainText
     
 End Sub

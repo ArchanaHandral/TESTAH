@@ -22,10 +22,10 @@ Private rpt As ARProdPlan
 Dim Counter As Long  'page count in multiple IRQ report
 
 Public Function Initialize(Username As String, Token As String, Server As String, Database As String, Optional DomainIconPath As String) As Boolean
-        
+
     Set gApplicationUser = New ClintrakCommon.ApplicationUser
-        
-    If gApplicationUser.AuthenticateFromToken(Username, Token, Server, Database, App.Title) Then
+
+    If gApplicationUser.AuthenticateFromToken(Username, Token, Server, Database, App.title) Then
         Set gadoConnection = New nADOConn.CADOConn
         With gadoConnection
             .ConnectionString = gApplicationUser.OLEDBConnectionString
@@ -34,7 +34,7 @@ Public Function Initialize(Username As String, Token As String, Server As String
             .CommandTimeout = 300
             .OpenConnection
         End With
-        
+
         Initialize = True
         
         ' Retrieve collection of Clintrak locations
@@ -45,26 +45,31 @@ Public Function Initialize(Username As String, Token As String, Server As String
         
         gDomainIconPath = DomainIconPath
     End If
-    
-    
+
+
 End Function
 
-
-Public Sub Load_Prod_Run(FileLinksId As Long, _
+Public Sub Load_Prod_Run(fileLinksId As Long, _
                             CodingNumber As Long, _
-                            JobId As Long)
+                            JobId As Long, _
+                            lockVersion As String)
                           
     On Error GoTo Error_this_Sub
     
-    gFileLinksId = FileLinksId
+    gFileLinksId = fileLinksId
     gCodingNumber = CodingNumber
     gJob_Id = JobId
-       
-    Load frmProdPlan
-    frmProdPlan.Show vbModal
+    Dim randId As Long
+    randId = basGlobals.GetRandIdFromLinksId(fileLinksId)
     
+    If basGlobals.GetLinkLock(lockVersion, randId) = True Then
+        Load frmProdPlan
+        frmProdPlan.Show vbModal
+    End If
+   
 Exit_this_Sub:
     Screen.MousePointer = vbDefault
+    basGlobals.ReleaseLinkLock
     Exit Sub
     
 Error_this_Sub:
@@ -92,14 +97,14 @@ Public Function SaveToFile(Path As String) As Boolean
     Report.Pages.Commit
     
 
-Exit_Function:
+exit_function:
     Exit Function
 
 Handle_Error:
     'Log errors and pass back to calling procedure
-    Err.Raise Err.Number, Err.source & "->SaveToFile()", Err.description
+    Err.Raise Err.Number, Err.Source & "->SaveToFile()", Err.description
     SaveToFile = False
-    GoTo Exit_Function
+    GoTo exit_function
     
 End Function
 
