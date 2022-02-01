@@ -99,6 +99,7 @@ Public Function Clone() As CColBarcodeInfo
             .BarcodeFields = Me.Item(i).BarcodeFields
             .BarcodeFValue = Me.Item(i).BarcodeFValue
             .BarcodeDesc = Me.Item(i).BarcodeDesc
+            .IsGS1Barcode = Me.Item(i).IsGS1Barcode
         End With
                                                                                  
     Next i

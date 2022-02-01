@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "mscomctl.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{8D650141-6025-11D1-BC40-0000C042AEC0}#3.0#0"; "ssdw3b32.ocx"
 Begin VB.Form frmProdPlan 
    BorderStyle     =   0  'None
@@ -1252,7 +1252,6 @@ Private Sub Form_Load()
     On Error GoTo Error_this_Sub
     
     CenterForm Me
-
     Dim strLabelId As String
     Dim lngQtyReq As Long
     Dim lngProofId As Long
@@ -1388,6 +1387,11 @@ Private Sub Form_Load()
             Me.txtProdDesc = ProductionRun.Prod_Description
             Me.txtReferanceNo = ProductionRun.Reference_No
             Me.txtBarcodeId = ProductionRun.Barcode_Id
+            
+            Set gBarcodeFile = New CodingFile
+            gBarcodeFile.Init gApplicationUser
+            gBarcodeFile.LoadByPDR ProductionRun.Barcode_Id
+            
             If Not CheckShippingExist(gJob_Id) Then  'checks to see whether the Shipping Address has been selected
                 MsgBox _
                     "The Shipping Address has NOT been selected!" & vbCrLf & _
@@ -1451,6 +1455,10 @@ Private Sub Form_Load()
         
         ProductionRun.OnsertDiePartNumber = gOnsertDiePartNumber
         ProductionRun.OnsertDieToolId = gOnsertDieToolId
+        
+        Set gBarcodeFile = New CodingFile
+        gBarcodeFile.Init gApplicationUser
+        gBarcodeFile.LoadByCDF "", gCodingFileName
         
         txtSamples.text = "0"
         txtSampleGroups.text = "0"
@@ -2425,6 +2433,10 @@ Private Sub mnuReplacements_Click()
         Exit Sub
     End If
         
+    Set gBarcodeFile = New CodingFile
+    gBarcodeFile.Init gApplicationUser
+    gBarcodeFile.LoadByRPF "", mReprintFile_id
+    
     'reset screen fields and collection fields
     booReplacement = True
     Me.txtReplacement.Visible = True
@@ -4763,3 +4775,4 @@ Private Sub UpdateExistingIRQList()
         Next
     End If
 End Sub
+

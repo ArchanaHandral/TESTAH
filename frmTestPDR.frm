@@ -75,7 +75,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   960
          TabIndex        =   5
-         Text            =   "Daniel.Wenke 5fcc1a4a-81bb-4268-b6f4-7b2bb4b6dfe5 USBOH-SQLDEV01\USBOHSQLDEV01 DWClintrak"
+         Text            =   "ian.sullivan 47859b5f-1adf-4c53-a7d7-f89026bb886a USBOH-SQLDev03\USBOHSQLDev03 GS1DevClintrak"
          Top             =   240
          Width           =   8415
       End
@@ -111,7 +111,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   1080
          TabIndex        =   16
-         Text            =   "2020-10-19 16:09:12.477"
+         Text            =   "2021-09-28 10:15:04.057"
          Top             =   1320
          Width           =   2175
       End
@@ -119,7 +119,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   1080
          TabIndex        =   9
-         Text            =   "86584"
+         Text            =   "102493"
          Top             =   960
          Width           =   1455
       End
@@ -127,7 +127,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   1080
          TabIndex        =   7
-         Text            =   "480686"
+         Text            =   "223730"
          Top             =   600
          Width           =   1455
       End
@@ -135,7 +135,7 @@ Begin VB.Form frmTestPDR
          Height          =   285
          Left            =   1080
          TabIndex        =   2
-         Text            =   "783444"
+         Text            =   "814003"
          Top             =   240
          Width           =   1455
       End

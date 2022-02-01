@@ -59,6 +59,7 @@ Public ProductionRun As CProdrun
 Public mData As CCOLPDRFILES
 Public dupData As CCOLdupFiles
 Public smpData As CCOLsmpFiles
+Public gBarcodeFile As ClintrakCommon.CodingFile
 Public gReprintFile_Type As String         'used to help determine replacement or resupply
 Public Planning As CPlanningMethods
 Public PlanningList As CColPlanningInfo
@@ -2254,6 +2255,7 @@ Public Sub LoadBarcodeInfo(productionRunId As Long)
                     .BarcodeFields = madoData.Recordset!Data_Column_Configuration
                     .BarcodeFValue = IIf(madoData.Recordset!FValue_Sequence_No = 0, "", "F" & madoData.Recordset!FValue_Sequence_No)
                     .BarcodeDesc = madoData.Recordset!Data_Column_Description
+                    .IsGS1Barcode = madoData.Recordset!IsGS1Barcode
                 End With
 
                 .Recordset.MoveNext

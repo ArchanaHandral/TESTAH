@@ -1212,10 +1212,7 @@ End Sub
 
 Private Sub jgrdData_UnboundReadData(ByVal RowIndex As Long, ByVal Bookmark As Variant, ByVal Values As GridEX20.JSRowData)
     Dim recTemp As CPRDFiles
-    Dim Coding_File_Data() As String
-    Dim selected_columns() As String
     Dim strData As String
-    Dim strBarcode As String
     Dim i As Long
 
     'don't worry if the grid is sorted or if the column positions are changed by the user
@@ -1253,9 +1250,7 @@ Private Sub jgrdData_UnboundReadData(ByVal RowIndex As Long, ByVal Bookmark As V
         Values(30) = IIf(.Field30 = "", BLANK_RPT, .Field30)
     End With
     
-
     If BarcodeInfo.count > 0 Then
-
         For i = 1 To intCodingColCount
             If i < intCodingColCount Then
                 strData = strData & Values(i) & gRandDelimiter
@@ -1263,22 +1258,12 @@ Private Sub jgrdData_UnboundReadData(ByVal RowIndex As Long, ByVal Bookmark As V
                 strData = strData & Values(i)
             End If
         Next i
-        
-        'separate into an array the data from the grid
-        Coding_File_Data = Split(strData, gRandDelimiter)
-        
         For i = 1 To BarcodeInfo.count
-            strBarcode = ""
-            
-            ReDim selected_columns(0)
-        
-            'place into an array the selected column numbers
-            Call Extract_MergeBarcode_Columns(BarcodeInfo.Item(i).BarcodeFields, selected_columns, True)
-            
-            'build the merge barcode
-            strBarcode = Display_Barcode(selected_columns, Coding_File_Data)
-            
-            Values(intCodingColCount + i) = strBarcode
+            If strData <> "" Then
+                Values(intCodingColCount + i) = gBarcodeFile.DataFromColumnAssignment(BarcodeInfo.Item(i).BarcodeFields, strData, BarcodeInfo.Item(i).IsGS1Barcode, True)
+            Else
+                Values(intCodingColCount + i) = ""
+            End If
         Next i
     End If
 
@@ -2417,118 +2402,6 @@ Error_this_Sub:
     Resume Exit_this_Sub
   
 End Sub
-
-Private Sub Extract_MergeBarcode_Columns(mergeCoding As String, ByRef colArray() As String, With_Delimiters As Boolean)
-'
-'comments:  This function extracts the merged barcode data into an array separating column numbers and delimiters
-'parameter: mergeCoding - delimited coding string, colArray - array to put extracted data into
-'           with_delimiter - determines whether or not to included the delimiter in the array
-'returns:   true if data exists
-'
-On Error GoTo Handle_Error
-
-    Dim i As Long
-    Dim tempHolder As String    'holds the temporary substrings
-    ReDim colArray(0)
-    
-    For i = 1 To Len(Trim(mergeCoding))
-        
-        If IsNumeric(Mid$(Trim(mergeCoding), i, 1)) Then
-            tempHolder = tempHolder & Mid$(Trim(mergeCoding), i, 1)
-        Else
-            If With_Delimiters Then
-                ReDim Preserve colArray(UBound(colArray) + 2)
-                colArray(UBound(colArray)) = Mid$(Trim(mergeCoding), i, 1)
-                colArray(UBound(colArray) - 1) = tempHolder
-            Else
-                ReDim Preserve colArray(UBound(colArray) + 1)
-                colArray(UBound(colArray)) = tempHolder
-            End If
-            tempHolder = ""
-        End If
-    Next
-    
-    'add the last column to the array
-    If IsNumeric(tempHolder) Then
-        ReDim Preserve colArray(UBound(colArray) + 1)
-        colArray(UBound(colArray)) = tempHolder
-    End If
-    
-Exit_Sub:
-    Exit Sub
-
-Handle_Error:
-    Err.Raise Err.Number, Err.Source, Err.description, , "Extract_MergeBarcode_Columns"
-    Resume Exit_Sub
-
-End Sub
-
-Private Function Display_Barcode(Selected_Column_Array() As String, Coding_File_Data() As String) As String
-'Function to return Barcode from the Input String Array
-'comments:  This function returns a string of what the barcode data will look like
-'returns:   string representing the merge barcode data
-
-On Error GoTo Handle_Error
-
-    Dim i As Long
-    Dim outputstring As String
-    
-    For i = 1 To UBound(Selected_Column_Array)
-        If outputstring = "" Then
-            If IsNumeric(Selected_Column_Array(i)) Then
-                If CInt(Selected_Column_Array(i)) - 1 <= UBound(Coding_File_Data) Then
-                    outputstring = Coding_File_Data(CInt(Selected_Column_Array(i)) - 1)
-                End If
-            Else
-                outputstring = CheckBarCodeOutPut(Selected_Column_Array(i))
-            End If
-        Else
-            If IsNumeric(Selected_Column_Array(i)) Then
-                If (CInt(Selected_Column_Array(i)) - 1) <= UBound(Coding_File_Data) Then
-                    outputstring = outputstring & Coding_File_Data(CInt(Selected_Column_Array(i)) - 1)
-                End If
-            Else
-                If Not Selected_Column_Array(i) = CNODELIMITER Then outputstring = outputstring & CheckBarCodeOutPut(Selected_Column_Array(i))
-          End If
-        End If
-    Next
-    
-    Display_Barcode = outputstring
-
-exit_function:
-    Exit Function
-
-Handle_Error:
-   'Log errors and pass to calling procedure
-    Err.Raise Err.Number, Err.Source & "->DisplayBarcode()", Err.description
-    Resume exit_function
-
-End Function
-
-Private Function CheckBarCodeOutPut(strColumn As String) As String
-    ' Returns the desired output pending the input column designation
-    On Error GoTo Handle_Error
-    Select Case strColumn
-        Case "R"
-            CheckBarCodeOutPut = Format$(Mid$(gRandBarcode, 4, Len(gRandBarcode) - 3), "000000")
-        Case "P"
-            If booReplacement Then
-                CheckBarCodeOutPut = Format$(Mid$(gOrigPDRNumber, 4, Len(gOrigPDRNumber) - 3), "0000000")
-            Else
-                CheckBarCodeOutPut = Format$(Mid$(ProductionRun.Barcode_Id, 4, Len(ProductionRun.Barcode_Id) - 3), "0000000")
-            End If
-        Case Is <> CNODELIMITER
-            CheckBarCodeOutPut = strColumn
-    End Select
-
-exit_function:
-    Exit Function
-
-Handle_Error:
-   'Log errors and pass to calling procedure
-    Err.Raise Err.Number, Err.Source & "->CheckBarCodeOutPut()", Err.description
-    Resume exit_function
-End Function
 
 Private Sub LockOutForm()
     On Error GoTo Handle_Error

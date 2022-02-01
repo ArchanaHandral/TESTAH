@@ -21,3 +21,4 @@ Option Explicit
 Public BarcodeFValue As String
 Public BarcodeFields As String
 Public BarcodeDesc As String
+Public IsGS1Barcode As Boolean
