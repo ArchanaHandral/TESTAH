@@ -64,8 +64,6 @@ Private mvarOnsertDieToolId As Long
 Private mvarDigitalLabelParts As String
 Private mvarNonBillable As CNonBillable
 Private mvarUseClientInventory As Boolean
-Private mvarUseClientInventoryModifiedBy As Long
-Private mvarUseClientInventoryDate As Date
 Private mvarUseClientInventoryReason As String
 Private mvarOriginalUseClientInventoryReason As String
 Private mvarIsProductionRunDeleted As Boolean
@@ -434,23 +432,6 @@ End Property
 Public Property Get UseClientInventory() As Boolean
     UseClientInventory = mvarUseClientInventory
 End Property
-
-Public Property Let UseClientInventoryModifiedBy(ByVal vdata As Long)
-    mvarUseClientInventoryModifiedBy = vdata
-End Property
-
-Public Property Get UseClientInventoryModifiedBy() As Long
-    UseClientInventoryModifiedBy = mvarUseClientInventoryModifiedBy
-End Property
-
-Public Property Let UseClientInventoryDate(ByVal vdata As Date)
-    mvarUseClientInventoryDate = vdata
-End Property
-
-Public Property Get UseClientInventoryDate() As Date
-    UseClientInventoryDate = mvarUseClientInventoryDate
-End Property
-
 Public Property Let UseClientInventoryReason(ByVal vdata As String)
     mvarUseClientInventoryReason = vdata
 End Property
@@ -492,8 +473,6 @@ Public Property Let OnsertBaseRollStockPartNumber(value As String)
 End Property
 
 Public Sub ResetUseClientInventoryReasonDetails()
-    mvarUseClientInventoryModifiedBy = 0
-    mvarUseClientInventoryDate = "1/1/1900"
     mvarUseClientInventoryReason = ""
 End Sub
 
@@ -558,8 +537,6 @@ Public Sub LookupRecord()
                 mvarUseClientInventory = .Recordset!UseClientInventory
                 mvarUseClientInventoryReason = .Recordset!UseClientInventoryReason
                 mvarOriginalUseClientInventoryReason = mvarUseClientInventoryReason
-                mvarUseClientInventoryDate = .Recordset!UseClientInventoryDate
-                mvarUseClientInventoryModifiedBy = .Recordset!UseClientInventoryModifiedBy
                 mvarOverLaminate = IIf(IsNull(.Recordset!OverLaminate), "N/A", .Recordset!OverLaminate)
                 mvarOverLaminateDescription = IIf(IsNull(.Recordset!OverLaminateDescription), "", .Recordset!OverLaminateDescription)
                 mvarPRGBarCode = .Recordset!Prgbarcode
@@ -573,7 +550,6 @@ Public Sub LookupRecord()
                 
                 mvarDigitalLabelParts = _
                     .Recordset!BK1_Identification & _
-                    IIf(.Recordset!BK2_Identification <> "", ", ", "") & .Recordset!BK2_Identification & _
                     IIf(.Recordset!BP_Identification <> "", ", ", "") & .Recordset!BP_Identification
                     
                 mbooProdRunFound = True
@@ -598,7 +574,6 @@ Error_this_Sub:
     Resume Exit_this_Sub
 
 End Sub
-
 Public Sub SaveProdRun()
     Dim objData As nADOData.CADOData
     Dim nreturn As Long
@@ -619,13 +594,13 @@ Public Sub SaveProdRun()
         .LockType = adLockReadOnly
         .Connection.BeginTrans
         booInTransaction = True
-        
+
         .ResetParameters
-        
+
         NonBillable.Save mvarJob_Log_Id, objData
 
         .ResetParameters
-        
+
         .AddParameter "Prod Run ID", mvarProduction_Run_Id, adInteger, adParamInput
         .AddParameter "Job Log ID", mvarJob_Log_Id, adInteger, adParamInput
         .AddParameter "Randomization ID", mvarRandomization_Id, adInteger, adParamInput
@@ -639,7 +614,8 @@ Public Sub SaveProdRun()
         .AddParameter "Samples Requested", mvarSamples_Requested, adInteger, adParamInput
         .AddParameter "Scatch Proof Id", mvarScratch_Proof_Id, adInteger, adParamInput
         .AddParameter "Scratch Stock", CheckNulls(mvarScratch_Stock), adVarChar, adParamInput
-        .AddParameter "Produced By", CheckNulls(mvarProduced_By), adVarChar, adParamInput
+        .AddParameter "ModifiedByEmployeeId", gApplicationUser.employeeId, adInteger, adParamInput
+
         .AddParameter "File Name", CheckNulls(mvarFile_Name), adVarChar, adParamInput
         .AddParameter "Orig Prod Run ID", mvarOrig_Prod_Run_Id, adInteger, adParamInput
         .AddParameter "Number Sample Types", mvarNumSampleTypes, adInteger, adParamInput
@@ -660,8 +636,6 @@ Public Sub SaveProdRun()
         .AddParameter "Non_Billable_Id", NonBillable.NonBillableId, adInteger, adParamInput
         .AddParameter "UseClientInventory", mvarUseClientInventory, adBoolean, adParamInput
         .AddParameter "UseClientInventoryReason", IIf(Len(mvarUseClientInventoryReason) > 0, mvarUseClientInventoryReason, "Null"), adVarChar, adParamInput
-        .AddParameter "UseClientInventoryDate", mvarUseClientInventoryDate, adDate, adParamInput
-        .AddParameter "UseClientInventoryModifiedBy", mvarUseClientInventoryModifiedBy, adInteger, adParamInput
         .AddParameter "OnsertBaseRollStockComponentId", mvarOnsertBaseRollStockComponentId, adInteger, adParamInput
         .AddParameter "OnsertBaseRollStockMinWidth", mvarOnsertBaseRollStockMinWidth, adDouble, adParamInput
         .AddParameter "Special Instructions", CheckNulls(mvarSpecial_Inst), adVarChar, adParamInput
@@ -906,6 +880,7 @@ Public Sub DeleteRecord()
         'delete any entries on the Production_Run_Client_Fields
         .ResetParameters
         .AddParameter "Prod Run Id", mvarProduction_Run_Id, adInteger, adParamInput
+        .AddParameter "ModifiedByEmployeeId", gApplicationUser.employeeId, adInteger, adParamInput
         .AddParameter "return", "   ", adInteger, adParamOutput
 
         .ExecuteSP "delete_ProductionRunClientFields_by_PDRId", True
@@ -921,6 +896,7 @@ Public Sub DeleteRecord()
         .ResetParameters
                 
         .AddParameter "Prod Run ID", mvarProduction_Run_Id, adInteger, adParamInput
+        .AddParameter "ModifiedByEmployeeId", gApplicationUser.employeeId, adInteger, adParamInput
         .AddParameter "return", "   ", adInteger, adParamOutput
                 
         ' first delete the production run
@@ -1038,7 +1014,7 @@ Public Sub UpdateSampleQuantities()
         .AddParameter "Production_Run_Id", mvarProduction_Run_Id, adInteger, adParamInput
         .AddParameter "Samples Requested", mvarSamples_Requested, adInteger, adParamInput
         .AddParameter "Number Sample Types", mvarNumSampleTypes, adInteger, adParamInput
-        .AddParameter "Produced By", CheckNulls(mvarProduced_By), adVarChar, adParamInput
+        .AddParameter "ModifiedByEmployeeId", gApplicationUser.employeeId, adInteger, adParamInput
         .AddParameter "Error", "   ", adInteger, adParamOutput
         .ExecuteSP "update_Production_Run_Samples", True
         .RetrieveParameters

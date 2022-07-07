@@ -297,7 +297,6 @@ Public Sub LookupRecord()
                 mvarOnsertBaseRollStockPartNumber = .Recordset!OnsertBaseRollStockPartNumber
                 mvarDigitalLabelParts = _
                     .Recordset!BK1_Identification & _
-                    IIf(.Recordset!BK2_Identification <> "", ", ", "") & .Recordset!BK2_Identification & _
                     IIf(.Recordset!BP_Identification <> "", ", ", "") & .Recordset!BP_Identification
                 .Recordset.MoveNext
             Loop

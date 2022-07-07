@@ -51,6 +51,8 @@ Public gLinksSpecInstr As String
 Public gDebugMode As String
 Public gRnrDebugFilePath As String
 Public gRnrBaseFilePath As String
+Public gWebUtilitiesUrl As String
+Public gWebAuditPRUrl As String
 Public gCodingFileId As Long
 Public gIsPRGRun As Boolean
 
@@ -1470,9 +1472,12 @@ On Error GoTo Error_this_Sub
 Dim Sampletotal As Long
 Dim QtyTotal As Long
 Dim nreturn As Long
+Dim ModifiedByEmployeeId As Long
 
 Sampletotal = 0
 QtyTotal = 0
+ModifiedByEmployeeId = gApplicationUser.employeeId
+
 
     If madoData Is Nothing Then
         Set madoData = New CADOData
@@ -1522,6 +1527,7 @@ QtyTotal = 0
             .AddParameter "Production Run Id", prod_id, adInteger, adParamInput
             .AddParameter "Samples Requested", QtyTotal, adInteger, adParamInput
             .AddParameter "Number Sample Types", Sampletotal, adInteger, adParamInput
+            .AddParameter "ModifiedByEmployeeId", ModifiedByEmployeeId, adInteger, adParamInput
             .AddParameter "return", "   ", adInteger, adParamOutput
             .ExecuteSP "save_Duplicate_ProdRun", True
         
@@ -2799,6 +2805,7 @@ On Error GoTo errHandler
         .AddParameter "fileId", fileIdentifier, adInteger, adParamInput
         .AddParameter "productionRunId", productionRunId, adInteger, adParamInput
         .AddParameter "codingFilePath", newFilePath, adVarChar, adParamInput
+        .AddParameter "ModifiedByEmployeeId", gApplicationUser.employeeId, adInteger, adParamInput
         .AddParameter "replacement", isReplacement, adInteger, adParamInput '1 = replacement 0 = not a replacement
         
         .ExecuteSP "update_Rand_CodingFile_Links", True

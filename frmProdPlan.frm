@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "mscomctl.OCX"
 Object = "{8D650141-6025-11D1-BC40-0000C042AEC0}#3.0#0"; "ssdw3b32.ocx"
 Begin VB.Form frmProdPlan 
    BorderStyle     =   0  'None
@@ -183,7 +183,7 @@ Begin VB.Form frmProdPlan
          EndProperty
          ForeColor       =   &H00C00000&
          Height          =   285
-         Left            =   1080
+         Left            =   1800
          Locked          =   -1  'True
          TabIndex        =   57
          TabStop         =   0   'False
@@ -205,36 +205,35 @@ Begin VB.Form frmProdPlan
          EndProperty
          ForeColor       =   &H00000000&
          Height          =   285
-         Left            =   1080
+         Left            =   1800
          Locked          =   -1  'True
          TabIndex        =   55
          TabStop         =   0   'False
          Text            =   "XXXXXXXXXXXX"
          Top             =   240
-         Width           =   3975
+         Width           =   2000
       End
       Begin VB.Label Label5 
          AutoSize        =   -1  'True
          BackStyle       =   0  'Transparent
-         Caption         =   "Quantity:"
+         Caption         =   "Clinical Supply Labels:"
          ForeColor       =   &H00C00000&
          Height          =   195
          Left            =   120
          TabIndex        =   56
          Top             =   600
-         Width           =   795
-         WordWrap        =   -1  'True
+         Width           =   1560
       End
       Begin VB.Label Label7 
          AutoSize        =   -1  'True
          BackStyle       =   0  'Transparent
-         Caption         =   "Stock No.:"
+         Caption         =   "Base Label Stock:"
          ForeColor       =   &H00000000&
-         Height          =   270
+         Height          =   195
          Left            =   120
          TabIndex        =   54
          Top             =   240
-         Width           =   855
+         Width           =   1260
       End
    End
    Begin VB.TextBox txtNonBillableNotice 
@@ -914,7 +913,7 @@ Begin VB.Form frmProdPlan
          Width           =   840
       End
       Begin VB.Label Label6 
-         Caption         =   "QTY Samples:"
+         Caption         =   "Samples:"
          Height          =   270
          Left            =   1680
          TabIndex        =   17
@@ -1111,6 +1110,9 @@ Begin VB.Form frmProdPlan
    End
    Begin VB.Menu mnuActions 
       Caption         =   "&Actions"
+      Begin VB.Menu mnuViewAuditTrail 
+         Caption         =   "View Audit Trail"
+      End
       Begin VB.Menu duplicateConfig 
          Caption         =   "&Duplicate Sample Configuration"
       End
@@ -1268,7 +1270,7 @@ Private Sub Form_Load()
     Dim xmls As New ClintrakCommon.XmlSettings
     Dim strFileNameSamples As String
     Dim strTempFileName As String
-    
+        
     booSamplesDirtyFlag = False
     Call Me.txtReplacement.Move(Me.StatusBar1.Panels(2).Left + 50, Me.StatusBar1.Top + 50)
     Call Me.txtPDRStatus.Move(Me.StatusBar1.Panels(3).Left + 50, Me.StatusBar1.Top + 50)
@@ -1289,9 +1291,11 @@ Private Sub Form_Load()
     'Load debug info from apps.xml
     gDebugMode = xmls.GetSetting("DebugMode")
     xmls.AppName = "ProductionRuns"
-    gRnrBaseFilePath = xmls.GetAppSetting("RnrBasePath")
+    gRnrBaseFilePath = xmls.GetSetting("RNRFilePath")
     gRnrDebugFilePath = gRnrBaseFilePath & "DEBUG\"
-    
+    gWebUtilitiesUrl = xmls.GetSetting("WebUtilitiesUrl")
+    gWebAuditPRUrl = gWebUtilitiesUrl & "Audit/AuditLog/Index?AuditType=Production%20Run"
+     
     ' came from ProdRunMain ------------------
     Call getFileLinksInfo
     Call GetJobInformation
@@ -1304,6 +1308,7 @@ Private Sub Form_Load()
     booReplacement = False
     Me.txtReplacement.Visible = False
     Me.mnuReplacements.enabled = False
+    Me.mnuViewAuditTrail.enabled = False
     booSamplesQTYChanged = False
     booPdrIsCombined = False
     Call Enable_Fields
@@ -1334,12 +1339,12 @@ Private Sub Form_Load()
     HoldScratchStockProofId = 0
     
     If ProductionRun.Production_Run_Id <> 0 Then
-        
+
         If gDebugMode = True Then
-            
+
             ProductionRun.LookupRecord
             'if coding path doesn't have debug, lets copy coding files
-            
+
             If InStr(1, ProductionRun.File_Name, gRnrDebugFilePath, vbTextCompare) <> 1 Then
 
                 strTempFileName = Replace$(ProductionRun.File_Name, gRnrBaseFilePath, gRnrDebugFilePath, 1, -1, vbTextCompare)
@@ -1907,6 +1912,11 @@ Private Sub mnuNonBillableView_Click()
         End If
     End If
 End Sub
+Private Sub mnuViewAuditTrail_Click()
+    Dim sWebAuditPRUrl As String
+    sWebAuditPRUrl = gWebAuditPRUrl & Chr(38) & "id=" & ProductionRun.Production_Run_Id
+    Shell "cmd /c start " & Chr(34) & Chr(34) & " " & Chr(34) & sWebAuditPRUrl & Chr(34), vbHide
+End Sub
 
 Private Sub mnuViewComputerizationOrder_Click()
 
@@ -2297,6 +2307,8 @@ Private Sub Load_Menu()
     Dim i As Long
 
     Me.mnuReplacements.enabled = True
+    Me.mnuViewAuditTrail.enabled = True
+    
 
     Set objData = New CADOData
     With objData
@@ -2457,6 +2469,7 @@ Private Sub mnuReplacements_Click()
     Me.cmdSamples.enabled = True
     Me.cmdSave.enabled = True
     Me.mnuReplacements.enabled = False
+    Me.mnuViewAuditTrail.enabled = False
     
     ' tj IRQ stuff 2 - //HoldStockProofId\\ and //HoldScratchStockProofId\\ would have been set from initial load and should be the same
     Me.txtStockIRQ = ""
@@ -2758,6 +2771,7 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
         End If
         
         Me.mnuReplacements.enabled = False
+        Me.mnuViewAuditTrail.enabled = True
        
         gReprintFileName = ProductionRun.File_Name
         intLastSlashPos = InStrRev(gReprintFileName, "\")
@@ -3384,7 +3398,7 @@ Private Function ValidScreen() As Boolean
     If Me.quantityTotal <> CLng(Me.txtSamples) Then
         MsgBox _
             "Quantity Samples do not match configured." & vbCrLf & _
-            "QTY Samples:" & quantityTotal, vbExclamation
+            "Samples:" & quantityTotal, vbExclamation
         Exit Function
     End If
     If Me.sampleTypes <> CInt(Me.txtSampleGroups) Then
@@ -4573,6 +4587,7 @@ Private Sub SaveClientReqdFields()
             .AddParameter "Production Run Id", ProductionRun.Production_Run_Id, adInteger, adParamInput
             .AddParameter "Client Required Field Name", ClientReqdFields.Item(i).Client_Required_Field_Name, adVarChar, adParamInput
             .AddParameter "Field Name Value", CheckNulls(ClientReqdFields.Item(i).Field_Name_Value), adVarChar, adParamInput
+            .AddParameter "ModifiedByEmployeeId", gApplicationUser.employeeId, adInteger, adParamInput
 
             .AddParameter "error", "    ", adInteger, adParamOutput
             .AddParameter "identity", "    ", adInteger, adParamOutput
