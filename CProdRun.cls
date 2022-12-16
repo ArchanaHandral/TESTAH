@@ -578,13 +578,13 @@ Public Sub SaveProdRun()
     Dim objData As nADOData.CADOData
     Dim nreturn As Long
     Dim booInTransaction As Boolean
-    Dim mvarPrev_Production_Run_Id As Long
+    Dim lngPrevProductionRunId As Long
                     
     On Error GoTo Error_this_Sub
     
     booInTransaction = False
     mbooProdRunUpdated = False
-    mvarPrev_Production_Run_Id = mvarProduction_Run_Id
+    lngPrevProductionRunId = mvarProduction_Run_Id
     
     Set objData = New CADOData
     With objData
@@ -663,7 +663,7 @@ Public Sub SaveProdRun()
             If Not booReplacement Then
                 If Not update_FileLinks_ProdRunId Then
                     mbooProdRunUpdated = False
-                    mvarProduction_Run_Id = mvarPrev_Production_Run_Id
+                    mvarProduction_Run_Id = lngPrevProductionRunId
                     .Connection.RollbackTrans
                     Exit Sub
                 End If
