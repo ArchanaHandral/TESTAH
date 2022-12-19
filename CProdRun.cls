@@ -577,13 +577,14 @@ End Sub
 Public Sub SaveProdRun()
     Dim objData As nADOData.CADOData
     Dim nreturn As Long
-    Dim booHasError As Boolean
     Dim booInTransaction As Boolean
+    Dim lngPrevProductionRunId As Long
                     
     On Error GoTo Error_this_Sub
     
     booInTransaction = False
     mbooProdRunUpdated = False
+    lngPrevProductionRunId = mvarProduction_Run_Id
     
     Set objData = New CADOData
     With objData
@@ -660,7 +661,13 @@ Public Sub SaveProdRun()
             mbooProdRunUpdated = True
             'don't update the links if this is a replacement production run
             If Not booReplacement Then
-                booHasError = Not update_FileLinks_ProdRunId
+                If Not update_FileLinks_ProdRunId Then
+                    mbooProdRunUpdated = False
+                    mvarProduction_Run_Id = lngPrevProductionRunId
+                    .Connection.RollbackTrans
+                    Exit Sub
+                End If
+            
                 If frmProdPlan.mvarLinksReportDirty And booReplacement = False Then
                     basGlobals.UpdateLinkLockVersionAndUpdatedBy
                 Else
@@ -681,12 +688,6 @@ Public Sub SaveProdRun()
             .Connection.RollbackTrans
             booInTransaction = False
         End If
-        
-        If (booHasError) Then
-            MsgBox "Error: " & Err.Number & " " & Err.description, vbCritical, _
-                    "Error Occurred Updating File Links with the Prod Run Id"
-        End If
-        
         
     End With
    
