@@ -862,22 +862,7 @@ Public Sub DeleteRecord()
         .CursorType = adOpenForwardOnly
         .CommandType = adCmdStoredProc
         .LockType = adLockReadOnly
-        
-        'delete any entry on the Links_PDR_Schedule_Approval table
-        .ResetParameters
-        .AddParameter "Prod Run Id", mvarProduction_Run_Id, adInteger, adParamInput
-        .AddParameter "return", "   ", adInteger, adParamOutput
-
-        .ExecuteSP "delete_LinksPDR_Approval_by_PDR", True
-    
-        .RetrieveParameters
-        nreturn = .GetParameterValue("return")
-        If IsNull(nreturn) Or Trim$(nreturn) = "" Or nreturn <> 0 Then
-            mbooProdRunUpdated = False
-            .Connection.RollbackTrans
-            Exit Sub
-        End If
-        
+              
         'delete any entries on the Production_Run_Client_Fields
         .ResetParameters
         .AddParameter "Prod Run Id", mvarProduction_Run_Id, adInteger, adParamInput
