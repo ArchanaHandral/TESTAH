@@ -100,8 +100,7 @@ Public Const NA_TEXT As String = "N/A"
 Public BarcodeInfo As CColBarcodeInfo
 Public CCBlindLamApplyCol As Collection
 Public BlindLamApplyCol As Collection
-'job scheduling dll
-Public UpdateSchedule As ScheduleUpdate.CScheduleUpdatemain
+
 ' DW 2008-017 added
 Public gDomainIconPath As String
 

@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "mscomctl.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{8D650141-6025-11D1-BC40-0000C042AEC0}#3.0#0"; "ssdw3b32.ocx"
 Begin VB.Form frmProdPlan 
    BorderStyle     =   0  'None
@@ -2032,17 +2032,6 @@ Private Sub cmdDeleteProdRun_Click()
     ProductionRun.Prod_Run_Updated = False
     ProductionRun.DeleteRecord
     If ProductionRun.Prod_Run_Updated Then
-        
-        If Not booReplacement Then
-            Set UpdateSchedule = New ScheduleUpdate.CScheduleUpdatemain
-            With gApplicationUser
-                If UpdateSchedule.Initialize(.Username, .Token, .SQLServer, .SQLDatabase, gDomainIconPath) Then
-                    Call UpdateSchedule.CheckIfAllPDRsApproved(gadoConnection, ProductionRun.Job_Log_Id, ProductionRun.Randomization_Id)
-                End If
-            End With
-            Set UpdateSchedule = Nothing
-        End If
-        
         MsgBox "Production Run Record was Successfully Deleted.", vbInformation
         Call UpdateCompletelyShippedFlag(ProductionRun.Job_Log_Id)
         txtDirtyFlag = ""
@@ -2075,7 +2064,6 @@ Private Sub Form_Unload(Cancel As Integer)
     Set dupSameCodingData = Nothing
     Set smpSameCodingData = Nothing
     Set BarcodeInfo = Nothing
-    Set UpdateSchedule = Nothing
     Set ProductionRun = Nothing
     Set mData = Nothing
     Set dupData = Nothing
@@ -3258,21 +3246,6 @@ Private Sub cmdSave_Click()
         
         If booInitialSave Then
             Call LoadBarcodeInfo(ProductionRun.Production_Run_Id)
-            
-            ' changes the Links approval method to PDRs if it is currently FULL and it is
-            ' currently approved and it clears the approval date.
-            ' This also inserts Links PDR approval entries for all non-Replacement PDRs
-            ' and puts the Links approval date/proc. loc as their individual approval
-            ' dates/proc.loc. (for all PDRs EXCEPT the one just created by this save)
-            If Not booReplacement Then
-                Set UpdateSchedule = New ScheduleUpdate.CScheduleUpdatemain
-                With gApplicationUser
-                    If UpdateSchedule.Initialize(.Username, .Token, .SQLServer, .SQLDatabase, gDomainIconPath) Then
-                        Call UpdateSchedule.SaveNewPDR(gadoConnection, ProductionRun.Job_Log_Id, ProductionRun.Randomization_Id, ProductionRun.Production_Run_Id)
-                    End If
-                End With
-                Set UpdateSchedule = Nothing
-            End If
             Me.chkUseClientInventory.enabled = True
         End If
         
