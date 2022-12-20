@@ -3128,3 +3128,48 @@ errorHandler:
     ' this error will get pushed to the caller
     Error.Raise 1, Err.Source, "->UpdateLinkLock(): " & Err.description
 End Sub
+
+Public Function GetLookupId(LookupType As String, LookupValue As String) As Integer
+
+On Error GoTo PROC_ERR
+
+     If madoData Is Nothing Then
+        Set madoData = New CADOData
+            With madoData
+                ' DW 2010-002 added
+                Set .Connection = GetDBConnection
+            End With
+    End If
+
+    With madoData
+        ' DW 2010-002 added
+        Set .Connection = GetDBConnection
+        .CursorType = adOpenForwardOnly
+        .CommandType = adCmdStoredProc
+        .LockType = adLockReadOnly
+
+        .ResetParameters
+        
+        .AddParameter "in_lookup_type", LookupType, adChar, adParamInput
+        .AddParameter "in_lookup_Value", LookupValue, adChar, adParamInput
+        .OpenRecordSetFromSP "get_LookupID_By_Type_Value"
+        
+        If Not .Recordset.EOF Then
+            GetLookupId = .Recordset!Lookup_Id
+        End If
+        .Recordset.Close
+    End With
+   
+  
+Proc_EXIT:
+    Exit Function
+  
+PROC_ERR:
+    MsgBox "Error: " & Err.Number & ". " & Err.description, , _
+        "Error Getting Lookup Id"
+    Resume Proc_EXIT
+
+End Function
+
+
+

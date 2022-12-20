@@ -78,6 +78,8 @@ Private mvarOnsertBaseRollStockComponentId As Long
 Private mvarOnsertBaseRollStockPartNumber As String
 Private mvarSpecialInstructionsInitial As String
 
+Private mvarStatusLookupId As Integer
+
 Public Function IsOnRushRequest() As Boolean
     Dim objData As nADOData.CADOData
     Set objData = basGlobals.CreateNewSPCall
@@ -95,10 +97,16 @@ Public Function IsOnRushRequest() As Boolean
     End With
 End Function
 
+Public Property Get StatusLookupId() As Integer
+    StatusLookupId = mvarStatusLookupId
+End Property
+Public Property Let StatusLookupId(ByVal vdata As Integer)
+    mvarStatusLookupId = vdata
+End Property
+
 Public Property Get SpecialInstructions() As String
     SpecialInstructions = mvarSpecialInstructionsInitial
 End Property
-
 Public Property Let SpecialInstructions(ByVal vdata As String)
     mvarSpecialInstructionsInitial = vdata
 End Property
@@ -642,6 +650,8 @@ Public Sub SaveProdRun()
         .AddParameter "Special Instructions", CheckNulls(mvarSpecial_Inst), adVarChar, adParamInput
         
         mvarOriginalUseClientInventoryReason = mvarUseClientInventoryReason
+        
+        .AddParameter "StatusLookupId", mvarStatusLookupId, adInteger, adParamInput
          
         .AddParameter "return", "   ", adInteger, adParamOutput
         .AddParameter "identity", "   ", adInteger, adParamOutput
