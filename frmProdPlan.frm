@@ -3247,6 +3247,11 @@ Private Sub cmdSave_Click()
         If booInitialSave Then
             Call LoadBarcodeInfo(ProductionRun.Production_Run_Id)
             Me.chkUseClientInventory.enabled = True
+            If booReplacement Then
+                ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "Approved")
+            Else
+                ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "AwaitingApproval")
+            End If
         End If
         
         'Save client required fields values
