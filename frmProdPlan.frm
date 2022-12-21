@@ -1894,6 +1894,11 @@ Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
 End Sub
 
 Private Sub mnuCancelPDR_Click()
+     If IsThereAnIRQ Then
+     MsgBox "The PDR cannot be cancelled because it already has IRQs." & vbCrLf & _
+        "Have the PDR removed from its IRQs and try again.", vbOKOnly + vbInformation, "Cancel PDR"
+        Exit Sub
+    End If
      If ProductionRun.IsOnRushRequest Then
         MsgBox "The PDR cannot be cancelled because it is on a rush request." & vbCrLf & _
         "Remove the PDR from its rush request and try again.", vbOKOnly + vbInformation, "Cancel PDR"
