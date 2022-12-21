@@ -1110,6 +1110,9 @@ Begin VB.Form frmProdPlan
    End
    Begin VB.Menu mnuActions 
       Caption         =   "&Actions"
+      Begin VB.Menu mnuCancelPDR 
+         Caption         =   "Cancel PDR"
+      End
       Begin VB.Menu mnuViewAuditTrail 
          Caption         =   "View Audit Trail"
       End
@@ -1180,6 +1183,8 @@ Private mvarDebugText As String
 Private mvarDebugIcoPath As String
 Public mvarBillingDirty As Boolean
 Public mvarLinksReportDirty As Boolean
+Public mvarPDRCancelDirty As Boolean
+
 
 
 Private Function CheckOverrides() As Boolean
@@ -1885,6 +1890,17 @@ Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
         Case 0, 1
             If Me.txtDirtyFlag = "Y" Then Cancel = True
     End Select
+    
+End Sub
+
+Private Sub mnuCancelPDR_Click()
+     If ProductionRun.IsOnRushRequest Then
+        MsgBox "The PDR cannot be cancelled because it is on a rush request." & vbCrLf & _
+        "Remove the PDR from its rush request and try again.", vbOKOnly + vbInformation, "Cancel PDR"
+        Exit Sub
+    End If
+    
+    mvarPDRCancelDirtyflag = True
     
 End Sub
 
