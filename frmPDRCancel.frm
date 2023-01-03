@@ -89,7 +89,7 @@ Option Explicit
 Private Sub cmdOK_Click()
 
     If Me.cmbPDRCancelReasons.ListIndex > -1 Then
-     frmProdPlan.mvarPDRCancelDirtyflag = True
+        frmProdPlan.mvarPDRCancelDirtyflag = True
         
         ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "Cancelled")
         ProductionRun.CancellationReasonLookupId = cmbPDRCancelReasons.itemData(cmbPDRCancelReasons.ListIndex)
@@ -98,8 +98,8 @@ Private Sub cmdOK_Click()
             
     Else
        
-       MsgBox "You must select a reason to cancel the PDR or you can close this screen to undo your Cancellation attempt.", vbOKOnly + vbInformation, "Cancel PDR"
-       frmProdPlan.mvarPDRCancelDirtyflag = False
+        MsgBox "You must select a reason to cancel the PDR or you can close this screen to undo your Cancellation attempt.", vbOKOnly + vbInformation, "Cancel PDR"
+        frmProdPlan.mvarPDRCancelDirtyflag = False
     
     End If
 
@@ -109,22 +109,19 @@ Private Sub Form_Load()
     basGlobals.GetPDRCancellationReasons cmbPDRCancelReasons
     UpdatePDRCancelUI
 
-    ' store a copy of the original values for check for changes check
-    'BackupOnLoad
 End Sub
 
 Private Sub UpdatePDRCancelUI()
     
     If ProductionRun.CancellationReasonLookupId > -1 Then
-     Me.cmbPDRCancelReasons.ListIndex = GetPDRCancellationReasonListIndex(ProductionRun.CancellationReasonLookupId)
+        Me.cmbPDRCancelReasons.ListIndex = GetPDRCancellationReasonListIndex(ProductionRun.CancellationReasonLookupId)
     Else
         Me.cmbPDRCancelReasons.ListIndex = GetPDRCancellationReasonListIndex(0)
+
     End If
 
-    ' ProductionRun.CancellationReasonLookupId = cmbPDRCancelReasons.itemData(cmbPDRCancelReasons.ListIndex)
     Me.txtPDRCancelNotes.text = ProductionRun.CancellationNotes
-    '  MsgBox "ProductionRun.CancellationNotes:" & ProductionRun.CancellationNotes & "IsValidSelection:" & IsValidSelection, vbOKOnly + vbInformation, "Cancel PDR"
-
+    
 End Sub
 
 Private Function GetPDRCancellationReasonListIndex(PDRCancellationReasonLookupId As Integer)
@@ -164,6 +161,7 @@ Private Sub Form_Unload(Cancel As Integer)
         ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "Cancelled")
         ProductionRun.CancellationReasonLookupId = cmbPDRCancelReasons.itemData(cmbPDRCancelReasons.ListIndex)
         ProductionRun.CancellationNotes = Trim(Me.txtPDRCancelNotes.text)
+
     End If
 
 End Sub
@@ -175,6 +173,7 @@ Private Function IsValidSelection() As Boolean
     Else
         MsgBox "You did not select a reason, so your Cancellation attempt will be undone.", vbOKOnly + vbInformation, "Cancel PDR"
         IsValidSelection = False
+
     End If
     
 End Function
