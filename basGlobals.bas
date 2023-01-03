@@ -10,6 +10,7 @@ Option Explicit
 Public gadoConnection As nADOConn.CADOConn
 Private madoData As nADOData.CADOData
 Private nonBillableReasonList As Recordset
+Private pdrCancelReasonList As Recordset
 Public gClintrakLocations As ClintrakCommon.LocationCollection
 Public gLocationHandler As ClintrakCommon.location
 Public gUserLocation As ClintrakCommon.LocationClass
@@ -3170,6 +3171,55 @@ PROC_ERR:
     Resume Proc_EXIT
 
 End Function
+Public Sub GetPDRCancellationReasons(ctrl As ComboBox)
+    On Error GoTo Handle_Error
+    Dim reason As String
+    Dim Id As Long
+    
+    EnsurePDRCancelReasonsLoaded
+    
+    pdrCancelReasonList.MoveFirst
+    While Not pdrCancelReasonList.EOF
+        reason = pdrCancelReasonList!description
+        Id = pdrCancelReasonList!Lookup_Id
+        If reason <> "" Then
+            ctrl.AddItem reason
+            ctrl.itemData(ctrl.NewIndex) = Id
+        End If
+        pdrCancelReasonList.MoveNext
+    Wend
+
+Cleanup_Exit:
+    Exit Sub
+    
+Handle_Error:
+    Err.Raise Err.Number, Err.Source, Err.description
+    Resume Cleanup_Exit
+End Sub
 
 
+Public Sub EnsurePDRCancelReasonsLoaded()
+    ' because VB6 doesn't support short-circuit evaluations...
+    If pdrCancelReasonList Is Nothing Then
+        Set pdrCancelReasonList = GetPDRCancellationReasonsHelper
+    ElseIf pdrCancelReasonList.state = 0 Then
+        Set pdrCancelReasonList = GetPDRCancellationReasonsHelper
+    End If
+End Sub
+Private Function GetPDRCancellationReasonsHelper() As Recordset
+    Dim objData As nADOData.CADOData
+    Set objData = New nADOData.CADOData
+    With objData
+        Set .Connection = GetDBConnection
+         .ResetParameters
+        .CommandType = adCmdStoredProc
+        .CursorType = adOpenForwardOnly
+        .RowsetSize = 1
+         ' Call the SP to create the resultset
+        .AddParameter "Lookup Value", "PDRCancellationReason", adVarChar, adParamInput
+        .OpenRecordSetFromSP "get_LookupValues"
+        Set GetPDRCancellationReasonsHelper = .Recordset
+    End With
 
+    Set objData = Nothing
+End Function

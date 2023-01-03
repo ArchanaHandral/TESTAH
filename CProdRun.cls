@@ -79,6 +79,8 @@ Private mvarOnsertBaseRollStockPartNumber As String
 Private mvarSpecialInstructionsInitial As String
 
 Private mvarStatusLookupId As Integer
+Private mvarCancellationReasonLookupId As Integer
+Private mvarCancellationNotes As String
 
 Public Function IsOnRushRequest() As Boolean
     Dim objData As nADOData.CADOData
@@ -102,6 +104,18 @@ Public Property Get StatusLookupId() As Integer
 End Property
 Public Property Let StatusLookupId(ByVal vdata As Integer)
     mvarStatusLookupId = vdata
+End Property
+Public Property Get CancellationReasonLookupId() As Integer
+    CancellationReasonLookupId = mvarCancellationReasonLookupId
+End Property
+Public Property Get CancellationNotes() As String
+    CancellationNotes = mvarCancellationNotes
+End Property
+Public Property Let CancellationReasonLookupId(ByVal vdata As Integer)
+    mvarCancellationReasonLookupId = vdata
+End Property
+Public Property Let CancellationNotes(ByVal vdata As String)
+    mvarCancellationNotes = vdata
 End Property
 
 Public Property Get SpecialInstructions() As String
