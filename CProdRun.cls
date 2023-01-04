@@ -79,6 +79,8 @@ Private mvarOnsertBaseRollStockPartNumber As String
 Private mvarSpecialInstructionsInitial As String
 
 Private mvarStatusLookupId As Integer
+Private mvarCancellationReasonLookupId As Integer
+Private mvarCancellationNotes As String
 
 Public Function IsOnRushRequest() As Boolean
     Dim objData As nADOData.CADOData
@@ -102,6 +104,18 @@ Public Property Get StatusLookupId() As Integer
 End Property
 Public Property Let StatusLookupId(ByVal vdata As Integer)
     mvarStatusLookupId = vdata
+End Property
+Public Property Get CancellationReasonLookupId() As Integer
+    CancellationReasonLookupId = mvarCancellationReasonLookupId
+End Property
+Public Property Get CancellationNotes() As String
+    CancellationNotes = mvarCancellationNotes
+End Property
+Public Property Let CancellationReasonLookupId(ByVal vdata As Integer)
+    mvarCancellationReasonLookupId = vdata
+End Property
+Public Property Let CancellationNotes(ByVal vdata As String)
+    mvarCancellationNotes = vdata
 End Property
 
 Public Property Get SpecialInstructions() As String
@@ -545,6 +559,9 @@ Public Sub LookupRecord()
                 mvarUseClientInventory = .Recordset!UseClientInventory
                 mvarUseClientInventoryReason = .Recordset!UseClientInventoryReason
                 mvarOriginalUseClientInventoryReason = mvarUseClientInventoryReason
+                mvarStatusLookupId = .Recordset!StatusLookupId
+                mvarCancellationReasonLookupId = .Recordset!CancellationReasonLookupId
+                mvarCancellationNotes = .Recordset!CancellationNotes
                 mvarOverLaminate = IIf(IsNull(.Recordset!OverLaminate), "N/A", .Recordset!OverLaminate)
                 mvarOverLaminateDescription = IIf(IsNull(.Recordset!OverLaminateDescription), "", .Recordset!OverLaminateDescription)
                 mvarPRGBarCode = .Recordset!Prgbarcode
@@ -652,6 +669,8 @@ Public Sub SaveProdRun()
         mvarOriginalUseClientInventoryReason = mvarUseClientInventoryReason
         
         .AddParameter "StatusLookupId", mvarStatusLookupId, adInteger, adParamInput
+        .AddParameter "CancellationReasonLookupId", mvarCancellationReasonLookupId, adInteger, adParamInput
+        .AddParameter "CancellationNotes", CheckNulls(mvarCancellationNotes), adVarChar, adParamInput
          
         .AddParameter "return", "   ", adInteger, adParamOutput
         .AddParameter "identity", "   ", adInteger, adParamOutput
