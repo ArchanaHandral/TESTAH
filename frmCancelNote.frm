@@ -58,7 +58,7 @@ Begin VB.Form frmCancelNote
       Top             =   840
       Width           =   1155
    End
-   Begin VB.Label lblLabel1 
+   Begin VB.Label lblRemChar 
       AutoSize        =   -1  'True
       BackStyle       =   0  'Transparent
       Caption         =   "Characters remaining:"
@@ -78,14 +78,10 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
 Option Explicit
+
 Public reason As String
-Public notes As String
 
-'Private Sub CancelButton_Click()
-'    reason = ""
-'    Unload Me
-'End Sub
-
+Public notes  As String
 
 Private Sub Form_Load()
     basGlobals.GetPDRCancellationReasons CmbCancelReasons
@@ -99,46 +95,52 @@ Private Sub Form_Unload(Cancel As Integer)
     
     If reason = "" Then
         frmProdPlan.mvarPDRCancelDirtyflag = False
-        MsgBox _
-            "You did not select a reason, so your Cancellation attempt will be undone.", _
-            vbExclamation
+        MsgBox "You did not select a reason, so your Cancellation attempt will be undone.", vbExclamation
     Else
         UpdatePDRCancelUI
+
     End If
     
 End Sub
+
 Private Sub UpdatePDRCancelUI()
     notes = Me.txtCancelNotes.text
+
     If Trim$(notes) = "" Then
         notes = "N/A"
+
     End If
-   frmProdPlan.mvarPDRCancelDirtyflag = True
-   ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "Cancelled")
-   ProductionRun.CancellationReasonLookupId = CmbCancelReasons.itemData(CmbCancelReasons.ListIndex)
-   ProductionRun.CancellationNotes = notes
+
+    frmProdPlan.mvarPDRCancelDirtyflag = True
+    ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "Cancelled")
+    ProductionRun.CancellationReasonLookupId = CmbCancelReasons.itemData(CmbCancelReasons.ListIndex)
+    ProductionRun.CancellationNotes = notes
+
 End Sub
     
-Private Sub Label1_Click()
-
-End Sub
-
 Private Sub cmdOK_Click()
+
     If Len(Trim$(CmbCancelReasons.text)) = 0 Then
-        MsgBox _
-            "You must select a reason or close this screen to undo your Cacellation attempt.", _
-            vbExclamation
+        MsgBox "You must select a reason or close this screen to undo your Cacellation attempt.", vbExclamation
         Exit Sub
+
     End If
-    'reason = Me.ComReason.text
-    'UpdatePDRCancelUI
+    
     Unload Me
+
 End Sub
 
 Private Sub txtCancelNotes_Change()
-   SetCharactersRemaining
+    SetCharactersRemaining
     
 End Sub
 
 Private Sub SetCharactersRemaining()
-    Me.lblLabel1.Caption = Me.lblLabel1.Tag & CStr(Me.txtCancelNotes.MaxLength - Len(Me.txtCancelNotes.text))
+    Me.lblRemChar.Caption = Me.lblRemChar.Tag & CStr(Me.txtCancelNotes.MaxLength - Len(Me.txtCancelNotes.text))
+
+End Sub
+Public Static Sub ShowCancelNote()
+    Dim frm As frmCancelNote
+    Set frm = New frmCancelNote
+    frm.Show vbModal
 End Sub

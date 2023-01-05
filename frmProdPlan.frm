@@ -1923,7 +1923,7 @@ Private Sub mnuCancelPDR_Click()
 End Sub
 
 Private Sub CancelPDR()
-    frmPDRCancel.ShowCancelNote
+    frmCancelNote.ShowCancelNote
 
     If frmProdPlan.mvarPDRCancelDirtyflag = True Then
         Me.mnuCancelPDR.Caption = PDR_UNCANCEL_TEXT
