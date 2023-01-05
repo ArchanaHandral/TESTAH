@@ -1765,21 +1765,12 @@ Private Sub Form_Load()
     ' DW 2012-001 added
     If txtPDRStatus.text = "COMBINED PDR" Then Me.chkReOrientation.enabled = False
     
-     If ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", PDR_CANCEL_STATUS) Then
+    If ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", PDR_CANCEL_STATUS) Then
         Me.mnuCancelPDR.Caption = PDR_UNCANCEL_TEXT
         Me.txtPDRStatus.text = PDR_STATUS_FOOTER_TEXT
         Me.txtPDRStatus.Visible = True
-     End If
+    End If
      
-'    If ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", PDR_CANCEL_STATUS) And mvarPDRCancelDirtyflag Then
-'        Me.txtPDRStatus.text = "PDR HAS BEEN CANCELLED"
-'        Me.txtPDRStatus.Visible = True
-'        Me.mnuCancelPDR.Caption = PDR_UNCANCEL_TEXT
-'
-'    Else
-'        Me.txtPDRStatus.Visible = False
-'        Me.mnuCancelPDR.Caption = PDR_CANCEL_TEXT
-'    End If
     ' DW 2008-017 added
     Me.StatusBar1.Panels(1).text = gClintrakLocations(gApplicationUser.ClintrakLocationId).Display & " User "
     Me.StatusBar1.Panels(1).Picture = LoadPicture(gDomainIconPath & gApplicationUser.ClintrakLocationId & ".ico")
