@@ -98,6 +98,11 @@ Public Const LABEL_AND_SAMPLES_TEXT As String = "Apply to Labels and Samples"
 Public Const NOT_BLINDED_TEXT As String = "Not Blinded"
 Public Const NA_TEXT As String = "N/A"
 
+Public Const PDR_UNCANCEL_TEXT As String = "Uncancel PDR"
+Public Const PDR_CANCEL_TEXT As String = "Cancel PDR"
+Public Const PDR_CANCEL_STATUS As String = "Cancelled"
+Public Const PDR_STATUS_FOOTER_TEXT As String = "PDR HAS BEEN CANCELLED"
+
 Public BarcodeInfo As CColBarcodeInfo
 Public CCBlindLamApplyCol As Collection
 Public BlindLamApplyCol As Collection

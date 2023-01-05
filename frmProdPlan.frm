@@ -1765,6 +1765,21 @@ Private Sub Form_Load()
     ' DW 2012-001 added
     If txtPDRStatus.text = "COMBINED PDR" Then Me.chkReOrientation.enabled = False
     
+     If ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", PDR_CANCEL_STATUS) Then
+        Me.mnuCancelPDR.Caption = PDR_UNCANCEL_TEXT
+        Me.txtPDRStatus.text = PDR_STATUS_FOOTER_TEXT
+        Me.txtPDRStatus.Visible = True
+     End If
+     
+'    If ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", PDR_CANCEL_STATUS) And mvarPDRCancelDirtyflag Then
+'        Me.txtPDRStatus.text = "PDR HAS BEEN CANCELLED"
+'        Me.txtPDRStatus.Visible = True
+'        Me.mnuCancelPDR.Caption = PDR_UNCANCEL_TEXT
+'
+'    Else
+'        Me.txtPDRStatus.Visible = False
+'        Me.mnuCancelPDR.Caption = PDR_CANCEL_TEXT
+'    End If
     ' DW 2008-017 added
     Me.StatusBar1.Panels(1).text = gClintrakLocations(gApplicationUser.ClintrakLocationId).Display & " User "
     Me.StatusBar1.Panels(1).Picture = LoadPicture(gDomainIconPath & gApplicationUser.ClintrakLocationId & ".ico")
@@ -1907,8 +1922,38 @@ Private Sub mnuCancelPDR_Click()
 
     End If
     
-    mvarPDRCancelDirtyflag = True
-    frmPDRCancel.ShowPDRCancel
+    If Me.mnuCancelPDR.Caption = PDR_CANCEL_TEXT Then
+        CancelPDR
+    Else
+        UNCancelPDR
+
+    End If
+    
+End Sub
+
+Private Sub CancelPDR()
+    frmPDRCancel.ShowCancelNote
+
+    If frmProdPlan.mvarPDRCancelDirtyflag = True Then
+        Me.mnuCancelPDR.Caption = PDR_UNCANCEL_TEXT
+        Me.txtPDRStatus.text = PDR_STATUS_FOOTER_TEXT
+
+    End If
+    
+End Sub
+
+Private Sub UNCancelPDR()
+    Me.mnuCancelPDR.Caption = PDR_CANCEL_TEXT
+    txtPDRStatus.text = ""
+    ProductionRun.CancellationReasonLookupId = 0
+    ProductionRun.CancellationNotes = "N/A"
+
+    If (ProductionRun.ApprovalDate <> "1/1/1900") Or booReplacement Then
+        ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "Approved")
+    Else
+        ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "AwaitingApproval")
+
+    End If
     
 End Sub
 

@@ -670,7 +670,7 @@ Public Sub SaveProdRun()
         
         .AddParameter "StatusLookupId", mvarStatusLookupId, adInteger, adParamInput
         .AddParameter "CancellationReasonLookupId", mvarCancellationReasonLookupId, adInteger, adParamInput
-        .AddParameter "CancellationNotes", CheckNulls(mvarCancellationNotes), adVarChar, adParamInput
+        .AddParameter "CancellationNotes", mvarCancellationNotes, adVarChar, adParamInput
          
         .AddParameter "return", "   ", adInteger, adParamOutput
         .AddParameter "identity", "   ", adInteger, adParamOutput
