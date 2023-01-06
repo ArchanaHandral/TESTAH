@@ -561,7 +561,7 @@ Public Sub LookupRecord()
                 mvarOriginalUseClientInventoryReason = mvarUseClientInventoryReason
                 mvarStatusLookupId = .Recordset!StatusLookupId
                 mvarCancellationReasonLookupId = .Recordset!CancellationReasonLookupId
-                mvarCancellationNotes = .Recordset!CancellationNotes
+                mvarCancellationNotes = IIf(IsNull(.Recordset!CancellationNotes), "N/A", .Recordset!CancellationNotes)
                 mvarOverLaminate = IIf(IsNull(.Recordset!OverLaminate), "N/A", .Recordset!OverLaminate)
                 mvarOverLaminateDescription = IIf(IsNull(.Recordset!OverLaminateDescription), "", .Recordset!OverLaminateDescription)
                 mvarPRGBarCode = .Recordset!Prgbarcode
@@ -670,7 +670,7 @@ Public Sub SaveProdRun()
         
         .AddParameter "StatusLookupId", mvarStatusLookupId, adInteger, adParamInput
         .AddParameter "CancellationReasonLookupId", mvarCancellationReasonLookupId, adInteger, adParamInput
-        .AddParameter "CancellationNotes", CheckNulls(mvarCancellationNotes), adVarChar, adParamInput
+        .AddParameter "CancellationNotes", mvarCancellationNotes, adVarChar, adParamInput
          
         .AddParameter "return", "   ", adInteger, adParamOutput
         .AddParameter "identity", "   ", adInteger, adParamOutput
