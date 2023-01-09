@@ -561,7 +561,7 @@ Public Sub LookupRecord()
                 mvarOriginalUseClientInventoryReason = mvarUseClientInventoryReason
                 
                 mvarStatusLookupId = IIf(IsNull(.Recordset!StatusLookupId), 0, .Recordset!StatusLookupId)
-                mvarCancellationReasonLookupId = IIf(IsNull(.Recordset!CancellationReasonLookupId), 0, .Recordset!StatusLookupId)
+                mvarCancellationReasonLookupId = IIf(IsNull(.Recordset!CancellationReasonLookupId), 0, .Recordset!CancellationReasonLookupId)
                 mvarCancellationNotes = IIf(IsNull(.Recordset!CancellationNotes), "N/A", .Recordset!CancellationNotes)
                 
                 mvarOverLaminate = IIf(IsNull(.Recordset!OverLaminate), "N/A", .Recordset!OverLaminate)

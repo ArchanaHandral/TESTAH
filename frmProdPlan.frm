@@ -1928,6 +1928,8 @@ Private Sub CancelPDR()
     If frmProdPlan.mvarPDRCancelDirtyflag = True Then
         Me.mnuCancelPDR.Caption = UNCANCEL_TEXT
         Me.txtPDRStatus.text = STATUS_FOOTER_TEXT
+        Me.txtPDRStatus.Visible = True
+        txtDirtyFlag.text = "Y"
 
     End If
     
