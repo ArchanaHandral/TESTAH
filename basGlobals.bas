@@ -98,10 +98,14 @@ Public Const LABEL_AND_SAMPLES_TEXT As String = "Apply to Labels and Samples"
 Public Const NOT_BLINDED_TEXT As String = "Not Blinded"
 Public Const NA_TEXT As String = "N/A"
 
-Public Const PDR_UNCANCEL_TEXT As String = "Uncancel PDR"
-Public Const PDR_CANCEL_TEXT As String = "Cancel PDR"
-Public Const PDR_CANCEL_STATUS As String = "Cancelled"
-Public Const PDR_STATUS_FOOTER_TEXT As String = "PDR HAS BEEN CANCELLED"
+Public Const UNCANCEL_TEXT As String = "Uncancel PDR"
+Public Const CANCEL_TEXT As String = "Cancel PDR"
+Public Const STATUS_FOOTER_TEXT As String = "PDR HAS BEEN CANCELLED"
+
+Public Const CANCEL_STATUS As String = "Cancelled"
+Public Const APPROVED_STATUS As String = "Approved"
+Public Const AWAITINGAPPROVAL_STATUS As String = "AwaitingApproval"
+
 
 Public BarcodeInfo As CColBarcodeInfo
 Public CCBlindLamApplyCol As Collection
@@ -340,7 +344,19 @@ Public Function CheckNulls(Teststr As String) As String
     CheckNulls = tempstr
          
 End Function
-
+Public Function CheckNullWithNA(Teststr As String) As String
+    
+    Dim tempstr As String
+    
+    tempstr = Teststr
+    
+    If IsNull(tempstr) Or Trim$(tempstr) = "" Then
+        tempstr = "N/A"
+    End If
+         
+    CheckNullWithNA = tempstr
+         
+End Function
 Public Function CheckEmptyString(text As String) As String
     If Len(text) = 0 Then
         CheckEmptyString = " "
@@ -3134,7 +3150,10 @@ errorHandler:
     ' this error will get pushed to the caller
     Error.Raise 1, Err.Source, "->UpdateLinkLock(): " & Err.description
 End Sub
-
+Public Function GetStatusID(Status As String) As Integer
+    GetStatusID = basGlobals.GetLookupId("PDRStatus", Status)
+                       
+End Function
 Public Function GetLookupId(LookupType As String, LookupValue As String) As Integer
 
 On Error GoTo PROC_ERR

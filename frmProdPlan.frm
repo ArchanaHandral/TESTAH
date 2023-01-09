@@ -1765,9 +1765,9 @@ Private Sub Form_Load()
     ' DW 2012-001 added
     If txtPDRStatus.text = "COMBINED PDR" Then Me.chkReOrientation.enabled = False
     
-    If ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", PDR_CANCEL_STATUS) Then
-        Me.mnuCancelPDR.Caption = PDR_UNCANCEL_TEXT
-        Me.txtPDRStatus.text = PDR_STATUS_FOOTER_TEXT
+    If ProductionRun.StatusLookupId = basGlobals.GetStatusID(CANCEL_STATUS) Then
+        Me.mnuCancelPDR.Caption = UNCANCEL_TEXT
+        Me.txtPDRStatus.text = STATUS_FOOTER_TEXT
         Me.txtPDRStatus.Visible = True
     End If
      
@@ -1913,7 +1913,7 @@ Private Sub mnuCancelPDR_Click()
 
     End If
     
-    If Me.mnuCancelPDR.Caption = PDR_CANCEL_TEXT Then
+    If Me.mnuCancelPDR.Caption = CANCEL_TEXT Then
         CancelPDR
     Else
         UNCancelPDR
@@ -1926,23 +1926,23 @@ Private Sub CancelPDR()
     frmCancelNote.ShowCancelNote
 
     If frmProdPlan.mvarPDRCancelDirtyflag = True Then
-        Me.mnuCancelPDR.Caption = PDR_UNCANCEL_TEXT
-        Me.txtPDRStatus.text = PDR_STATUS_FOOTER_TEXT
+        Me.mnuCancelPDR.Caption = UNCANCEL_TEXT
+        Me.txtPDRStatus.text = STATUS_FOOTER_TEXT
 
     End If
     
 End Sub
 
 Private Sub UNCancelPDR()
-    Me.mnuCancelPDR.Caption = PDR_CANCEL_TEXT
+    Me.mnuCancelPDR.Caption = CANCEL_TEXT
     txtPDRStatus.text = ""
     ProductionRun.CancellationReasonLookupId = 0
     ProductionRun.CancellationNotes = "N/A"
 
     If (ProductionRun.ApprovalDate <> "1/1/1900") Or booReplacement Then
-        ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "Approved")
+        ProductionRun.StatusLookupId = basGlobals.GetStatusID(APPROVED_STATUS)
     Else
-        ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "AwaitingApproval")
+        ProductionRun.StatusLookupId = basGlobals.GetStatusID(AWAITINGAPPROVAL_STATUS)
 
     End If
     
@@ -3308,9 +3308,9 @@ Private Sub cmdSave_Click()
             Call LoadBarcodeInfo(ProductionRun.Production_Run_Id)
             Me.chkUseClientInventory.enabled = True
             If booReplacement Then
-                ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "Approved")
+                ProductionRun.StatusLookupId = basGlobals.GetStatusID(APPROVED_STATUS)
             Else
-                ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "AwaitingApproval")
+                ProductionRun.StatusLookupId = basGlobals.GetStatusID(AWAITINGAPPROVAL_STATUS)
             End If
         End If
         
