@@ -1947,7 +1947,7 @@ Private Sub UNCancelPDR()
         ProductionRun.StatusLookupId = basGlobals.GetStatusID(AWAITINGAPPROVAL_STATUS)
 
     End If
-    
+    txtDirtyFlag.text = "Y"
 End Sub
 
 Private Sub mnuNonBillableView_Click()
