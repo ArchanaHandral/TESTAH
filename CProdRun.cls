@@ -99,6 +99,38 @@ Public Function IsOnRushRequest() As Boolean
     End With
 End Function
 
+Public Function IsScheduled() As Boolean
+    Dim objData As nADOData.CADOData
+    Set objData = basGlobals.CreateNewSPCall
+    Dim rs As Recordset
+    With objData
+        .AddParameter "@in_PDR_Id", mvarProduction_Run_Id
+                
+        Set rs = .OpenRecordSetFromSP("get_If_PDR_Is_Scheduled")
+        If rs.EOF = False Then
+            IsScheduled = CInt(rs(0).value) <> 0
+        Else
+            Err.Raise vbObjectError + 1, "IsScheduled", "Error determining if this PDR is Scheduled: no data set"
+        End If
+    End With
+End Function
+
+Public Function IsCombined() As Boolean
+    Dim objData As nADOData.CADOData
+    Set objData = basGlobals.CreateNewSPCall
+    Dim rs As Recordset
+    With objData
+        .AddParameter "@in_PDR_Id", mvarProduction_Run_Id
+                
+        Set rs = .OpenRecordSetFromSP("get_If_PDR_Is_Combined")
+        If rs.EOF = False Then
+            IsCombined = CInt(rs(0).value) <> 0
+        Else
+            Err.Raise vbObjectError + 1, "IsScheduled", "Error determining if this PDR is Combined: no data set"
+        End If
+    End With
+End Function
+
 Public Property Get StatusLookupId() As Integer
     StatusLookupId = mvarStatusLookupId
 End Property
