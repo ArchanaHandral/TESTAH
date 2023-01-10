@@ -112,10 +112,11 @@ Private Sub UpdatePDRCancelUI()
     End If
 
     frmProdPlan.mvarPDRCancelDirtyflag = True
-    ProductionRun.StatusLookupId = basGlobals.GetLookupId("PDRStatus", "Cancelled")
+    ProductionRun.StatusLookupId = basGlobals.GetStatusID(CANCEL_STATUS)
     ProductionRun.CancellationReasonLookupId = CmbCancelReasons.itemData(CmbCancelReasons.ListIndex)
     ProductionRun.CancellationNotes = notes
-
+   
+    
 End Sub
     
 Private Sub cmdOK_Click()

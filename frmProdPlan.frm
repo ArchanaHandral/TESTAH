@@ -1913,6 +1913,12 @@ Private Sub mnuCancelPDR_Click()
 
     End If
     
+    If ProductionRun.IsScheduled Then
+        MsgBox "The PDR cannot be cancelled because it is scheduled." & vbCrLf & "Have the PDR unscheduled and try again.", vbOKOnly + vbInformation, "Cancel PDR"
+        Exit Sub
+
+    End If
+    
     If Me.mnuCancelPDR.Caption = CANCEL_TEXT Then
         CancelPDR
     Else
@@ -1928,6 +1934,8 @@ Private Sub CancelPDR()
     If frmProdPlan.mvarPDRCancelDirtyflag = True Then
         Me.mnuCancelPDR.Caption = UNCANCEL_TEXT
         Me.txtPDRStatus.text = STATUS_FOOTER_TEXT
+        Me.txtPDRStatus.Visible = True
+        txtDirtyFlag.text = "Y"
 
     End If
     
@@ -1945,7 +1953,7 @@ Private Sub UNCancelPDR()
         ProductionRun.StatusLookupId = basGlobals.GetStatusID(AWAITINGAPPROVAL_STATUS)
 
     End If
-    
+    txtDirtyFlag.text = "Y"
 End Sub
 
 Private Sub mnuNonBillableView_Click()
