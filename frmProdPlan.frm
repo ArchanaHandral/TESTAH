@@ -1912,13 +1912,19 @@ Private Sub mnuCancelPDR_Click()
         Exit Sub
 
     End If
-    
+
     If ProductionRun.IsScheduled Then
         MsgBox "The PDR cannot be cancelled because it is scheduled." & vbCrLf & "Have the PDR unscheduled and try again.", vbOKOnly + vbInformation, "Cancel PDR"
         Exit Sub
 
     End If
     
+    If ProductionRun.IsCombined Then
+        MsgBox "The PDR cannot be cancelled because it is part of a PRG." & vbCrLf & "Delete the PRG and try again.", vbOKOnly + vbInformation, "Cancel PDR"
+        Exit Sub
+
+    End If
+  
     If Me.mnuCancelPDR.Caption = CANCEL_TEXT Then
         CancelPDR
     Else
