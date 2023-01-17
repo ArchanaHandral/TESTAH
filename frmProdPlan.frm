@@ -1942,7 +1942,7 @@ Private Sub CancelPDR()
         Me.txtPDRStatus.text = STATUS_FOOTER_TEXT
         Me.txtPDRStatus.Visible = True
         txtDirtyFlag.text = "Y"
-
+        frmProdPlan.mvarLinksReportDirty = True
     End If
     
 End Sub
@@ -3565,9 +3565,10 @@ Private Function HasDataChanged() As Boolean
     If Me.chkReOrientation.value <> ProductionRun.Reorient_Ind Then GoTo Flag_Dirty_Links
     If ProductionRun.Special_Inst <> ProductionRun.SpecialInstructions Then GoTo Flag_Dirty_Links ' Special_Inst = current, SpecialInstructions = original
     If ProductionRun.NonBillable.HasChange() Then GoTo Flag_Dirty
+    If txtDirtyFlag.text = "Y" Then GoTo Flag_Dirty_Links
     If ProductionRun.HasChanges Then GoTo Flag_Dirty
-        
-    ' Determine whether client required fields have changed
+    
+    ' Determine whether client required fields have changes
     If Not ClientReqdFields Is Nothing Then
         If ClientReqdFields.count > 0 Then
             For i = 1 To ClientReqdFields.count
