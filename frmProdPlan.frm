@@ -3568,7 +3568,7 @@ Private Function HasDataChanged() As Boolean
     If txtDirtyFlag.text = "Y" Then GoTo Flag_Dirty_Links
     If ProductionRun.HasChanges Then GoTo Flag_Dirty
     
-    ' Determine whether client required fields have changeds
+    ' Determine whether client required fields have changes
     If Not ClientReqdFields Is Nothing Then
         If ClientReqdFields.count > 0 Then
             For i = 1 To ClientReqdFields.count
