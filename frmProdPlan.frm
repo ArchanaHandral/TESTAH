@@ -1515,6 +1515,9 @@ Private Sub Form_Load()
     
     ProductionRun.Client_Name = Me.txtClientName
     
+    'Check if PDR Cancelled
+    Call CheckIfPDRCancelled
+       
     Call CheckColumnNumbers
     
     ' This option is only enabled for Replacements
@@ -1764,12 +1767,6 @@ Private Sub Form_Load()
         
     ' DW 2012-001 added
     If txtPDRStatus.text = "COMBINED PDR" Then Me.chkReOrientation.enabled = False
-    
-    If ProductionRun.StatusLookupId = basGlobals.GetStatusID(CANCEL_STATUS) Then
-        Me.mnuCancelPDR.Caption = UNCANCEL_TEXT
-        Me.txtPDRStatus.text = STATUS_FOOTER_TEXT
-        Me.txtPDRStatus.Visible = True
-    End If
      
     ' DW 2008-017 added
     Me.StatusBar1.Panels(1).text = gClintrakLocations(gApplicationUser.ClintrakLocationId).Display & " User "
@@ -2789,6 +2786,7 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
                 
         Me.chkPrintAtPackager.enabled = True
         
+       
         'md added for clintrak samples - determine if the PDR has been RUN.  If so, block all
         'fields on the form.
         If Determine_If_PDR_HasRun Then
@@ -3154,7 +3152,10 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
         End If
     
     End If
-    
+   
+   'Check if PDR Cancelled
+    Call CheckIfPDRCancelled
+        
 Exit_this_Sub:
     Exit Sub
 
@@ -3613,6 +3614,13 @@ Handle_Error:
     Resume Cleanup_Exit
 End Function
 
+Private Sub CheckIfPDRCancelled()
+  If ProductionRun.StatusLookupId = basGlobals.GetStatusID(CANCEL_STATUS) Then
+        Me.mnuCancelPDR.Caption = UNCANCEL_TEXT
+        Me.txtPDRStatus.text = STATUS_FOOTER_TEXT
+        Me.txtPDRStatus.Visible = True
+    End If
+End Sub
 Private Sub CheckColumnNumbers()
 '
 'comments: This sub checks to see whether the number of columns in the
