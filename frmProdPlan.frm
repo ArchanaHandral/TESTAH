@@ -1514,9 +1514,6 @@ Private Sub Form_Load()
     End If
     
     ProductionRun.Client_Name = Me.txtClientName
-    
-    'Check if PDR Cancelled
-    Call CheckIfPDRCancelled
        
     Call CheckColumnNumbers
     
@@ -1768,6 +1765,9 @@ Private Sub Form_Load()
     ' DW 2012-001 added
     If txtPDRStatus.text = "COMBINED PDR" Then Me.chkReOrientation.enabled = False
      
+    'Check if PDR Cancelled
+    Call CheckIfPDRCancelled
+    
     ' DW 2008-017 added
     Me.StatusBar1.Panels(1).text = gClintrakLocations(gApplicationUser.ClintrakLocationId).Display & " User "
     Me.StatusBar1.Panels(1).Picture = LoadPicture(gDomainIconPath & gApplicationUser.ClintrakLocationId & ".ico")
