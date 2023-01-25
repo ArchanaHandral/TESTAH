@@ -1764,7 +1764,6 @@ Private Sub Form_Load()
         
     ' DW 2012-001 added
     If txtPDRStatus.text = "COMBINED PDR" Then Me.chkReOrientation.enabled = False
-    ' Check if PDR Cancelled
     Call CheckIfPDRCancelled
     ' DW 2008-017 added
     Me.StatusBar1.Panels(1).text = gClintrakLocations(gApplicationUser.ClintrakLocationId).Display & " User "
@@ -1791,7 +1790,7 @@ Private Sub Form_Load()
     If Not CBool(Me.chkPrintAtPackager.value) Then
         If Me.txtSamples > 0 Then
             If FileLen(gSampleFileName) = 0 Then
-               If vbYes = MsgBox("The Internal Sample Files were not found. Do you want the system to re-create the Internal Samples based on today’s data?", vbYesNo) Then
+               If vbYes = MsgBox("The Internal Sample Files were not found. Do you want the system to re-create the Internal Samples based on todayÂ’s data?", vbYesNo) Then
                     If Fix_Samples_FromPDR_Screen Then
 'change PDR sample counts for new samples just configured
                         ProductionRun.Samples_Requested = CLng(Me.txtSamples)
@@ -3136,7 +3135,7 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
 ' need to set gSampleFilename to reprint PDR. Currently set to original PDR
                 Call GetSampleFileName
                 If FileLen(gSampleFileName) = 0 Then
-                    If vbYes = MsgBox("The Internal Sample Files were not found. Do you want the system to re-create the Internal Samples based on today’s data?", vbYesNo) Then
+                    If vbYes = MsgBox("The Internal Sample Files were not found. Do you want the system to re-create the Internal Samples based on todayÂ’s data?", vbYesNo) Then
                         If Fix_Samples_FromPDR_Screen Then
 'change PDR sample counts for new samples just configured
                             ProductionRun.Samples_Requested = CLng(Me.txtSamples)
