@@ -1764,10 +1764,7 @@ Private Sub Form_Load()
         
     ' DW 2012-001 added
     If txtPDRStatus.text = "COMBINED PDR" Then Me.chkReOrientation.enabled = False
-     
-    'Check if PDR Cancelled
     Call CheckIfPDRCancelled
-    
     ' DW 2008-017 added
     Me.StatusBar1.Panels(1).text = gClintrakLocations(gApplicationUser.ClintrakLocationId).Display & " User "
     Me.StatusBar1.Panels(1).Picture = LoadPicture(gDomainIconPath & gApplicationUser.ClintrakLocationId & ".ico")
@@ -1793,7 +1790,7 @@ Private Sub Form_Load()
     If Not CBool(Me.chkPrintAtPackager.value) Then
         If Me.txtSamples > 0 Then
             If FileLen(gSampleFileName) = 0 Then
-               If vbYes = MsgBox("The Internal Sample Files were not found. Do you want the system to re-create the Internal Samples based on today’s data?", vbYesNo) Then
+               If vbYes = MsgBox("The Internal Sample Files were not found. Do you want the system to re-create the Internal Samples based on todayÂ’s data?", vbYesNo) Then
                     If Fix_Samples_FromPDR_Screen Then
 'change PDR sample counts for new samples just configured
                         ProductionRun.Samples_Requested = CLng(Me.txtSamples)
@@ -2529,6 +2526,7 @@ Private Sub mnuReplacements_Click()
     Me.cmdSave.enabled = True
     Me.mnuReplacements.enabled = False
     Me.mnuViewAuditTrail.enabled = False
+    Me.mnuCancelPDR.Caption = CANCEL_TEXT
     
     ' tj IRQ stuff 2 - //HoldStockProofId\\ and //HoldScratchStockProofId\\ would have been set from initial load and should be the same
     Me.txtStockIRQ = ""
@@ -2554,7 +2552,9 @@ Private Sub mnuReplacements_Click()
         ' empty. This forces the user to pick a value on save.
         ProductionRun.NonBillable.reasonId = -1
     End If
-    
+    ProductionRun.StatusLookupId = basGlobals.GetStatusID(APPROVED_STATUS)
+    ProductionRun.CancellationReasonLookupId = 0
+    ProductionRun.CancellationNotes = "N/A"
     Me.txtProducedBy = gApplicationUser.LastName & ", " & gApplicationUser.FirstName
     Me.chkReOrientation.value = 0
     
@@ -3135,7 +3135,7 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
 ' need to set gSampleFilename to reprint PDR. Currently set to original PDR
                 Call GetSampleFileName
                 If FileLen(gSampleFileName) = 0 Then
-                    If vbYes = MsgBox("The Internal Sample Files were not found. Do you want the system to re-create the Internal Samples based on today’s data?", vbYesNo) Then
+                    If vbYes = MsgBox("The Internal Sample Files were not found. Do you want the system to re-create the Internal Samples based on todayÂ’s data?", vbYesNo) Then
                         If Fix_Samples_FromPDR_Screen Then
 'change PDR sample counts for new samples just configured
                             ProductionRun.Samples_Requested = CLng(Me.txtSamples)
@@ -3292,6 +3292,16 @@ Private Sub cmdSave_Click()
         ' non billable reason is updated as the combo box is changed (so that the UI can be made read-only as necessary)
     End With
     
+     If booInitialSave Then
+            Call LoadBarcodeInfo(ProductionRun.Production_Run_Id)
+            Me.chkUseClientInventory.enabled = True
+            If booReplacement Then
+                ProductionRun.StatusLookupId = basGlobals.GetStatusID(APPROVED_STATUS)
+            Else
+                ProductionRun.StatusLookupId = basGlobals.GetStatusID(AWAITINGAPPROVAL_STATUS)
+            End If
+     End If
+    
     'if we're in debug mode for a new production run and coding isn't updated we need to update coding for a new run
     'then update the coding link
     If (gDebugMode = True) And (booNewProdRun = True) And (InStr(1, ProductionRun.File_Name, gRnrDebugFilePath, vbTextCompare) <> 1) Then
@@ -3316,16 +3326,6 @@ Private Sub cmdSave_Click()
                 MsgBox _
                     "Production Run was Saved but the Samples were not Configured" & vbCrLf & _
                     "Please contact IT.", vbExclamation
-            End If
-        End If
-        
-        If booInitialSave Then
-            Call LoadBarcodeInfo(ProductionRun.Production_Run_Id)
-            Me.chkUseClientInventory.enabled = True
-            If booReplacement Then
-                ProductionRun.StatusLookupId = basGlobals.GetStatusID(APPROVED_STATUS)
-            Else
-                ProductionRun.StatusLookupId = basGlobals.GetStatusID(AWAITINGAPPROVAL_STATUS)
             End If
         End If
         
@@ -3619,7 +3619,9 @@ Private Sub CheckIfPDRCancelled()
         Me.mnuCancelPDR.Caption = UNCANCEL_TEXT
         Me.txtPDRStatus.text = STATUS_FOOTER_TEXT
         Me.txtPDRStatus.Visible = True
-    End If
+  Else
+        Me.mnuCancelPDR.Caption = CANCEL_TEXT
+  End If
 End Sub
 Private Sub CheckColumnNumbers()
 '
