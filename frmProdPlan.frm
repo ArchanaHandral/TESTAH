@@ -1314,6 +1314,7 @@ Private Sub Form_Load()
     Me.txtReplacement.Visible = False
     Me.mnuReplacements.enabled = False
     Me.mnuViewAuditTrail.enabled = False
+    Me.mnuCancelPDR.enabled = False
     booSamplesQTYChanged = False
     booPdrIsCombined = False
     Call Enable_Fields
@@ -2364,6 +2365,7 @@ Private Sub Load_Menu()
 
     Me.mnuReplacements.enabled = True
     Me.mnuViewAuditTrail.enabled = True
+    Me.mnuCancelPDR.enabled = True
     
 
     Set objData = New CADOData
@@ -2526,6 +2528,7 @@ Private Sub mnuReplacements_Click()
     Me.cmdSave.enabled = True
     Me.mnuReplacements.enabled = False
     Me.mnuViewAuditTrail.enabled = False
+    Me.mnuCancelPDR.enabled = False
     Me.mnuCancelPDR.Caption = CANCEL_TEXT
     
     ' tj IRQ stuff 2 - //HoldStockProofId\\ and //HoldScratchStockProofId\\ would have been set from initial load and should be the same
@@ -2832,6 +2835,7 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
         
         Me.mnuReplacements.enabled = False
         Me.mnuViewAuditTrail.enabled = True
+        Me.mnuCancelPDR.enabled = False
        
         gReprintFileName = ProductionRun.File_Name
         intLastSlashPos = InStrRev(gReprintFileName, "\")
