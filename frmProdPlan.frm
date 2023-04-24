@@ -2835,7 +2835,7 @@ Private Sub mnuRepProdRuns_Click(index As Integer)
         
         Me.mnuReplacements.enabled = False
         Me.mnuViewAuditTrail.enabled = True
-        Me.mnuCancelPDR.enabled = False
+        Me.mnuCancelPDR.enabled = True
        
         gReprintFileName = ProductionRun.File_Name
         intLastSlashPos = InStrRev(gReprintFileName, "\")
