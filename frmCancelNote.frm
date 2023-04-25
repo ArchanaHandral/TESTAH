@@ -95,7 +95,7 @@ Private Sub Form_Unload(Cancel As Integer)
     
     If reason = "" Then
         frmProdPlan.mvarPDRCancelDirtyflag = False
-        MsgBox "You did not select a reason, so your Cancellation attempt will be undone.", vbExclamation
+        MsgBox "You did not select a reason, so your Cancellation attempt will be undone.", vbOKOnly + vbInformation, "Cancel PDR"
     Else
         UpdatePDRCancelUI
 
@@ -122,7 +122,7 @@ End Sub
 Private Sub cmdOK_Click()
 
     If Len(Trim$(CmbCancelReasons.text)) = 0 Then
-        MsgBox "You must select a reason or close this screen to undo your Cacellation attempt.", vbExclamation
+        MsgBox "You must select a reason to cancel the PDR or you can close this screen to undo your Cancellation attempt.", vbOKOnly + vbInformation, "Cancel PDR"
         Exit Sub
 
     End If
